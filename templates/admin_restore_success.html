@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="page-title">Restore Successful</h2>
+
+<div class="glass-card summary-card">
+    <h3><i class="fa-solid fa-circle-check"></i> Backup Restored Successfully</h3>
+    <p>The backup <strong>{{ backup }}</strong> has been restored.</p>
+
+    <button class="btn" onclick="window.location.href='/admin/backups/history'">
+        <i class="fa-solid fa-arrow-left"></i> Back to Backup History
+    </button>
+</div>
+
+{% endblock %}

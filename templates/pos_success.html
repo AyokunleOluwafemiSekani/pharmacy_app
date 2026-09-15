@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>POS Success</title>
+
+<!-- Inter Font -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+    --deep-ash-green: #2F4F4F;
+    --medium-ash-green: #3C5F5F;
+    --light-ash: #E8ECEB;
+    --hospital-blue: #4C7D7E;
+    --white: #FFFFFF;
+    --text-dark: #4A4A4A;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--light-ash);
+    margin: 0;
+    padding: 30px;
+}
+
+.success-box {
+    background: var(--white);
+    width: 90%;
+    max-width: 600px;
+    margin: auto;
+    padding: 25px;
+    border-radius: 14px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    text-align: center;
+}
+
+h2 {
+    color: var(--deep-ash-green);
+    margin-bottom: 10px;
+}
+
+table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+    background: var(--white);
+}
+
+th {
+    background: var(--deep-ash-green);
+    color: white;
+    padding: 10px;
+    font-size: 14px;
+}
+
+td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    font-size: 14px;
+}
+
+p {
+    margin-top: 20px;
+    font-weight: 600;
+    color: var(--hospital-blue);
+}
+
+.back-btn {
+    margin-top: 25px;
+    background: var(--deep-ash-green);
+    color: white;
+    padding: 10px 18px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+    transition: 0.3s;
+}
+
+.back-btn:hover {
+    background: var(--hospital-blue);
+}
+</style>
+</head>
+
+<body>
+
+<div class="success-box">
+    <h2>Transaction Successful</h2>
+
+    <table>
+        <tr>
+            <th>Drug</th>
+            <th>Qty</th>
+            <th>Total</th>
+        </tr>
+
+        {% for item in cart %}
+        <tr>
+            <td>{{ item.drug }}</td>
+            <td>{{ item.qty }}</td>
+            <td>₦{{ item.total }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <p>Stock updated successfully.</p>
+
+    <button class="back-btn" onclick="window.location.href='/pos'">Back to POS</button>
+</div>
+
+</body>
+</html>

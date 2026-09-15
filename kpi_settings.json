@@ -1,0 +1,10 @@
+{
+    "show_sales_today": true,
+    "show_sales_month": true,
+    "show_transactions": true,
+    "show_customers": true,
+    "show_top_products": true,
+    "show_low_stock": true,
+    "low_stock_threshold": 10,
+    "date_range": "monthly"
+}

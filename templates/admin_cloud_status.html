@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="page-title">Cloud Backup Status</h2>
+
+<!-- LOCAL BACKUP SUMMARY -->
+<div class="glass-card summary-card">
+    <h3><i class="fa-solid fa-database"></i> Local Backup Summary</h3>
+
+    {% if local_stats %}
+        <p><strong>Latest Backup:</strong> {{ local_stats.latest }}</p>
+        <p><strong>Latest File:</strong> {{ local_stats.latest_name }}</p>
+        <p><strong>Total Local Backups:</strong> {{ local_stats.count }}</p>
+        <p><strong>Size:</strong> {{ local_stats.latest_size }}</p>
+    {% else %}
+        <p>No local backups found.</p>
+    {% endif %}
+</div>
+
+<!-- CLOUD STATUS -->
+<div class="glass-card summary-card">
+    <h3><i class="fa-solid fa-cloud"></i> Google Drive Status</h3>
+
+    {% if cloud_ok %}
+        <p><strong>Cloud Connection:</strong> Connected</p>
+        <p><strong>Total Cloud Backups:</strong> {{ cloud_count }}</p>
+    {% else %}
+        <p class="error-banner">Google Drive connection failed.</p>
+    {% endif %}
+</div>
+
+<!-- CLOUD BACKUP LIST -->
+<h3 class="section-title">Cloud Backups</h3>
+
+<div class="table-container smooth-table">
+<table class="responsive-table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Date</th>
+            <th>Size</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% if cloud_backups %}
+            {% for b in cloud_backups %}
+            <tr>
+                <td data-label="Name">{{ b.name }}</td>
+                <td data-label="Date">{{ b.date }}</td>
+                <td data-label="Size">{{ b.size }} MB</td>
+
+                <td data-label="Actions">
+                    <button class="btn small-btn download-btn"
+                        onclick="window.location.href='/admin/backups/cloud-download?id={{ b.id }}&name={{ b.name }}'">
+                        <i class="fa-solid fa-download"></i>
+                    </button>
+
+                    <button class="btn small-btn restore-btn"
+                        onclick="window.location.href='/admin/backups/cloud-restore?id={{ b.id }}&name={{ b.name }}'">
+                        <i class="fa-solid fa-rotate-left"></i>
+                    </button>
+                </td>
+            </tr>
+            {% endfor %}
+        {% else %}
+            <tr><td colspan="4">No cloud backups found.</td></tr>
+        {% endif %}
+    </tbody>
+</table>
+</div>
+
+<style>
+.summary-card {
+    margin-bottom: 20px;
+    padding: 20px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+</style>
+
+{% endblock %}

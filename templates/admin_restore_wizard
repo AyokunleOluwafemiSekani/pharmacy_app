@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="page-title">Restore Wizard</h2>
+
+<p class="page-subtitle">Select a backup to begin the restore process.</p>
+
+<div class="table-container smooth-table">
+<table class="responsive-table">
+    <thead>
+        <tr>
+            <th>Source</th>
+            <th>Name</th>
+            <th>Date</th>
+            <th>Size</th>
+            <th>Restore</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for b in backups %}
+        <tr>
+            <td data-label="Source">
+                {% if b.source == "local" %}
+                    <span class="badge local-badge">Local</span>
+                {% else %}
+                    <span class="badge cloud-badge">Cloud</span>
+                {% endif %}
+            </td>
+
+            <td data-label="Name">{{ b.name }}</td>
+            <td data-label="Date">{{ b.date }}</td>
+            <td data-label="Size">{{ b.size }}</td>
+
+            <td data-label="Restore">
+                <button class="btn restore-btn"
+                    onclick="window.location.href='/admin/backups/restore-run?source={{ b.source }}&name={{ b.name }}&id={{ b.id }}'">
+                    <i class="fa-solid fa-rotate-left"></i> Restore
+                </button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+
+<style>
+.page-subtitle {
+    margin-bottom: 15px;
+    font-size: 16px;
+    opacity: 0.8;
+}
+
+.badge {
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    color: white;
+}
+
+.local-badge {
+    background: #4C7D7E;
+}
+
+.cloud-badge {
+    background: #3b82f6;
+}
+
+.restore-btn {
+    background: #4C7D7E;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+}
+
+.restore-btn:hover {
+    background: #3a6364;
+}
+</style>
+
+{% endblock %}

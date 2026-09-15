@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="page-title">Cloud Sync Monitor</h2>
+
+<p class="page-subtitle">Monitor Google Drive connection and cloud backup activity.</p>
+
+<div class="glass-card summary-card">
+    <h3><i class="fa-solid fa-cloud"></i> Cloud Connection</h3>
+
+    {% if status.connected %}
+        <p><strong>Status:</strong> <span class="badge ok-badge">Connected</span></p>
+        <p><strong>Total Cloud Backups:</strong> {{ status.count }}</p>
+        <p><strong>Last Cloud Backup:</strong> {{ status.last_backup }}</p>
+    {% else %}
+        <p><strong>Status:</strong> <span class="badge fail-badge">Disconnected</span></p>
+        <p>Google Drive could not be reached.</p>
+    {% endif %}
+</div>
+
+<h3 class="section-title">Cloud Backup Files</h3>
+
+<div class="table-container smooth-table">
+<table class="responsive-table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Date</th>
+            <th>Size</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% if status.backups %}
+            {% for b in status.backups %}
+            <tr>
+                <td data-label="Name">{{ b.name }}</td>
+                <td data-label="Date">{{ b.date }}</td>
+                <td data-label="Size">{{ b.size }} MB</td>
+
+                <td data-label="Actions">
+                    <button class="btn small-btn download-btn"
+                        onclick="window.location.href='/admin/backups/cloud-download?id={{ b.id }}&name={{ b.name }}'">
+                        <i class="fa-solid fa-download"></i>
+                    </button>
+
+                    <button class="btn small-btn restore-btn"
+                        onclick="window.location.href='/admin/backups/cloud-restore?id={{ b.id }}&name={{ b.name }}'">
+                        <i class="fa-solid fa-rotate-left"></i>
+                    </button>
+                </td>
+            </tr>
+            {% endfor %}
+        {% else %}
+            <tr><td colspan="4">No cloud backups found.</td></tr>
+        {% endif %}
+    </tbody>
+</table>
+</div>
+
+<style>
+.badge {
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    color: white;
+}
+
+.ok-badge {
+    background: #4C7D7E;
+}
+
+.fail-badge {
+    background: #d9534f;
+}
+</style>
+
+{% endblock %}

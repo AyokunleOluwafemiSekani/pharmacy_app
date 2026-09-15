@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "pharmacybackupsystem",
+  "private_key_id": "fd333d7f1adb0622d4c732d32fd6e378ce8f1e8c",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDAC38bvqJ/DJec\n2Yf0BaNEplu8SM9wW3sI16k4fYYxgVRqjW+2LCAfHRE+nJgwJb0du5GOHy04zzrT\nJZN8X0Sw3rCSR6xewTge1zBmw/GLrWdxgvEVBzCqQ7WD14aBHot6t93lbaU7K7t7\n5w8cJ+3RviySK+DFF4dVbxFtbUoKDdu7C+2j1epbSUELAfnT6FrgTuxsbsaQOPSa\nS1dWGSmNdYWBf/4WOfKlq6akE7CsxLZngH16OAsVsxMOJ+vcp88/H88XN4Ajuur7\n8ud/2cfUqPEg0GY/Jr+h3ZEDbh2u/dRbfOqgaiogflvardCSAoNNmmJURz1zg02A\nkZtaxg9jAgMBAAECggEACYxoyP3dAXkkTqmoL1Nab07gL8fk/H6n6uQiJ0ticTKv\nek7G96VRAYsF8PmDPZ2avhA15/2X14PCNn5fS2dHOI4R9Gv434s22Z20a9+hMmMw\nSf4LM5L0cfrE2yXLq77Ti4n5z+74MK13eG0gHLPFiNCuUaQ53ELTuUU49hphfIdm\npUkWZ4i1J2FPjip8BpPp4j0XP1c09C55FyPKikCtEOfVoP1buF5S00Xy+Ri5MrYN\n6B5IRbDU6xv1pFjWC41+CfsM7IW5CVdoEVWsOEBMBDwEKdJR6hSaSIh+9BikOqj0\nN1Q8NJ2KuvcK7NZdyOFTrTQwZPLrRtIMyFZNvYeCjQKBgQD7PETw3/XZgXEUEwyW\n2e/SWqBNfziqp4D3ZbDao0tKheZgp3tQyfy6UeM8ThauPTGdJ3cfCkiIiIkLhOeL\nbuA2EVWKKqhq+NueW6AnsuSsk6f6OieDbvz9DlSyRQFZnwWnA2KidN3o1o7MeafT\nkNjOHPFZWQluAsqfHVaKsBqbFQKBgQDDr9x/uKvOYQ4xfOKiVU5T83oaHrXKkKeM\nQt9Bay0k3cVjt2l1L3s7G9LsbxLx5z8k3TBEPQSikh+Pi5Ihd/1yVMo8yXf69h8F\ni+C1q/+m+iL9l3gANCxnFAD0sfcNQpbiucLghFhCCN0RIu9kQdn2CsOK6j8++2Zq\ntry6fs++lwKBgG2G0dtdF9YR+1UwFM3zBv1iqv3+F5s2WSABwj8e72T2yP+cJEON\nO1OS/Yi91l9xqB6GJQVwOzzioTRXZYZA+Rg5KFyKyk+QXFZGRaTo9Y5S9Ok+zxka\nmspLpBrvwG3syM8Nx8NhRZkLaMe1xbeTLyF0Nren/Fdseh8x8BeYPJEdAoGBALJM\n0LpHR7PZ1xbcVZvX4nC3zi9yf+279A3m+Ikg4JdQwoPjIGG4C66F4Z+wbTCgpXYv\nW8UxW8HNJpiicVmxfOrpuwO8BmhSTV2+X9boix5Xl/48PwjggPzCy0Qpy5L3c4fN\n/nSX4dr5PIRasolFPxXiJN20JkB6zIy7SCcdWKitAoGAMNBJhw9IVCRC+CjgiKHB\nti917GVUw3pmc0CBx8M3vxFA7xIjtQP110Navm0sfRpt7ujx7yvQtXJaOIXHioc1\nmtT9/gyZUCOJz2K5XQz5tLiwkEi03igdndjCzquFxwTgUyly1t3oomLvU2D9A3kh\nKhPL/ancs6Dc4TnCT1TOMS4=\n-----END PRIVATE KEY-----\n",
+  "client_email": "pharmacy-backup-service@pharmacybackupsystem.iam.gserviceaccount.com",
+  "client_id": "105857333942417983572",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/pharmacy-backup-service%40pharmacybackupsystem.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

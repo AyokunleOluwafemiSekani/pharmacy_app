@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Inpatient Bill Summary</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary-blue: #2C3E50;
+            --hospital-green: #1ABC9C;
+            --soft-ash: #ECF0F1;
+            --stamp-red: #c0392b;
+        }
+
+        body {
+            font-family: 'Segoe UI';
+            background: var(--soft-ash);
+            margin: 0;
+        }
+
+        /* BACKDROP LOGO (screen only) */
+        .backdrop-logo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 1000px;
+            height: 1000px;
+            opacity: 0.06;
+            transform: translate(-50%, -50%);
+            z-index: 0;
+            background-image: url('/static/ibukunolu logo.jpeg');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        /* MAIN CONTENT */
+        #mainContent {
+            padding: 25px;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* PRINT AREA */
+        .print-area {
+            background: white;
+            padding: 25px 40px;
+            border-radius: 12px;
+            width: 1100px;
+            margin: 20px auto;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+            position: relative;
+        }
+
+        /* HEADER */
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .hospital-logo {
+            height: 100px;   /* BIGGER LOGO */
+            width: 160px;
+            object-fit: contain;
+        }
+
+        .hospital-info h3 {
+            margin: 0;
+            color: var(--primary-blue);
+            font-size: 32px; /* MATCH HEIGHT */
+        }
+
+        .invoice-box {
+            text-align: right;
+            font-size: 14px;
+        }
+
+        /* INFO BOX */
+        .info-box {
+            background: #f9fafc;
+            padding: 15px;
+            border-left: 4px solid var(--primary-blue);
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        /* TABLE */
+        .table-container {
+            max-height: 500px;
+            overflow-y: auto;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead th {
+            background: var(--primary-blue);
+            color: white;
+            padding: 10px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+        }
+
+        td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+            text-align: center;
+        }
+
+        /* STAMP */
+        .stamp {
+            font-size: 22px;
+            font-weight: bold;
+            color: var(--stamp-red);
+            border: 4px solid var(--stamp-red);
+            padding: 12px 25px;
+            border-radius: 50%;
+            transform: rotate(-15deg);
+            display: inline-block;
+            background: white;
+        }
+
+        /* SIGNATURE */
+        .signature-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+        }
+
+        .signature-line {
+            margin-top: 40px;
+            border-top: 1px solid #333;
+            padding-top: 5px;
+            text-align: center;
+        }
+
+        /* BUTTONS */
+        .btn-primary {
+            background: var(--hospital-green);
+            color: white;
+            padding: 10px 18px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .btn-secondary {
+            background: var(--primary-blue);
+            color: white;
+            padding: 10px 18px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 15px;
+            margin-left: 10px;
+        }
+
+        /* PRINT MODE */
+        @media print {
+
+            /* Hide everything */
+            body * {
+                visibility: hidden !important;
+            }
+
+            /* Show only print-area */
+            .print-area, .print-area * {
+                visibility: visible !important;
+            }
+
+            /* Hide backdrop logo */
+            .backdrop-logo {
+                display: none !important;
+            }
+
+            /* Print layout */
+            .print-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                padding: 20px 40px;
+                box-shadow: none !important;
+            }
+
+            /* Hide buttons */
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="backdrop-logo"></div>
+
+<div id="mainContent">
+
+<div class="print-area">
+
+    <!-- HEADER -->
+    <div class="header-row">
+        <img src="/static/ibukunolu logo.jpeg" class="hospital-logo">
+
+        <div class="hospital-info">
+            <h3>Ibukun Olu Specialist Hospital</h3>
+            <p>Oyin‑Adegoke Close, Oke‑Obaagun, Osun State</p>
+            <p>Tel: +2348068575958</p>
+        </div>
+
+        <div class="invoice-box">
+            <p><strong>Invoice No:</strong> {{ invoice_number }}</p>
+            <p><strong>Generated:</strong> {{ generated_date }}</p>
+
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=http://127.0.0.1/inpatient/bill/calculate?patient={{ patient }}&admission={{ admission_date }}&discharge={{ discharge_date }}"
+                 style="width:120px; height:120px; border:2px solid #2C3E50; padding:5px; background:white;">
+        </div>
+    </div>
+
+    <h2>Inpatient Bill Summary</h2>
+
+    <div class="info-box">
+        <p><strong>Patient:</strong> {{ patient }}</p>
+        <p><strong>Admission Date:</strong> {{ admission_date }}</p>
+        <p><strong>Discharge Date:</strong> {{ discharge_date }}</p>
+        <p><strong>Grand Total of Bill:</strong> ₦{{ "%.2f"|format(total_bill) }}</p>
+    </div>
+
+    <!-- BUTTONS -->
+    <div style="margin-bottom:20px;" class="no-print">
+        <button class="btn-primary" onclick="window.print()">Print Summary</button>
+        <button class="btn-secondary" onclick="window.location.href='/pos'">Return to POS</button>
+        <button class="btn-secondary" onclick="window.location.href='/inpatient/bill/receipt?patient={{ patient }}&admission={{ admission_date }}&discharge={{ discharge_date }}'">
+    Print Mini Receipt
+</button>
+
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Drug Name</th>
+                    <th>Category</th>
+                    <th>Sales Price</th>
+                    <th>Qty Sold</th>
+                    <th>Bill Total</th>
+                    <th>Transaction ID</th>
+                    <th>Patient Name</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for row in bill_items %}
+                <tr>
+                    <td>{{ row["date"] }}</td>
+                    <td>{{ row["drug_name"] }}</td>
+                    <td>{{ row["category"] }}</td>
+                    <td>{{ row["sales_price"] }}</td>
+                    <td>{{ row["qty_sold"] }}</td>
+                    <td>{{ row["bill_total"] }}</td>
+                    <td>{{ row["transaction_id"] }}</td>
+                    <td>{{ row["patient_name"] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- SIGNATURES -->
+    <div class="signature-row">
+        <div class="signature-line">
+            <strong>Pharmacist Signature</strong><br>
+            {{ user }}
+        </div>
+
+        <div class="signature-line">
+            <strong>Accounts / Billing Signature</strong><br>
+            &nbsp;
+        </div>
+    </div>
+
+</div>
+
+</div>
+
+</body>
+</html>

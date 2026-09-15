@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="/static/style.css">
+    <title>Audit Trail</title>
+    <style>
+        body { 
+            font-family:'Segoe UI'; 
+            background:#eef1f5; 
+            margin:0; 
+            padding-top:80px;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            height: 100%;
+            width: 250px;
+            position: fixed;
+            top: 0;
+            left: -250px;
+            background: #004aad;
+            padding-top: 20px;
+            transition: 0.3s;
+            z-index: 1000;
+        }
+
+        .sidebar h3 {
+            color: white;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .sidebar a {
+            padding: 12px 20px;
+            text-decoration: none;
+            font-size: 16px;
+            color: white;
+            display: block;
+        }
+
+        .sidebar a:hover {
+            background: #00337a;
+        }
+
+        /* ===== TOGGLE BUTTON ===== */
+        .toggle-btn {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            background: #004aad;
+            color: white;
+            border: none;
+            padding: 10px 14px;
+            font-size: 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            z-index: 1100;
+        }
+
+        .toggle-btn:hover {
+            background: #00337a;
+        }
+
+        /* ===== EXISTING PAGE STYLES ===== */
+        .header { 
+            background:#003366; 
+            color:white; 
+            padding:15px; 
+            position:fixed; 
+            top:0; 
+            width:100%; 
+            z-index:900;
+        }
+
+        .container { 
+            width:1200px; 
+            margin:auto; 
+            padding:20px; 
+        }
+
+        table { 
+            width:100%; 
+            border-collapse:collapse; 
+            background:white; 
+        }
+
+        th, td { 
+            padding:8px; 
+            border-bottom:1px solid #ddd; 
+            text-align:left; 
+        }
+
+        th { 
+            background:#f2f2f2; 
+        }
+
+        .footer {
+            position:fixed; 
+            bottom:0; 
+            left:0; 
+            width:100%;
+            background:rgba(0,0,0,0.65); 
+            color:white;
+            text-align:center; 
+            padding:8px; 
+            font-size:14px;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- ===== SIDEBAR ===== -->
+<div id="sidebar" class="sidebar">
+    <h3>Pharmacy Menu</h3>
+    <a href="/dashboard">Dashboard</a>
+    <a href="/pos">POS</a>
+    <a href="/stock">StockView</a>
+    <a href="/druglist">Drug List</a>
+    <a href="/drug_entry">Drug Entry</a>
+    <a href="/inpatient_data">InPatient Data</a>
+    <a href="/dutylog">Duty Log</a>
+    <a href="/kpi_dashboard">KPI Dashboard</a>
+    <a href="/logout">Logout</a>
+</div>
+
+<!-- ===== TOGGLE BUTTON ===== -->
+<button id="toggleBtn" class="toggle-btn">☰ Menu</button>
+
+<!-- ===== HEADER ===== -->
+<div class="header">
+    Logged in as: {{ user }} ({{ role }})
+</div>
+
+<!-- ===== PAGE CONTENT ===== -->
+<div class="container">
+    <h2>Audit Trail</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Timestamp</th>
+                <th>User</th>
+                <th>Role</th>
+                <th>Action</th>
+                <th>Details</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in logs %}
+            <tr>
+                <td>{{ log.timestamp }}</td>
+                <td>{{ log.user }}</td>
+                <td>{{ log.role }}</td>
+                <td>{{ log.action }}</td>
+                <td>{{ log.details }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- ===== FOOTER ===== -->
+<div class="footer">
+    Powered by Ibukun-Olu ICT Unit
+</div>
+
+<!-- ===== SIDEBAR SCRIPT ===== -->
+<script>
+    const sidebar = document.getElementById("sidebar");
+    const toggleBtn = document.getElementById("toggleBtn");
+
+    toggleBtn.onclick = function () {
+        if (sidebar.style.left === "0px") {
+            sidebar.style.left = "-250px";
+        } else {
+            sidebar.style.left = "0px";
+        }
+    };
+</script>
+
+</body>
+</html>

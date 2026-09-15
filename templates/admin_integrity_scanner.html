@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="page-title">Backup Integrity Scanner</h2>
+
+<p class="page-subtitle">This tool checks backup encryption, SHA256 integrity, and corruption.</p>
+
+<div class="table-container smooth-table">
+<table class="responsive-table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Date</th>
+            <th>Size</th>
+            <th>SHA File</th>
+            <th>SHA Valid</th>
+            <th>Encrypted</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for b in results %}
+        <tr>
+            <td data-label="Name">{{ b.name }}</td>
+            <td data-label="Date">{{ b.date }}</td>
+            <td data-label="Size">{{ b.size }}</td>
+
+            <td data-label="SHA File">
+                {% if b.sha_exists %}
+                    <span class="badge ok-badge">Exists</span>
+                {% else %}
+                    <span class="badge fail-badge">Missing</span>
+                {% endif %}
+            </td>
+
+            <td data-label="SHA Valid">
+                {% if b.sha_valid %}
+                    <span class="badge ok-badge">Valid</span>
+                {% else %}
+                    <span class="badge fail-badge">Invalid</span>
+                {% endif %}
+            </td>
+
+            <td data-label="Encrypted">
+                {% if b.encrypted_ok %}
+                    <span class="badge ok-badge">OK</span>
+                {% else %}
+                    <span class="badge fail-badge">Corrupted</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+
+<style>
+.badge {
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    color: white;
+}
+
+.ok-badge {
+    background: #4C7D7E;
+}
+
+.fail-badge {
+    background: #d9534f;
+}
+</style>
+
+{% endblock %}

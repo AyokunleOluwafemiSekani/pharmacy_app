@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>{{ title if title else "Admin Panel" }}</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+/* ============================
+GLOBAL + WATERMARK
+============================ */
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: #F5F7FA;
+    margin: 0;
+    transition: margin-left 0.35s ease;
+
+    background-image: url('/static/ibukunolu logo.jpeg');
+    background-repeat: repeat;
+    background-size: 260px;
+    opacity: 0.98;
+}
+
+/* ============================
+SIDEBAR
+============================ */
+.sidebar {
+    height: 100%;
+    width: 260px;
+    position: fixed;
+    top: 0;
+    left: -260px;
+    background: #2F4F4F;
+    padding-top: 20px;
+    transition: left 0.35s ease;
+    z-index: 1000;
+    overflow-y: auto;
+    box-shadow: 3px 0 10px rgba(0,0,0,0.3);
+}
+
+.profile-section {
+    text-align: center;
+    padding: 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+}
+
+.profile-pic {
+    width: 85px;
+    height: 85px;
+    border-radius: 50%;
+    border: 3px solid white;
+    object-fit: cover;
+    margin-bottom: 12px;
+}
+
+.sidebar h3 { color: #ffffff; margin: 5px 0; font-size: 19px; }
+.sidebar p { color: #dfe7e7; margin: 0; }
+
+.sidebar a {
+    display: block;
+    padding: 14px 22px;
+    color: #e6eef7;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 500;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    transition: 0.25s ease;
+}
+
+.sidebar a:hover {
+    background: #4C7D7E;
+    padding-left: 28px;
+}
+
+.sidebar a.active {
+    background: #4C7D7E;
+    color: #ffffff;
+    padding-left: 28px;
+    box-shadow: inset 3px 0 0 #3CB371;
+}
+
+/* ============================
+TOGGLE BUTTON
+============================ */
+.toggle-btn {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    background: #2F4F4F;
+    color: white;
+    border: none;
+    padding: 10px 14px;
+    font-size: 22px;
+    border-radius: 6px;
+    cursor: pointer;
+    z-index: 1100;
+    box-shadow: 0 0 10px rgba(0,0,0,0.25);
+}
+
+.toggle-btn:hover {
+    background: #4C7D7E;
+}
+
+/* ============================
+MAIN CONTENT
+============================ */
+#mainContent {
+    padding: 25px;
+    margin-left: 20px;
+    transition: margin-left 0.35s ease;
+}
+
+body.sidebar-open #sidebar { left: 0; }
+body.sidebar-open #mainContent { margin-left: 260px; }
+
+/* ============================
+SUCCESS BANNER
+============================ */
+.success-banner {
+    display: none;
+    background: #e9f9f0;
+    border-left: 4px solid #3CB371;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    font-size: 14px;
+    color: #1f7a3b;
+    animation: slideDown 0.5s ease;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================
+LOADING SPINNER
+============================ */
+.spinner-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+}
+
+.spinner {
+    width: 70px;
+    height: 70px;
+    border: 7px solid #f3f3f3;
+    border-top: 7px solid #4C7D7E;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ============================
+SIDEBAR
+============================ -->
+<div id="sidebar" class="sidebar">
+    <div class="profile-section">
+        <img src="/static/ibukunolu logo.jpeg" class="profile-pic">
+        <h3>{{ user }}</h3>
+        <p>{{ role }}</p>
+    </div>
+
+    <a href="/dashboard"><i class="fa-solid fa-house"></i> Dashboard</a>
+    <a href="/admin/dashboard"><i class="fa-solid fa-user-gear"></i> Admin Panel</a>
+    <a href="/admin/users"><i class="fa-solid fa-users"></i> User Management</a>
+    <a href="/admin/backups"><i class="fa-solid fa-database"></i> Backups</a>
+    <a href="/admin/settings"><i class="fa-solid fa-gear"></i> Settings</a>
+    <a href="/admin/logs"><i class="fa-solid fa-clock-rotate-left"></i> Logs</a>
+    <a href="/admin/kpi"><i class="fa-solid fa-chart-line"></i> KPI Dashboard</a>
+    <a href="/logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+</div>
+
+<!-- ============================
+TOGGLE BUTTON
+============================ -->
+<button id="toggleBtn" class="toggle-btn"><i class="fa-solid fa-bars"></i></button>
+
+<!-- ============================
+SUCCESS BANNER
+============================ -->
+<div id="successBanner" class="success-banner"></div>
+
+<!-- ============================
+MAIN CONTENT BLOCK
+============================ -->
+<div id="mainContent">
+    {% block content %}{% endblock %}
+</div>
+
+<!-- ============================
+SPINNER
+============================ -->
+<div id="spinnerOverlay" class="spinner-overlay">
+    <div class="spinner"></div>
+</div>
+
+<script>
+document.getElementById("toggleBtn").onclick = () => {
+    document.body.classList.toggle("sidebar-open");
+};
+
+function showSuccess(msg){
+    const banner=document.getElementById("successBanner");
+    banner.innerHTML=`<i class="fa-solid fa-circle-check"></i> ${msg}`;
+    banner.style.display="block";
+    setTimeout(()=>banner.style.display="none",4000);
+}
+
+function showSpinner(){ document.getElementById("spinnerOverlay").style.display="flex"; }
+function hideSpinner(){ document.getElementById("spinnerOverlay").style.display="none"; }
+</script>
+
+</body>
+</html>

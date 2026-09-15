@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="/static/style.css">
+    <meta charset="UTF-8">
+    <title>Admin Panel</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: #F5F7FA;
+            margin: 0;
+            transition: margin-left 0.3s ease;
+        }
+/* MULTIPLE LOGO WATERMARK */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('/static/ibukunolu logo.jpeg');
+            background-repeat: repeat;
+            background-size: 260px;
+            opacity: 0.05;
+            z-index: -1;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            height: 100%;
+            width: 260px;
+            position: fixed;
+            top: 0;
+            left: -260px;
+            background: #2E2E2E;
+            padding-top: 20px;
+            transition: left 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+            box-shadow: 3px 0 10px rgba(0,0,0,0.3);
+        }
+
+        .profile-section {
+            text-align: center;
+            padding: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.15);
+        }
+
+        .profile-pic {
+            width: 85px;
+            height: 85px;
+            border-radius: 50%;
+            border: 3px solid white;
+            object-fit: cover;
+            margin-bottom: 12px;
+        }
+        .sidebar h3 {
+            color: #4DA8DA;
+            margin: 5px 0;
+        }
+
+        .sidebar p {
+            color: #ccc;
+            margin: 0;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 14px 20px;
+            color: #F5F7FA;
+            text-decoration: none;
+            font-size: 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            transition: background 0.2s ease;
+        }
+
+        .sidebar a:hover {
+            background: #4DA8DA;
+            color: #fff;
+        }
+
+        /* TOGGLE BUTTON */
+        .toggle-btn {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            background: #2E2E2E;
+            color: white;
+            border: none;
+            padding: 10px 14px;
+            font-size: 22px;
+            border-radius: 6px;
+            cursor: pointer;
+            z-index: 1100;
+            box-shadow: 2px 2px 6px rgba(0,0,0,0.3);
+        }
+
+        /* MAIN CONTENT */
+        #mainContent {
+            padding: 25px;
+            margin-left: 20px;
+            transition: margin-left 0.3s ease;
+        }
+
+        h2 {
+            margin-bottom: 10px;
+            color: #2E2E2E;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        /* DASHBOARD GRID */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        /* DASHBOARD CARD */
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+        }
+
+        .card i {
+            font-size: 40px;
+            color: #4DA8DA;
+            margin-bottom: 10px;
+        }
+
+        .card h3 {
+            margin: 0;
+            font-size: 20px;
+            color: #2E2E2E;
+        }
+
+        .card p {
+            margin: 5px 0 0;
+            color: #555;
+            font-size: 14px;
+        }
+
+        /* BACK TO TOP */
+        #backToTop {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            background: #3CB371;
+            color: white;
+            padding: 12px 18px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            display: none;
+            z-index: 2000;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div id="sidebar" class="sidebar">
+    <div class="profile-section">
+        <img src="/static/ibukunolu logo.jpeg" class="profile-pic">
+        <h3>{{ user }}</h3>
+        <p>{{ role }}</p>
+    </div>
+    <a href="/profile" class="{% if request.path == '/profile' %}active{% endif %}">
+        <i class="fa-solid fa-user"></i> My Profile </a>
+    <a href="/dashboard"><i class="fa-solid fa-house"></i> Dashboard</a>
+    <a href="/pos"><i class="fa-solid fa-prescription-bottle-medical"></i> POS / Dispense</a>
+    <a href="/stock"><i class="fa-solid fa-boxes-stacked"></i> Stock View</a>
+    <a href="/druglist"><i class="fa-solid fa-list"></i> Drug List</a>
+    <a href="/drug_entry"><i class="fa-solid fa-cart-plus"></i> Drug Entry</a>
+    <a href="/inpatient_data"><i class="fa-solid fa-bed-pulse"></i> InPatient Data</a>
+    <a href="/dutylog"><i class="fa-solid fa-clock"></i> Duty Log</a>
+    <a href="/audit_trail"><i class="fa-solid fa-file-lines"></i> Audit Trail</a>
+    <a href="/kpi_dashboard"><i class="fa-solid fa-chart-line"></i> KPI Dashboard</a>
+
+    <a href="/admin/dashboard"><i class="fa-solid fa-user-gear"></i> Admin Panel</a>
+
+    <a href="/logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+</div>
+
+<button id="toggleBtn" class="toggle-btn"><i class="fa-solid fa-bars"></i></button>
+
+<!-- MAIN CONTENT -->
+<div id="mainContent">
+
+<h2>Admin Panel</h2>
+
+<div class="grid">
+
+    <div class="card" onclick="window.location.href='/admin/users'">
+        <i class="fa-solid fa-users-gear"></i>
+        <h3>User Management</h3>
+        <p>Add, remove, or update system users.</p>
+    </div>
+
+    <div class="card" onclick="window.location.href='/admin/logs'">
+        <i class="fa-solid fa-file-lines"></i>
+        <h3>System Logs</h3>
+        <p>View audit logs and activity history.</p>
+    </div>
+
+    <div class="card" onclick="window.location.href='/admin/sheets'">
+        <i class="fa-solid fa-table"></i>
+        <h3>Sheet Maintenance</h3>
+        <p>Manage Excel sheets and data integrity.</p>
+    </div>
+
+    <div class="card" onclick="window.location.href='/admin/kpi'">
+        <i class="fa-solid fa-chart-line"></i>
+        <h3>KPI Controls</h3>
+        <p>Configure KPI metrics and thresholds.</p>
+    </div>
+
+    <div class="card" onclick="window.location.href='/admin/settings'">
+        <i class="fa-solid fa-gears"></i>
+        <h3>System Settings</h3>
+        <p>Control system-wide configurations.</p>
+    </div>
+
+    <div class="card" onclick="window.location.href='/admin/backups'">
+        <i class="fa-solid fa-database"></i>
+        <h3>Data Backup</h3>
+        <p>Backup and restore system data.</p>
+    </div>
+
+</div>
+
+</div>
+
+<!-- BACK TO TOP -->
+<div id="backToTop" onclick="scrollToTop()">↑</div>
+
+<script>
+    /* SIDEBAR TOGGLE */
+    const sidebar = document.getElementById("sidebar");
+    const mainContent = document.getElementById("mainContent");
+    const toggleBtn = document.getElementById("toggleBtn");
+
+    toggleBtn.onclick = function () {
+        if (sidebar.style.left === "0px") {
+            sidebar.style.left = "-260px";
+            mainContent.style.marginLeft = "20px";
+        } else {
+            sidebar.style.left = "0px";
+            mainContent.style.marginLeft = "260px";
+        }
+    };
+
+    /* BACK TO TOP */
+    window.onscroll = function () {
+        let btn = document.getElementById("backToTop");
+        btn.style.display = document.documentElement.scrollTop > 200 ? "block" : "none";
+    };
+
+    function scrollToTop() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pharmacy Dashboard</title>
+
+    <!-- Premium Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        :root {
+            --deep-ash-green: #2F4F4F;
+            --medium-ash-green: #3C5F5F;
+            --light-ash: #E8ECEB;
+            --hospital-blue: #4C7D7E;
+            --text-dark: #4A4A4A;
+            --white: #FFFFFF;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: var(--light-ash);
+            position: relative;
+            transition: margin-left 0.3s ease;
+        }
+
+        /* MULTIPLE LOGO WATERMARK */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('/static/ibukunolu logo.jpeg');
+            background-repeat: repeat;
+            background-size: 260px;
+            opacity: 0.05;
+            z-index: -1;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            height: 100%;
+            width: 260px;
+            position: fixed;
+            top: 0;
+            left: -260px;
+            background: var(--deep-ash-green);
+            padding-top: 20px;
+            transition: left 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+            box-shadow: 3px 0 10px rgba(0,0,0,0.25);
+        }
+
+        .profile-section {
+            text-align: center;
+            padding: 25px;
+            border-bottom: 1px solid rgba(255,255,255,0.15);
+        }
+
+        .profile-pic {
+            width: 85px;
+            height: 85px;
+            border-radius: 50%;
+            border: 3px solid white;
+            object-fit: cover;
+            margin-bottom: 12px;
+        }
+
+        .profile-section h3 {
+            color: white;
+            margin: 5px 0 0 0;
+            font-size: 19px;
+            font-weight: 600;
+        }
+
+        .profile-section p {
+            color: #dfe7e7;
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 14px 22px;
+            color: #e6eef7;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            transition: 0.2s;
+        }
+
+        .sidebar a:hover {
+            background: var(--medium-ash-green);
+            padding-left: 28px;
+        }
+
+        .sidebar i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* ===== TOGGLE BUTTON ===== */
+        .toggle-btn {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            background: var(--deep-ash-green);
+            color: white;
+            border: none;
+            padding: 10px 14px;
+            font-size: 22px;
+            border-radius: 6px;
+            cursor: pointer;
+            z-index: 1100;
+            box-shadow: 0 0 10px rgba(0,0,0,0.25);
+        }
+
+        .toggle-btn:hover {
+            background: var(--medium-ash-green);
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main {
+            padding: 30px;
+            margin-left: 20px;
+            transition: margin-left 0.3s ease;
+        }
+
+        .welcome-banner {
+            background: var(--hospital-blue);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .cards {
+            display: flex;
+            gap: 25px;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            background: var(--white);
+            width: 300px;
+            padding: 25px;
+            border-radius: 14px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+            transition: 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.22);
+        }
+
+        .card h3 {
+            margin: 0 0 12px 0;
+            color: var(--deep-ash-green);
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .card p {
+            color: var(--text-dark);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: var(--deep-ash-green);
+            color: white;
+            text-align: center;
+            padding: 10px;
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div id="sidebar" class="sidebar">
+    <div class="profile-section">
+       <img src="/static/ibukunolu logo.jpeg" class="profile-pic">
+        <h3>{{ user }}</h3>
+
+        <!-- ROLE BADGE -->
+        <span class="role-badge
+            {% if role == 'Admin' %}role-admin{% endif %}
+            {% if role == 'Auditor' %}role-auditor{% endif %}
+            {% if role == 'Pharmacist' %}role-pharmacist{% endif %}
+            {% if role == 'Administrator' %}role-administrator{% endif %}
+        ">
+            {{ role }}
+        </span>
+    </div>
+
+    <a href="/profile" class="{% if request.path == '/profile' %}active{% endif %}">
+        <i class="fa-solid fa-user"></i> My Profile
+    </a>
+
+    <a href="/dashboard" class="{% if request.path == '/dashboard' %}active{% endif %}">
+        <i class="fa-solid fa-house"></i> Dashboard
+    </a>
+
+    {% if has_permission("pos") %}
+    <a href="/pos" class="{% if request.path == '/pos' %}active{% endif %}">
+        <i class="fa-solid fa-prescription-bottle-medical"></i> POS / Dispense
+    </a>
+    {% endif %}
+
+    {% if has_permission("stock") %}
+    <a href="/stock" class="{% if request.path == '/stock' %}active{% endif %}">
+        <i class="fa-solid fa-boxes-stacked"></i> Stock View
+    </a>
+    {% endif %}
+
+    {% if has_permission("drug_list") %}
+    <a href="/druglist" class="{% if request.path == '/druglist' %}active{% endif %}">
+        <i class="fa-solid fa-list"></i> Drug List
+    </a>
+    {% endif %}
+
+    {% if has_permission("drug_entry") %}
+    <a href="/drug_entry" class="{% if request.path == '/drug_entry' %}active{% endif %}">
+        <i class="fa-solid fa-cart-plus"></i> Drug Entry
+    </a>
+    {% endif %}
+
+    {% if has_permission("inpatient") %}
+    <a href="/inpatient_data" class="{% if request.path == '/inpatient_data' %}active{% endif %}">
+        <i class="fa-solid fa-bed-pulse"></i> InPatient Data
+    </a>
+    {% endif %}
+
+    {% if has_permission("dutylog") %}
+    <a href="/audit_trail" class="{% if request.path == '/audit_trail' %}active{% endif %}">
+        <i class="fa-solid fa-file-lines"></i> Audit Trail
+    </a>
+    {% endif %}
+
+    {% if has_permission("kpi") %}
+    <a href="/kpi_dashboard" class="{% if request.path == '/kpi_dashboard' %}active{% endif %}">
+        <i class="fa-solid fa-chart-line"></i> KPI Dashboard
+    </a>
+    {% endif %}
+
+    {% if has_permission("admin_panel") %}
+    <a href="/admin/dashboard" class="{% if request.path == '/admin/dashboard' %}active{% endif %}">
+        <i class="fa-solid fa-user-gear"></i> Admin Panel
+    </a>
+    {% endif %}
+
+    <a href="/logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+</div>
+
+
+<button id="toggleBtn" class="toggle-btn"><i class="fa-solid fa-bars"></i></button>
+
+<div id="mainContent" class="main">
+    <div class="welcome-banner">
+        Welcome, {{ user }}
+    </div>
+
+    <div class="cards">
+        <div class="card">
+            <h3>POS / Dispense</h3>
+            <p>Dispense drugs, update stock, and print receipts.</p>
+        </div>
+
+        <div class="card">
+            <h3>Stock View</h3>
+            <p>View available drugs, quantities, and expiry dates.</p>
+        </div>
+
+        <div class="card">
+            <h3>Drug List</h3>
+            <p>View, edit, and manage drug inventory.</p>
+        </div>
+
+        <div class="card">
+            <h3>Drug Entry</h3>
+            <p>Restock drugs and update inventory levels.</p>
+        </div>
+
+        <div class="card">
+            <h3>InPatient Data</h3>
+            <p>Record inpatient drug dispensing and billing.</p>
+        </div>
+
+        <div class="card">
+            <h3>Duty Log</h3>
+            <p>Log pharmacist duty hours and notes.</p>
+        </div>
+
+        <div class="card">
+            <h3>Audit Trail</h3>
+            <p>Track system activity and user actions.</p>
+        </div>
+
+        {% if role == "Admin" %}
+        <div class="card">
+            <h3>Admin Panel</h3>
+            <p>Manage users, audit logs, and pharmacist shifts.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="footer">
+    Powered by Ibukun-Olu ICT Unit
+</div>
+
+<script>
+    const sidebar = document.getElementById("sidebar");
+    const mainContent = document.getElementById("mainContent");
+    const toggleBtn = document.getElementById("toggleBtn");
+
+    toggleBtn.onclick = function () {
+        if (sidebar.style.left === "0px") {
+            sidebar.style.left = "-260px";
+            mainContent.style.marginLeft = "20px";
+        } else {
+            sidebar.style.left = "0px";
+            mainContent.style.marginLeft = "260px";
+        }
+    };
+</script>
+
+</body>
+</html>

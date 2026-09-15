@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Inpatient Pharmacy Bill Calculator</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary-blue: #2C3E50;
+            --hospital-green: #1ABC9C;
+            --sky-blue: #3498DB;
+            --soft-ash: #ECF0F1;
+        }
+
+        body {
+            font-family: 'Segoe UI';
+            background: var(--soft-ash);
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            height: 100%;
+            width: 260px;
+            position: fixed;
+            top: 0;
+            left: -260px;
+            background: var(--primary-blue);
+            padding-top: 20px;
+            transition: left 0.35s ease;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .profile-section {
+            text-align: center;
+            padding: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .profile-pic {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid white;
+            object-fit: cover;
+            margin-bottom: 10px;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 14px 20px;
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.15);
+            transition: background 0.25s ease, padding-left 0.25s ease;
+        }
+
+        .sidebar a:hover {
+            background: var(--hospital-green);
+            padding-left: 28px;
+        }
+
+        .toggle-btn {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 10px 14px;
+            font-size: 22px;
+            border-radius: 6px;
+            cursor: pointer;
+            z-index: 1100;
+        }
+
+        /* MAIN CONTENT */
+        #mainContent {
+            padding: 25px;
+            margin-left: 20px;
+            transition: margin-left 0.35s ease;
+        }
+
+        .container {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            width: 1100px;
+            margin: 20px auto;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+        }
+
+        h2 {
+            margin-top: 0;
+            color: var(--primary-blue);
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+
+        .filter-row div {
+            display: flex;
+            flex-direction: column;
+        }
+
+        select, input {
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            min-width: 220px;
+        }
+
+        .btn-primary {
+            background: var(--hospital-green);
+            color: white;
+            padding: 10px 18px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .btn-primary:hover {
+            background: var(--sky-blue);
+        }
+
+        .summary-box {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background: #f9fafc;
+            border-left: 4px solid var(--primary-blue);
+        }
+
+        /* AUTOCOMPLETE LIST */
+        .autocomplete-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            max-height: 150px;
+            overflow-y: auto;
+            display: none;
+            z-index: 2000;
+        }
+
+        .autocomplete-item {
+            padding: 8px;
+            cursor: pointer;
+        }
+
+        .autocomplete-item:hover {
+            background: var(--hospital-green);
+            color: white;
+        }
+
+        /* LOADER */
+        #loaderOverlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.45);
+            z-index: 3000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loader {
+            width: 60px;
+            height: 60px;
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid var(--hospital-green);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- LOADER -->
+<div id="loaderOverlay">
+    <div class="loader"></div>
+</div>
+
+<!-- SIDEBAR -->
+<div id="sidebar" class="sidebar">
+    <div class="profile-section">
+       <img src="/static/ibukunolu logo.jpeg" class="logo">
+        <h3>{{ user }}</h3>
+        <p>{{ role }}</p>
+    </div>
+
+    <a href="/dashboard"><i class="fa-solid fa-house"></i> Dashboard</a>
+    <a href="/pos"><i class="fa-solid fa-prescription-bottle-medical"></i> POS / Dispense</a>
+    <a href="/inpatient_data"><i class="fa-solid fa-bed-pulse"></i> InPatient Data</a>
+    <a href="/logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+</div>
+
+<button id="toggleBtn" class="toggle-btn"><i class="fa-solid fa-bars"></i></button>
+
+<!-- MAIN CONTENT -->
+<div id="mainContent">
+
+<div class="container">
+    <h2>Inpatient Pharmacy Bill Calculator</h2>
+
+    <form method="post" action="/inpatient/bill/calculate">
+
+        <div class="filter-row">
+
+            <!-- AUTOCOMPLETE PATIENT SEARCH -->
+            <div style="position:relative; width:250px;">
+                <label><strong>Select Patient</strong></label>
+
+                <input type="text" id="patientSearch" placeholder="Search patient..."
+                       autocomplete="off"
+                       style="padding:8px; border-radius:6px; border:1px solid #ccc; width:100%;">
+
+                <div id="autocompleteList" class="autocomplete-list"></div>
+
+                <input type="hidden" name="patient" id="patientHidden">
+            </div>
+
+            <div>
+                <label><strong>Admission Date</strong></label>
+                <select name="admission_date" id="admissionSelect" required>
+                    <option value="">Select admission date</option>
+                </select>
+            </div>
+
+            <div>
+                <label><strong>Discharge Date</strong></label>
+                <select name="discharge_date" id="dischargeSelect" required>
+                    <option value="">Select discharge date</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="summary-box">
+            <p>
+                <strong>Note:</strong> This bill will include all inpatient pharmacy/consumable entries
+                for the selected patient between the chosen admission and discharge dates.
+            </p>
+        </div>
+
+        <button type="submit" class="btn-primary" style="margin-top:15px;">
+            Calculate Inpatient Pharmacy Bill
+        </button>
+
+        <button type="button" class="btn-primary" style="margin-top:15px; margin-left:10px;"
+                onclick="window.location.href='/inpatient/history?patient=' + document.getElementById('patientHidden').value">
+            View Patient History
+        </button>
+
+    </form>
+
+</div>
+
+</div>
+
+<script>
+    const sidebar = document.getElementById("sidebar");
+    const mainContent = document.getElementById("mainContent");
+    const toggleBtn = document.getElementById("toggleBtn");
+
+    toggleBtn.onclick = function () {
+        sidebar.style.left = sidebar.style.left === "0px" ? "-260px" : "0px";
+        mainContent.style.marginLeft = sidebar.style.left === "0px" ? "260px" : "20px";
+    };
+
+    // ============================
+    // AUTOCOMPLETE PATIENT SEARCH
+    // ============================
+
+    let allPatients = [
+        {% for p in patients %}
+            "{{ p }}",
+        {% endfor %}
+    ];
+
+    const searchInput = document.getElementById("patientSearch");
+    const listBox = document.getElementById("autocompleteList");
+    const hiddenPatient = document.getElementById("patientHidden");
+
+    searchInput.addEventListener("input", function () {
+        let value = this.value.toLowerCase();
+        listBox.innerHTML = "";
+
+        if (value.trim() === "") {
+            listBox.style.display = "none";
+            hiddenPatient.value = "";
+            return;
+        }
+
+        let filtered = allPatients.filter(p => p.toLowerCase().includes(value));
+
+        filtered.forEach(p => {
+            let item = document.createElement("div");
+            item.classList.add("autocomplete-item");
+            item.textContent = p;
+
+            item.onclick = function () {
+                searchInput.value = p;
+                hiddenPatient.value = p;
+                listBox.style.display = "none";
+
+                // Show loader
+                document.getElementById("loaderOverlay").style.display = "flex";
+
+                // Fetch dates for selected patient
+                fetch(`/inpatient/bill/get_dates?patient=${p}`)
+                    .then(response => response.json())
+                    .then(data => {
+
+                        let admission = document.getElementById("admissionSelect");
+                        let discharge = document.getElementById("dischargeSelect");
+
+                        admission.innerHTML = `<option value="">Select admission date</option>`;
+                        discharge.innerHTML = `<option value="">Select discharge date</option>`;
+
+                        // ⭐ DO NOT SORT — display EXACTLY as returned
+                        data.dates.forEach(d => {
+                            admission.innerHTML += `<option value="${d}">${d}</option>`;
+                            discharge.innerHTML += `<option value="${d}">${d}</option>`;
+                        });
+
+                        // Hide loader
+                        document.getElementById("loaderOverlay").style.display = "none";
+                    })
+                    .catch(() => {
+                        alert("Error loading dates.");
+                        document.getElementById("loaderOverlay").style.display = "none";
+                    });
+            };
+
+            listBox.appendChild(item);
+        });
+
+        listBox.style.display = filtered.length > 0 ? "block" : "none";
+    });
+
+    // CLOSE AUTOCOMPLETE WHEN CLICKING OUTSIDE
+    document.addEventListener("click", function (e) {
+        if (!searchInput.contains(e.target)) {
+            listBox.style.display = "none";
+        }
+    });
+</script>
+
+</body>
+</html>

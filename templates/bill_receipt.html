@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Inpatient Mini Receipt</title>
+
+<style>
+    body {
+        font-family: "Segoe UI", sans-serif;
+        background: #eef2f5;
+        margin: 0;
+        padding: 25px;
+    }
+
+    .receipt {
+        width: 100%;
+        max-width: 900px;
+        margin: auto;
+        background: white;
+        padding: 35px 50px;
+        border-radius: 14px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+        border: 1px solid #d9d9d9;
+    }
+
+    /* HEADER */
+    .header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .logo {
+        width: 170px;
+        height: 170px;
+        object-fit: contain;
+        margin-bottom: 10px;
+    }
+
+    .hospital-name {
+        font-size: 30px;
+        font-weight: bold;
+        color: #2C3E50;
+        margin: 5px 0;
+    }
+
+    .hospital-info {
+        font-size: 15px;
+        color: #555;
+        margin-top: -5px;
+    }
+
+    /* DIVIDER */
+    .divider {
+        border-bottom: 2px solid #2C3E50;
+        margin: 20px 0;
+    }
+
+    /* SECTION */
+    .section {
+        font-size: 16px;
+        margin: 12px 0;
+        line-height: 1.6;
+    }
+
+    /* ITEMS TABLE (monospace style) */
+    .items {
+        font-family: Consolas, monospace;
+        font-size: 15px;
+        margin-top: 15px;
+        background: #fafafa;
+        padding: 15px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+    }
+
+    .items-header {
+        font-weight: bold;
+        border-bottom: 1px solid #333;
+        padding-bottom: 6px;
+        margin-bottom: 8px;
+    }
+
+    .item-row {
+        padding: 4px 0;
+        border-bottom: 1px dashed #ccc;
+    }
+
+    /* TOTAL */
+    .total-box {
+        background: #f0f8f4;
+        padding: 15px;
+        border-left: 5px solid #1ABC9C;
+        border-radius: 8px;
+        font-size: 18px;
+        font-weight: bold;
+        margin-top: 20px;
+    }
+
+    /* FOOTER */
+    .footer {
+        margin-top: 25px;
+        font-size: 15px;
+        line-height: 1.6;
+    }
+
+    /* BARCODE + QR */
+    .code-section {
+        text-align: center;
+        margin-top: 25px;
+    }
+
+    .barcode {
+        width: 320px;
+        height: 90px;
+        margin-bottom: 15px;
+    }
+
+    .qr {
+        width: 140px;
+        height: 140px;
+        border: 2px solid #333;
+        padding: 5px;
+        background: white;
+        border-radius: 6px;
+    }
+
+    /* BUTTONS */
+    .btn {
+        padding: 12px 22px;
+        font-size: 16px;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        margin: 10px;
+    }
+
+    .btn-print {
+        background: #1ABC9C;
+        color: white;
+    }
+
+    .btn-pos {
+        background: #2C3E50;
+        color: white;
+    }
+
+    /* PRINT MODE */
+    @media print {
+        body {
+            background: white !important;
+        }
+        .receipt {
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            width: 100%;
+            border: none !important;
+        }
+        .no-print {
+            display: none !important;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="receipt">
+
+    <!-- HEADER -->
+    <div class="header">
+        <img src="/static/ibukunolu logo.jpeg" class="logo">
+        <div class="hospital-name">IBUKUN OLU SPECIALIST HOSPITAL</div>
+        <div class="hospital-info">
+            Oyin‑Adegoke Close, Oke‑Obaagun, Osun State<br>
+            Tel: +2348068575958
+        </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- PATIENT INFO -->
+    <div class="section">
+        <strong>Patient:</strong> {{ patient }}<br>
+        <strong>Admission Date:</strong> {{ admission_date }}<br>
+        <strong>Discharge Date:</strong> {{ discharge_date }}<br>
+        <strong>Bill Generated:</strong> {{ generated_date }}<br>
+        <strong>Invoice No:</strong> {{ invoice_number }}<br>
+        <strong>Pharmacist:</strong> {{ user }}
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ITEMS -->
+    <div class="items">
+        <div class="items-header">
+            DATE        DRUG NAME               QTY   PRICE   TOTAL
+        </div>
+
+        {% for row in bill_items %}
+        <div class="item-row">
+            {{ row["date"] }}  
+            {{ row["drug_name"] }}  
+            {{ row["qty_sold"] }}  
+            ₦{{ row["sales_price"] }}  
+            ₦{{ row["bill_total"] }}
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- TOTAL -->
+    <div class="total-box">
+        GRAND TOTAL: ₦{{ "%.2f"|format(total_bill) }}
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+        <strong>Verified By Pharmacy:</strong> ✔
+    </div>
+
+    <!-- BARCODE + QR -->
+    <div class="code-section">
+        <img src="https://barcode.tec-it.com/barcode.ashx?data={{ invoice_number }}&code=Code128&dpi=96"
+             class="barcode">
+
+        <br>
+
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=http://127.0.0.1/inpatient/bill/calculate?patient={{ patient }}&admission={{ admission_date }}&discharge={{ discharge_date }}"
+             class="qr">
+    </div>
+
+    <!-- BUTTONS -->
+    <div class="center no-print" style="margin-top:25px;">
+        <button class="btn btn-print" onclick="window.print()">Print Receipt</button>
+        <button class="btn btn-pos" onclick="window.location.href='/pos'">Return to POS</button>
+    </div>
+
+</div>
+
+</body>
+</html>

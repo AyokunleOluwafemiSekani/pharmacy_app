@@ -1,0 +1,430 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="page-title">User Management</h2>
+
+{% if message %}
+<div class="success-banner">
+    <i class="fa-solid fa-circle-check"></i> {{ message }}
+</div>
+{% endif %}
+
+{% if error %}
+<div class="error-banner">
+    <i class="fa-solid fa-circle-exclamation"></i> {{ error }}
+</div>
+{% endif %}
+
+<!-- ADD USER BUTTON -->
+<button class="btn add-user-btn" onclick="openAddUserModal()">
+    <i class="fa-solid fa-user-plus"></i> Add New User
+</button>
+
+<!-- USERS TABLE -->
+<h3 class="section-title">All Users</h3>
+
+<div class="table-container smooth-table">
+<table class="responsive-table">
+    <thead>
+        <tr>
+            <th>User ID</th>
+            <th>Password</th>
+            <th>Name</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for u in users %}
+        <tr>
+            <td data-label="User ID">{{ u['User Id'] }}</td>
+            <td data-label="Password">{{ u['Password'] }}</td>
+            <td data-label="Name">{{ u['Name'] }}</td>
+            <td data-label="Role">{{ u['Role'] }}</td>
+
+            <td data-label="Status">
+                {% if u['Password'] == "DEACTIVATED" %}
+                    <span class="status-deactivated">Deactivated</span>
+                {% else %}
+                    <span class="status-active">Active</span>
+                {% endif %}
+            </td>
+
+            <td data-label="Actions">
+                <button class="btn small-btn edit-btn"
+                    onclick="openEditModal('{{ u['User Id'] }}','{{ u['Name'] }}','{{ u['Role'] }}')">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                </button>
+
+                <button class="btn small-btn activity-btn"
+                    onclick="openActivityModal('{{ u['User Id'] }}')">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                </button>
+
+                <button class="btn small-btn export-btn"
+                    onclick="exportActivity('{{ u['User Id'] }}')">
+                    <i class="fa-solid fa-file-excel"></i>
+                </button>
+
+                {% if u['Password'] != "DEACTIVATED" %}
+                <button class="btn small-btn deactivate-btn"
+                    onclick="window.location.href='/admin/users/deactivate?user={{ u['User Id'] }}'">
+                    <i class="fa-solid fa-user-slash"></i>
+                </button>
+                {% endif %}
+
+                {% if u['Password'] == "DEACTIVATED" %}
+                <button class="btn small-btn reactivate-btn"
+                    onclick="window.location.href='/admin/users/reactivate?user={{ u['User Id'] }}'">
+                    <i class="fa-solid fa-user-check"></i>
+                </button>
+                {% endif %}
+
+                {% if role == "Admin" %}
+                <button class="btn small-btn delete-btn"
+                    onclick="window.location.href='/admin/users/delete?user={{ u['User Id'] }}'">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+
+<!-- ADD USER MODAL -->
+<div id="addUserModal" class="modal">
+    <div class="modal-content glass-card animated-modal">
+        <h3 class="modal-title">
+            <i class="fa-solid fa-user-plus"></i> Create New User
+        </h3>
+
+        <form method="POST" action="/admin/users/add">
+
+            <div class="form-group">
+                <label><i class="fa-solid fa-id-card"></i> Name</label>
+                <input name="name" required placeholder="Enter personnel name">
+            </div>
+
+            <div class="form-group">
+                <label><i class="fa-solid fa-user"></i> User ID</label>
+                <input name="User ID" required placeholder="Enter desired username">
+            </div>
+
+            <div class="form-group password-group">
+                <label><i class="fa-solid fa-lock"></i> Password</label>
+                <div class="password-wrapper">
+                    <input name="password" id="add_password" type="password" required placeholder="Enter password">
+                    <i class="fa-solid fa-eye" id="toggleAddPassword"></i>
+                </div>
+                <small class="hint">Use a strong password (min 6 characters)</small>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fa-solid fa-user-gear"></i> Role</label>
+                <select name="role" required>
+                    <option value="Pharmacist">🧪 Pharmacist</option>
+                    <option value="Admin">🛠 Admin</option>
+                    <option value="Auditor">📊 Auditor</option>
+                    <option value="Administrator">⚙ Administrator</option>
+                    <option value="Director">🏛 Director</option>
+                </select>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn save-btn" type="submit">
+                    <i class="fa-solid fa-check"></i> Create User
+                </button>
+                <button class="btn cancel-btn" type="button" onclick="closeAddUserModal()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- EDIT USER MODAL -->
+<div id="editModal" class="modal">
+    <div class="modal-content glass-card animated-modal">
+        <h3 class="modal-title">
+            <i class="fa-solid fa-user-pen"></i> Edit User
+        </h3>
+
+        <form method="POST" action="/admin/users/edit">
+
+            <input type="hidden" id="edit_userid" name="userid">
+
+            <div class="form-group">
+                <label><i class="fa-solid fa-id-card"></i> Name</label>
+                <input id="edit_name" name="name" readonly>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fa-solid fa-lock"></i> New Password (optional)</label>
+                <input id="edit_password" name="password" type="password">
+            </div>
+
+            <div class="form-group">
+                <label><i class="fa-solid fa-user-gear"></i> Role</label>
+                <select id="edit_role" name="role">
+                    <option value="Pharmacist">Pharmacist</option>
+                    <option value="Admin">Admin</option>
+                    <option value="Auditor">Auditor</option>
+                    <option value="Administrator">Administrator</option>
+                    <option value="Director">Director</option>
+                </select>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn save-btn" type="submit">Save Changes</button>
+                <button class="btn cancel-btn" type="button" onclick="closeEditModal()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- USER ACTIVITY MODAL -->
+<div id="activityModal" class="modal">
+    <div class="modal-content glass-card animated-modal">
+        <h3 class="modal-title">
+            <i class="fa-solid fa-clock-rotate-left"></i> User Activity Log
+        </h3>
+
+        <div id="activityContent">
+            <p class="loading-text">Loading activity...</p>
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn cancel-btn" onclick="closeActivityModal()">Close</button>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Responsive Table */
+.responsive-table td[data-label] {
+    display: block;
+    text-align: right;
+}
+@media (min-width: 700px) {
+    .responsive-table td[data-label] {
+        display: table-cell;
+        text-align: left;
+    }
+}
+
+/* Banners */
+.success-banner {
+    background: #3CB371;
+    color: white;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+.error-banner {
+    background: #b30000;
+    color: white;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+/* Status */
+.status-active { color: green; font-weight: bold; }
+.status-deactivated { color: red; font-weight: bold; }
+
+/* Add User Button */
+.add-user-btn {
+    background: #4C7D7E;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    font-size: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Table */
+.table-container { margin-top: 20px; }
+table { width: 100%; border-collapse: collapse; }
+th {
+    background: #4C7D7E;
+    color: white;
+    padding: 12px;
+}
+td {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+/* Buttons */
+.small-btn {
+    padding: 6px 12px;
+    font-size: 13px;
+    border-radius: 6px;
+    margin-right: 4px;
+}
+.edit-btn { background: #4C7D7E; color: white; }
+.activity-btn { background: #6a5acd; color: white; }
+.export-btn { background: #2e8b57; color: white; }
+.deactivate-btn { background: #1545e4; color: white; }
+.reactivate-btn { background: #3CB371; color: white; }
+.delete-btn { background: #b30000; color: white; }
+
+/* Modal */
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.65);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
+/* Glassmorphism Card */
+.glass-card {
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(12px);
+    border-radius: 16px;
+    padding: 30px;
+    width: 90%;
+    max-width: 450px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+}
+
+/* Modal Animation */
+.animated-modal {
+    animation: popIn 0.25s ease-out;
+}
+@keyframes popIn {
+    from { transform: scale(0.85); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* Form */
+.form-group {
+    margin-bottom: 18px;
+}
+.form-group label {
+    font-weight: bold;
+    margin-bottom: 6px;
+    display: block;
+}
+.form-group input, .form-group select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+/* Password Toggle */
+.password-wrapper {
+    position: relative;
+}
+.password-wrapper i {
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    cursor: pointer;
+    color: #4C7D7E;
+}
+
+/* Activity */
+.loading-text {
+    color: #777;
+    font-style: italic;
+}
+.activity-entry {
+    background: #f7f7f7;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    border-left: 4px solid #4C7D7E;
+}
+
+/* Modal Actions */
+.modal-actions {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+}
+.save-btn {
+    background: #4C7D7E;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 8px;
+}
+.cancel-btn {
+    background: #b30000;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 8px;
+}
+</style>
+
+<script>
+function openAddUserModal() {
+    document.getElementById("addUserModal").style.display = "flex";
+}
+function closeAddUserModal() {
+    document.getElementById("addUserModal").style.display = "none";
+}
+
+document.getElementById("toggleAddPassword").onclick = function() {
+    const field = document.getElementById("add_password");
+    field.type = field.type === "password" ? "text" : "password";
+};
+
+function openEditModal(id, name, role) {
+    document.getElementById("edit_userid").value = id;
+    document.getElementById("edit_name").value = name;
+    document.getElementById("edit_role").value = role;
+    document.getElementById("editModal").style.display = "flex";
+}
+function closeEditModal() {
+    document.getElementById("editModal").style.display = "none";
+}
+
+function openActivityModal(userId) {
+    document.getElementById("activityModal").style.display = "flex";
+
+    fetch(`/admin/users/activity/${userId}`)
+        .then(response => response.json())
+        .then(data => {
+            const logs = data.logs;
+            let html = "";
+
+            if (logs.length === 0) {
+                html = "<p>No activity found for this user.</p>";
+            } else {
+                logs.forEach(log => {
+                    html += `
+                        <div class="activity-entry">
+                            <p><strong>Login:</strong> ${log.login_time}</p>
+                            <p><strong>Logout:</strong> ${log.logout_time || "Still logged in"}</p>
+                        </div>
+                    `;
+                });
+            }
+
+            document.getElementById("activityContent").innerHTML = html;
+        })
+        .catch(() => {
+            document.getElementById("activityContent").innerHTML =
+                "<p class='error-text'>Unable to load activity.</p>";
+        });
+}
+
+function closeActivityModal() {
+    document.getElementById("activityModal").style.display = "none";
+}
+
+function exportActivity(userId) {
+    window.location.href = `/admin/users/activity/export/${userId}`;
+}
+</script>
+
+{% endblock %}

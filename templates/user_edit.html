@@ -1,0 +1,26 @@
+<h2>Edit Profile</h2>
+
+<form method="POST">
+    <label>Name</label>
+    <input type="text" name="name" value="{{ user['Name'] }}" required>
+
+    <label>Role</label>
+    <input type="text" name="role" value="{{ user['Role'] }}" readonly>
+
+    <label>New Password (optional)</label>
+    <input type="password" name="password">
+
+    <button type="submit">Save Changes</button>
+
+    {% if error %}
+        <p style="color:red">{{ error }}</p>
+    {% endif %}
+    {% if success %}
+        <p style="color:green">{{ success }}</p>
+    {% endif %}
+</form>
+<label>Profile Picture</label>
+<input type="file" name="picture" accept="image/*">
+{% if user['Picture'] %}
+    <img src="/static/profile_pics/{{ user['Picture'] }}" width="80" height="80" style="border-radius:50%">
+{% endif %}

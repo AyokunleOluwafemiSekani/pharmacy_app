@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="page-title">Cloud Backup Status</h2>
+
+<div class="status-card">
+    <h3 class="section-title">Backup Overview</h3>
+
+    <div class="status-grid">
+
+        <div class="status-item">
+            <i class="fa-solid fa-cloud"></i>
+            <h4>Cloud Sync</h4>
+            <p>{{ cloud_status }}</p>
+        </div>
+
+        <div class="status-item">
+            <i class="fa-solid fa-shield-halved"></i>
+            <h4>Encryption</h4>
+            <p>{{ encryption_status }}</p>
+        </div>
+
+        <div class="status-item">
+            <i class="fa-solid fa-fingerprint"></i>
+            <h4>Integrity</h4>
+            <p>{{ integrity_status }}</p>
+        </div>
+
+        <div class="status-item">
+            <i class="fa-solid fa-clock"></i>
+            <h4>Last Backup</h4>
+            <p>{{ last_backup }}</p>
+        </div>
+
+    </div>
+</div>
+
+<style>
+.status-card {
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(12px);
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    margin-bottom: 25px;
+}
+
+.status-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 20px;
+}
+
+.status-item {
+    background: #f7f7f7;
+    padding: 18px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.status-item i {
+    font-size: 28px;
+    color: #4C7D7E;
+    margin-bottom: 10px;
+}
+</style>
+
+{% endblock %}

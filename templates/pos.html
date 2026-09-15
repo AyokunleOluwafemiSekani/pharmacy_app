@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<title>POS – Pharmacy Billing</title>
+
+<!-- Inter Font -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<!-- Select2 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css">
+
+<style>
+:root {
+    --deep-ash-green: #2F4F4F;
+    --medium-ash-green: #3C5F5F;
+    --light-ash: #E8ECEB;
+    --hospital-blue: #4C7D7E;
+    --white: #FFFFFF;
+    --text-dark: #4A4A4A;
+    --danger-red: #B30000;
+
+    /* Dark mode variables */
+    --dark-bg: #1f1f1f;
+    --dark-card: #2a2a2a;
+    --dark-text: #f0f0f0;
+    --dark-border: #444;
+}
+/* ACTIVE LINK HIGHLIGHT + GLOW */
+.sidebar a.active {
+    background: var(--hospital-blue);
+    padding-left: 28px;
+    font-weight: bold;
+    box-shadow: inset 0 0 10px rgba(255,255,255,0.4),
+                0 0 12px rgba(76,125,126,0.8);
+}
+/* TOP BAR ROLE INDICATOR */
+.role-indicator {
+    position: fixed;
+    top: 15px;
+    left: 80px;
+    z-index: 2500;
+}
+
+.add-row-btn {
+    padding: 12px 20px;
+    background: var(--hospital-blue);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+    transition: 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.add-row-btn:hover {
+    background: var(--medium-ash-green);
+    transform: translateY(-2px);
+}
+
+/* GLOBAL */
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--light-ash);
+    margin: 0;
+    overflow-x: hidden;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+./* ROLE BADGES WITH COLORS + GLOW + PULSE */
+.role-badge {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 600;
+    color: white;
+    animation: pulseGlow 2s infinite;
+}
+
+/* Admin = Red */
+.role-admin {
+     background: #2F4F4F;
+    box-shadow: 0 0 12px rgba(47,79,79,0.7);
+}
+
+/* Auditor = Blue */
+.role-auditor {
+    background: #0055FF;
+    box-shadow: 0 0 12px rgba(0,85,255,0.7);
+}
+
+/* Pharmacist = Green */
+.role-pharmacist {
+    background: #009933;
+    box-shadow: 0 0 12px rgba(0,153,51,0.7);
+}
+
+/* Administrator = Deep Ash */
+.role-administrator {
+    background: #2F4F4F;
+    box-shadow: 0 0 12px rgba(47,79,79,0.7);
+}
+
+/* Pulse Animation */
+@keyframes pulseGlow {
+    0% { transform: scale(1); box-shadow: 0 0 12px rgba(255,255,255,0.4); }
+    50% { transform: scale(1.05); box-shadow: 0 0 18px rgba(255,255,255,0.7); }
+    100% { transform: scale(1); box-shadow: 0 0 12px rgba(255,255,255,0.4); }
+}
+
+
+/* Dark mode body */
+body.dark-mode {
+    background: var(--dark-bg);
+    color: var(--dark-text);
+}
+
+/* TOP CONTROLS */
+#topControls {
+    position: fixed;
+    top: 15px;
+    right: 25px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    z-index: 2000;
+}
+
+#totalBox {
+    background: var(--hospital-blue);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: 600;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+body.dark-mode #totalBox {
+    background: var(--medium-ash-green);
+}
+
+/* TOP BUTTONS */
+.top-btn {
+    background: var(--deep-ash-green);
+    color: white;
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+    transition: 0.3s ease;
+}
+
+.top-btn:hover {
+    background: var(--hospital-blue);
+}
+
+/* SIDEBAR */
+.sidebar {
+    height: 100%;
+    width: 260px;
+    position: fixed;
+    top: 0;
+    left: -260px;
+    background: var(--deep-ash-green);
+    padding-top: 20px;
+    transition: left 0.35s ease;
+    z-index: 1000;
+    overflow-y: auto;
+    box-shadow: 3px 0 10px rgba(0,0,0,0.25);
+}
+
+body.dark-mode .sidebar {
+    background: #1b2b2b;
+}
+
+.profile-section {
+    text-align: center;
+    padding: 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+}
+
+.profile-pic {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 3px solid white;
+    object-fit: cover;
+    margin-bottom: 10px;
+}
+
+.sidebar a {
+    display: block;
+    padding: 14px 20px;
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+    transition: 0.25s ease;
+}
+
+.sidebar a:hover {
+    background: var(--hospital-blue);
+    padding-left: 28px;
+}
+
+/* TOGGLE BUTTON */
+.toggle-btn {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    background: var(--deep-ash-green);
+    color: white;
+    border: none;
+    padding: 10px 14px;
+    font-size: 22px;
+    border-radius: 6px;
+    cursor: pointer;
+    z-index: 1100;
+    transition: background 0.3s ease;
+}
+
+.toggle-btn:hover {
+    background: var(--hospital-blue);
+}
+
+/* DARK MODE TOGGLE */
+#darkModeToggle {
+    background: var(--deep-ash-green);
+    color: white;
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+    transition: 0.3s ease;
+}
+
+#darkModeToggle:hover {
+    background: var(--hospital-blue);
+}
+
+/* MAIN CONTENT */
+#mainContent {
+    padding: 25px;
+    margin-left: 20px;
+    transition: margin-left 0.35s ease;
+}
+
+/* POS CARD */
+.pos-card {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+body.dark-mode .pos-card {
+    background: var(--dark-card);
+    color: var(--dark-text);
+}
+
+h2 {
+    margin-bottom: 10px;
+    color: var(--deep-ash-green);
+}
+
+body.dark-mode h2 {
+    color: var(--dark-text);
+}
+
+/* TABLE */
+.table-wrapper {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+body.dark-mode table {
+    background: var(--dark-card);
+}
+
+th {
+    background: var(--deep-ash-green);
+    color: white;
+    padding: 10px;
+    font-size: 13px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+body.dark-mode th {
+    background: #1b2b2b;
+}
+
+td {
+    padding: 8px;
+    border-bottom: 1px solid #ccc;
+}
+
+body.dark-mode td {
+    border-bottom: 1px solid var(--dark-border);
+}
+
+tr:hover {
+    background: #f0f5f5;
+}
+
+body.dark-mode tr:hover {
+    background: #333;
+}
+
+/* INPUTS */
+input {
+    width: 100%;
+    padding: 6px;
+    border: 1px solid #aaa;
+    border-radius: 6px;
+    font-size: 13px;
+    box-sizing: border-box;
+}
+
+body.dark-mode input {
+    background: #333;
+    border: 1px solid var(--dark-border);
+    color: var(--dark-text);
+}
+
+/* BUTTONS */
+.add-row-btn {
+    background: var(--hospital-blue);
+    color: white;
+    padding: 8px 14px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    margin-bottom: 15px;
+    font-size: 13px;
+    transition: background 0.3s ease;
+}
+
+.add-row-btn:hover {
+    background: var(--medium-ash-green);
+}
+
+.delete-btn {
+    background: var(--danger-red);
+    color: white;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    border: none;
+    font-size: 12px;
+}
+
+/* MODALS */
+.modal-overlay {
+    display:none;
+    position:fixed;
+    top:0; left:0;
+    width:100%; height:100%;
+    background:rgba(0,0,0,0.55);
+    z-index:3000;
+}
+
+.modal-box {
+    background:#ffffff;
+    width:90%;
+    max-width:380px;
+    padding:25px;
+    border-radius:12px;
+    margin:120px auto;
+    text-align:center;
+    box-shadow:0 0 20px rgba(0,0,0,0.25);
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+body.dark-mode .modal-box {
+    background: var(--dark-card);
+    color: var(--dark-text);
+}
+
+.modal-btn {
+    width:90%;
+    padding:12px;
+    margin:8px 0;
+    border:none;
+    border-radius:8px;
+    font-size:16px;
+    cursor:pointer;
+    background:var(--deep-ash-green);
+    color:white;
+    transition:0.3s;
+}
+
+.modal-btn:hover {
+    background:var(--hospital-blue);
+}
+
+.modal-cancel {
+    background:#777;
+}
+
+.modal-cancel:hover {
+    background:#555;
+}
+
+/* SELECT2 WIDTH FIX */
+.select2-container {
+    width: 100% !important;
+}
+
+/* MOBILE OPTIMIZATION */
+@media(max-width: 768px) {
+    #topControls {
+        right: 10px;
+        top: 10px;
+        flex-direction: column;
+        align-items: flex-end;
+    }
+
+    #mainContent {
+        padding: 15px;
+    }
+
+    .pos-card {
+        padding: 15px;
+    }
+}
+</style>
+
+<!-- JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
+<script>
+const drugData = {{ drugs|tojson }};
+const stockData = {{ stock|tojson }};
+
+const drugIndex = {};
+for (const d of drugData) {
+    drugIndex[d["drug_name"]] = d;
+}
+
+const stockIndex = {};
+for (const s of stockData) {
+    stockIndex[s["drug_name"]] = s;
+}
+
+function buildDrugOptions() {
+    return drugData.map(d => ({
+        id: d["drug_name"],
+        text: d["drug_name"]
+    }));
+}
+
+function getLatestBalance(drugName) {
+    return stockIndex[drugName]?.["quantity_remaining"] ??
+           drugIndex[drugName]?.["starting_balance"] ?? 0;
+}
+
+function fillRow(row) {
+    const drugName = $("#drug_" + row).val();
+    const qty = parseFloat($("#qty_" + row).val());
+
+    if (!drugName) {
+        $("#cat_" + row).val("");
+        $("#price_" + row).val("");
+        $("#total_" + row).val("");
+        $("#cost_" + row).val("");
+        $("#costTotal_" + row).val("");
+        $("#remain_" + row).val("");
+        updateSummary();
+        return;
+    }
+
+    const d = drugIndex[drugName];
+
+    $("#cat_" + row).val(d["categories"]);
+    $("#cost_" + row).val(d["cost_price"]);
+    $("#price_" + row).val(d["sales_price"]);
+    $("#remain_" + row).val(getLatestBalance(drugName));
+
+    if (!isNaN(qty) && qty > 0) {
+        $("#total_" + row).val((qty * d["sales_price"]).toFixed(2));
+        $("#costTotal_" + row).val((qty * d["cost_price"]).toFixed(2));
+    }
+
+    updateSummary();
+}
+
+function getConsultationFee() {
+    const hour = new Date().getHours();
+    return (hour >= 8 && hour < 17) ? 2000 : 3000;
+}
+
+function updateSummary() {
+    let drugsTotal = 0;
+
+    for (let i = 1; i <= rowCount; i++) {
+        const val = parseFloat($("#total_" + i).val());
+        if (!isNaN(val)) drugsTotal += val;
+    }
+
+    $("#drugsTotal").val(drugsTotal.toFixed(2));
+
+    const consultFee = getConsultationFee();
+    const grandTotal = drugsTotal + consultFee;
+
+    $("#totalBox").text(
+        `GRAND TOTAL: ₦${grandTotal.toFixed(2)} (Drugs: ₦${drugsTotal.toFixed(2)} + Consult: ₦${consultFee})`
+    );
+}
+
+function deleteRow(btn) {
+    $(btn).closest("tr").remove();
+    updateSummary();
+}
+
+let rowCount = 10;
+
+function addRow() {
+    rowCount++;
+
+    $("#posBody").append(`
+<tr>
+<td><select id="drug_${rowCount}" name="drug_${rowCount}" class="drug-select"><option></option></select></td>
+<td><input id="cat_${rowCount}" name="cat_${rowCount}" readonly></td>
+<td><input id="qty_${rowCount}" name="qty_${rowCount}" onkeyup="fillRow(${rowCount})"></td>
+<td><input id="price_${rowCount}" name="price_${rowCount}" readonly></td>
+<td><input id="total_${rowCount}" name="total_${rowCount}" readonly></td>
+<td><input id="cost_${rowCount}" name="cost_${rowCount}" readonly></td>
+<td><input id="costTotal_${rowCount}" name="costTotal_${rowCount}" readonly></td>
+<td><input id="remain_${rowCount}" name="remain_${rowCount}" readonly></td>
+<td><button class="delete-btn" type="button" onclick="deleteRow(this)">Delete</button></td>
+</tr>
+`);
+
+    $("#drug_" + rowCount).select2({
+        data: buildDrugOptions(),
+        placeholder: "Select Drug",
+        allowClear: true,
+        width: "100%"
+    }).on("change", () => fillRow(rowCount));
+}
+
+function validatePOS() {
+    let hasEntries = false;
+
+    for (let i = 1; i <= rowCount; i++) {
+        const drug = $("#drug_" + i).val();
+        const qty = parseFloat($("#qty_" + i).val());
+
+        if (drug && qty > 0) {
+            hasEntries = true;
+
+            const available = parseFloat($("#remain_" + i).val());
+            if (qty > available) {
+                alert(`Stock Alert:\nRequested: ${qty}\nAvailable: ${available}`);
+                return false;
+            }
+        }
+    }
+
+    if (!hasEntries) {
+        alert("POS sheet is empty.");
+        return false;
+    }
+
+    return true;
+}
+
+function openPatientTypePopup() {
+    if (!validatePOS()) return;
+    $("#patientTypePopup").fadeIn(150);
+}
+
+function closePatientTypePopup() {
+    $("#patientTypePopup").fadeOut(150);
+}
+
+function selectPatientType(type) {
+    $("#customerType").val(type);
+
+    for (let i = 1; i <= rowCount; i++) {
+        const drug = $("#drug_" + i).val();
+        if (!drug) continue;
+
+        const qty = parseFloat($("#qty_" + i).val());
+        if (isNaN(qty) || qty <= 0) continue;
+
+        const cost = parseFloat($("#cost_" + i).val()) || 0;
+        const normalSales = parseFloat($("#price_" + i).val()) || 0;
+
+        let finalSales =
+            type === "Staff" ? cost :
+            type === "NHIS" ? normalSales * 0.10 :
+            normalSales;
+
+        $("#price_" + i).val(finalSales.toFixed(2));
+        $("#total_" + i).val((qty * finalSales).toFixed(2));
+        $("#costTotal_" + i).val((qty * cost).toFixed(2));
+    }
+
+    $("#patientTypePopup").fadeOut(150);
+
+    if (type === "InPatient") {
+        $("#inpatientNamePopup").fadeIn(150);
+    } else {
+        $("#posForm").submit();
+    }
+}
+
+function closeInpatientNamePopup() {
+    $("#inpatientNamePopup").fadeOut(150);
+}
+
+function submitInpatientName() {
+    const name = $("#inpatientNameInput").val().trim();
+    if (!name) {
+        alert("Please enter patient name.");
+        return;
+    }
+
+    $("#patientName").val(name);
+    $("#inpatientNamePopup").fadeOut(150);
+    $("#posForm").submit();
+}
+
+/* Sidebar toggle with smooth animation and outside click close */
+$(document).ready(function () {
+    const sidebar = $("#sidebar");
+    const main = $("#mainContent");
+
+    $("#toggleBtn").click(function (e) {
+        e.stopPropagation();
+        if (sidebar.css("left") === "0px") {
+            sidebar.css("left", "-260px");
+            main.css("margin-left", "20px");
+        } else {
+            sidebar.css("left", "0px");
+            main.css("margin-left", "260px");
+        }
+    });
+
+    $(document).click(function (e) {
+        if (!$(e.target).closest("#sidebar, #toggleBtn").length) {
+            if (window.innerWidth < 900) {
+                sidebar.css("left", "-260px");
+                main.css("margin-left", "20px");
+            }
+        }
+    });
+
+    $(window).on("resize", function () {
+        if (window.innerWidth >= 900) {
+            sidebar.css("left", "0px");
+            main.css("margin-left", "260px");
+        } else {
+            sidebar.css("left", "-260px");
+            main.css("margin-left", "20px");
+        }
+    }).trigger("resize");
+
+    $(".drug-select").each(function () {
+        $(this).select2({
+            data: buildDrugOptions(),
+            placeholder: "Select Drug",
+            allowClear: true,
+            width: "100%"
+        }).on("change", function () {
+            const id = $(this).attr("id").split("_")[1];
+            fillRow(id);
+        });
+    });
+
+    // Dark mode toggle
+    $("#darkModeToggle").click(function () {
+        $("body").toggleClass("dark-mode");
+    });
+});
+</script>
+
+</head>
+
+<body>
+
+<!-- TOP CONTROLS -->
+<div id="topControls">
+    <div id="totalBox">GRAND TOTAL: ₦0.00</div>
+    <button class="top-btn" type="button" onclick="openPatientTypePopup()">SUBMIT</button>
+    <button class="top-btn" type="button" onclick="window.location.href='/inpatient/bill/calculator?patient={{ patient }}'">Bill Calculator</button>
+    <button class="top-btn" type="button" onclick="window.location.href='/last_transaction'">View Last Transaction</button>
+    <button id="darkModeToggle" class="top-btn" type="button">Dark Mode</button>
+</div>
+
+<!-- SIDEBAR -->
+<div id="sidebar" class="sidebar">
+    <div class="profile-section">
+        <img src="/static/ibukunolu logo.jpeg" class="profile-pic">
+        <h3>{{ user }}</h3>
+
+        <!-- ROLE BADGE -->
+        <span class="role-badge
+            {% if role == 'Admin' %}role-admin{% endif %}
+            {% if role == 'Auditor' %}role-auditor{% endif %}
+            {% if role == 'Pharmacist' %}role-pharmacist{% endif %}
+            {% if role == 'Administrator' %}role-administrator{% endif %}
+        ">
+            {{ role }}
+        </span>
+    </div>
+
+    <a href="/profile" class="{% if request.path == '/profile' %}active{% endif %}">
+        <i class="fa-solid fa-user"></i> My Profile
+    </a>
+
+    <a href="/dashboard" class="{% if request.path == '/dashboard' %}active{% endif %}">
+        <i class="fa-solid fa-house"></i> Dashboard
+    </a>
+
+    {% if has_permission("pos") %}
+    <a href="/pos" class="{% if request.path == '/pos' %}active{% endif %}">
+        <i class="fa-solid fa-prescription-bottle-medical"></i> POS / Dispense
+    </a>
+    {% endif %}
+
+    {% if has_permission("stock") %}
+    <a href="/stock" class="{% if request.path == '/stock' %}active{% endif %}">
+        <i class="fa-solid fa-boxes-stacked"></i> Stock View
+    </a>
+    {% endif %}
+
+    {% if has_permission("drug_list") %}
+    <a href="/druglist" class="{% if request.path == '/druglist' %}active{% endif %}">
+        <i class="fa-solid fa-list"></i> Drug List
+    </a>
+    {% endif %}
+
+    {% if has_permission("drug_entry") %}
+    <a href="/drug_entry" class="{% if request.path == '/drug_entry' %}active{% endif %}">
+        <i class="fa-solid fa-cart-plus"></i> Drug Entry
+    </a>
+    {% endif %}
+
+    {% if has_permission("inpatient") %}
+    <a href="/inpatient_data" class="{% if request.path == '/inpatient_data' %}active{% endif %}">
+        <i class="fa-solid fa-bed-pulse"></i> InPatient Data
+    </a>
+    {% endif %}
+
+    {% if has_permission("dutylog") %}
+    <a href="/audit_trail" class="{% if request.path == '/audit_trail' %}active{% endif %}">
+        <i class="fa-solid fa-file-lines"></i> Audit Trail
+    </a>
+    {% endif %}
+
+    {% if has_permission("kpi") %}
+    <a href="/kpi_dashboard" class="{% if request.path == '/kpi_dashboard' %}active{% endif %}">
+        <i class="fa-solid fa-chart-line"></i> KPI Dashboard
+    </a>
+    {% endif %}
+
+    {% if has_permission("admin_panel") %}
+    <a href="/admin/dashboard" class="{% if request.path == '/admin/dashboard' %}active{% endif %}">
+        <i class="fa-solid fa-user-gear"></i> Admin Panel
+    </a>
+    {% endif %}
+
+    <a href="/logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+</div>
+
+<!-- TOGGLE BUTTON -->
+<button id="toggleBtn" class="toggle-btn"><i class="fa-solid fa-bars"></i></button>
+
+<!-- MAIN CONTENT -->
+<div id="mainContent">
+    <div class="pos-card">
+
+        <h2>POS – Pharmacy Billing</h2>
+<button class="add-row-btn" type="button" onclick="addRow()">
+    <i class="fa-solid fa-plus"></i> Add Row
+</button>
+
+
+        <form id="posForm" method="POST" action="/pos/submit">
+
+            <input type="hidden" name="customer_type" id="customerType">
+            <input type="hidden" name="patient" id="patientName">
+            <input type="hidden" id="drugsTotal" name="drugsTotal">
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Drug</th>
+                            <th>Category</th>
+                            <th>Qty</th>
+                            <th>Selling Price</th>
+                            <th>Total</th>
+                            <th>Cost Price</th>
+                            <th>Cost Total</th>
+                            <th>Qty Remaining</th>
+                            <th>Delete</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="posBody">
+                        {% for i in range(1, 11) %}
+                        <tr>
+                            <td>
+                                <select id="drug_{{i}}" name="drug_{{i}}" class="drug-select">
+                                    <option></option>
+                                </select>
+                            </td>
+
+                            <td><input id="cat_{{i}}" name="cat_{{i}}" readonly></td>
+                            <td><input id="qty_{{i}}" name="qty_{{i}}" onkeyup="fillRow({{i}})"></td>
+                            <td><input id="price_{{i}}" name="price_{{i}}" readonly></td>
+                            <td><input id="total_{{i}}" name="total_{{i}}" readonly></td>
+                            <td><input id="cost_{{i}}" name="cost_{{i}}" readonly></td>
+                            <td><input id="costTotal_{{i}}" name="costTotal_{{i}}" readonly></td>
+                            <td><input id="remain_{{i}}" name="remain_{{i}}" readonly></td>
+
+                            <td><button class="delete-btn" type="button" onclick="deleteRow(this)">Delete</button></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+<!-- PATIENT TYPE MODAL -->
+<div id="patientTypePopup" class="modal-overlay">
+    <div class="modal-box">
+        <h3>Select Patient Type</h3>
+        <button class="modal-btn" onclick="selectPatientType('Staff')">Staff</button>
+        <button class="modal-btn" onclick="selectPatientType('NHIS')">NHIS</button>
+        <button class="modal-btn" onclick="selectPatientType('HMO')">HMO</button>
+        <button class="modal-btn" onclick="selectPatientType('InPatient')">InPatient</button>
+        <button class="modal-btn" onclick="selectPatientType('OutPatient')">OutPatient</button>
+        <button class="modal-btn" onclick="selectPatientType('NYSC')">NYSC</button>
+        <button class="modal-btn modal-cancel" onclick="closePatientTypePopup()">Cancel</button>
+    </div>
+</div>
+
+<!-- INPATIENT NAME MODAL -->
+<div id="inpatientNamePopup" class="modal-overlay">
+    <div class="modal-box">
+        <h3>Enter InPatient Name</h3>
+        <input type="text" id="inpatientNameInput"
+               placeholder="Patient Name"
+               style="width:90%; padding:12px; border-radius:8px; border:1px solid #aaa; font-size:16px;">
+        <br><br>
+        <button class="modal-btn" onclick="submitInpatientName()">Continue</button>
+        <button class="modal-btn modal-cancel" onclick="closeInpatientNamePopup()">Cancel</button>
+    </div>
+</div>
+
+</body>
+</html>

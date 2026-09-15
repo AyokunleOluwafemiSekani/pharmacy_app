@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>User Management – Admin Panel</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+/* ============================
+GLOBAL + WATERMARK
+============================ */
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: #F5F7FA;
+    margin: 0;
+    transition: margin-left 0.35s ease;
+
+    background-image: url('/static/ibukunolu logo.jpeg');
+    background-repeat: repeat;
+    background-size: 260px;
+    opacity: 0.98;
+}
+
+/* ============================
+SIDEBAR
+============================ */
+.sidebar {
+    height: 100%;
+    width: 260px;
+    position: fixed;
+    top: 0;
+    left: -260px;
+    background: #2F4F4F;
+    padding-top: 20px;
+    transition: left 0.35s ease;
+    z-index: 1000;
+    overflow-y: auto;
+    box-shadow: 3px 0 10px rgba(0,0,0,0.3);
+}
+
+.profile-section {
+    text-align: center;
+    padding: 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+    animation: fadeInDown 0.6s ease;
+}
+
+.profile-pic {
+    width: 85px;
+    height: 85px;
+    border-radius: 50%;
+    border: 3px solid white;
+    object-fit: cover;
+    margin-bottom: 12px;
+}
+
+.sidebar h3 { color: #ffffff; margin: 5px 0; font-size: 19px; }
+.sidebar p { color: #dfe7e7; margin: 0; }
+
+.sidebar a {
+    display: block;
+    padding: 14px 22px;
+    color: #e6eef7;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 500;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    transition: 0.25s ease;
+}
+
+.sidebar a:hover {
+    background: #4C7D7E;
+    padding-left: 28px;
+}
+
+.sidebar a.active {
+    background: #4C7D7E;
+    color: #ffffff;
+    padding-left: 28px;
+    box-shadow: inset 3px 0 0 #3CB371;
+}
+
+/* ============================
+TOGGLE BUTTON
+============================ */
+.toggle-btn {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    background: #2F4F4F;
+    color: white;
+    border: none;
+    padding: 10px 14px;
+    font-size: 22px;
+    border-radius: 6px;
+    cursor: pointer;
+    z-index: 1100;
+    box-shadow: 0 0 10px rgba(0,0,0,0.25);
+    animation: fadeIn 0.5s ease;
+}
+
+.toggle-btn:hover {
+    background: #4C7D7E;
+}
+
+/* ============================
+MAIN CONTENT
+============================ */
+#mainContent {
+    padding: 25px;
+    margin-left: 20px;
+    transition: margin-left 0.35s ease;
+}
+
+body.sidebar-open #sidebar { left: 0; }
+body.sidebar-open #mainContent { margin-left: 260px; }
+
+/* ============================
+SUCCESS BANNER
+============================ */
+.success-banner {
+    display: none;
+    background: #e9f9f0;
+    border-left: 4px solid #3CB371;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    font-size: 14px;
+    color: #1f7a3b;
+    animation: slideDown 0.5s ease;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================
+LOADING SPINNER
+============================ */
+.spinner-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+}
+
+.spinner {
+    width: 70px;
+    height: 70px;
+    border: 7px solid #f3f3f3;
+    border-top: 7px solid #4C7D7E;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* ============================
+FORM + TABLE
+============================ */
+.form-box {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 450px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    margin-bottom: 25px;
+}
+
+.form-box label { font-weight: 600; color: #2E2E2E; }
+.form-box input, .form-box select {
+    width: 100%; padding: 10px; margin-bottom: 12px;
+    border-radius: 6px; border: 1px solid #aaa;
+}
+
+.btn {
+    background: #4C7D7E;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.btn:hover { background: #3CB371; }
+
+.table-container {
+    max-height: 70vh;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+table { width: 100%; border-collapse: collapse; }
+th {
+    background: #4C7D7E; color: white;
+    padding: 12px; text-align: center;
+    position: sticky; top: 0; z-index: 5;
+}
+td { padding: 10px; border-bottom: 1px solid #eee; text-align: center; }
+tr:hover { background: #E8F4FA; }
+
+/* BUTTONS */
+.delete-btn { background: #b30000; color: white; padding: 6px 12px; border-radius: 6px; border: none; cursor: pointer; }
+.deactivate-btn { background: #ff9800; color: white; padding: 6px 12px; border-radius: 6px; border: none; cursor: pointer; }
+.activate-btn { background: #3CB371; color: white; padding: 6px 12px; border-radius: 6px; border: none; cursor: pointer; }
+.show-pass-btn { background: #4DA8DA; color: white; padding: 6px 12px; border-radius: 6px; border: none; cursor: pointer; }
+
+.search-bar {
+    width: 300px;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #aaa;
+    margin-bottom: 15px;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div id="sidebar" class="sidebar">
+    <div class="profile-section">
+        <img src="/static/ibukunolu logo.jpeg" class="profile-pic">
+        <h3>{{ user }}</h3>
+        <p>{{ role }}</p>
+    </div>
+
+    <a href="/admin/dashboard"><i class="fa-solid fa-user-gear"></i> Admin Panel</a>
+    <a href="/admin/users/activity"><i class="fa-solid fa-clock-rotate-left"></i> User Activity Log</a>
+    <a href="/dashboard"><i class="fa-solid fa-house"></i> Dashboard</a>
+    <a href="/logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+</div>
+
+<button id="toggleBtn" class="toggle-btn"><i class="fa-solid fa-bars"></i></button>
+
+<!-- MAIN CONTENT -->
+<div id="mainContent">
+
+<h2>User Management</h2>
+
+<!-- SUCCESS BANNER -->
+<div id="successBanner" class="success-banner"></div>
+
+<!-- SEARCH BAR -->
+<input type="text" id="searchBar" class="search-bar" placeholder="Search by User ID or Name..." onkeyup="filterUsers()">
+
+<!-- ADD USER FORM -->
+<div class="form-box">
+    <form id="addUserForm">
+
+        <label>Name</label>
+        <input name="name" id="new_name" required>
+
+        <label>User ID</label>
+        <input name="userid" id="new_userid" required>
+
+        <label>Password (plain text)</label>
+        <input name="password" id="new_password" required>
+
+        <label>Role</label>
+        <select name="role" id="new_role" required>
+            <option value="Pharmacist">Pharmacist</option>
+            <option value="Admin">Admin</option>
+            <option value="Auditor">Auditor</option>
+            <option value="Administrator">Administrator</option>
+            <option value="Director">Director</option>
+        </select>
+
+        <button class="btn" type="submit">Add User</button>
+    </form>
+</div>
+
+<!-- USERS TABLE -->
+<h2>All Users</h2>
+
+<div class="table-container">
+<table id="userTable">
+    <thead>
+        <tr>
+            <th>User ID</th>
+            <th>Password</th>
+            <th>Name</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for u in users %}
+        <tr>
+            <td>{{ u['Users ID'] }}</td>
+
+            <td>
+                <span id="pass_{{ u['Users ID'] }}" data-real="{{ u['Password'] }}" data-visible="false">********</span>
+                <button class="show-pass-btn" onclick="togglePassword('{{ u['Users ID'] }}')">Show</button>
+            </td>
+
+            <td>{{ u['Name'] }}</td>
+            <td>{{ u['Role'] }}</td>
+
+            <td>
+                {% if u['Active'] %}
+                    <span style="color:green;font-weight:600;">Active</span>
+                {% else %}
+                    <span style="color:red;font-weight:600;">Inactive</span>
+                {% endif %}
+            </td>
+
+            <td>
+                <button class="btn" onclick="openEditModal('{{ u['Users ID'] }}','{{ u['Name'] }}','{{ u['Role'] }}')">Edit</button>
+
+                {% if u['Active'] %}
+                <button class="deactivate-btn" onclick="deactivateUser('{{ u['Users ID'] }}')">Deactivate</button>
+                {% else %}
+                <button class="activate-btn" onclick="activateUser('{{ u['Users ID'] }}')">Activate</button>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+
+</div>
+
+<!-- SPINNER -->
+<div id="spinnerOverlay" class="spinner-overlay">
+    <div class="spinner"></div>
+</div>
+
+<script>
+/* SIDEBAR TOGGLE */
+document.getElementById("toggleBtn").onclick = () => {
+    document.body.classList.toggle("sidebar-open");
+};
+
+/* SUCCESS BANNER */
+function showSuccess(msg){
+    const banner=document.getElementById("successBanner");
+    banner.innerHTML=`<i class="fa-solid fa-circle-check"></i> ${msg}`;
+    banner.style.display="block";
+    setTimeout(()=>banner.style.display="none",4000);
+}
+
+/* SPINNER */
+function showSpinner(){ document.getElementById("spinnerOverlay").style.display="flex"; }
+function hideSpinner(){ document.getElementById("spinnerOverlay").style.display="none"; }
+
+/* PASSWORD REVEAL */
+function togglePassword(id){
+    const span=document.getElementById("pass_"+id);
+    if(span.dataset.visible==="true"){
+        span.innerText="********";
+        span.dataset.visible="false";
+    } else {
+        span.innerText=span.dataset.real;
+        span.dataset.visible="true";
+    }
+}
+
+/* SEARCH FILTER */
+function filterUsers(){
+    const q=document.getElementById("searchBar").value.toLowerCase();
+    const rows=document.querySelectorAll("#userTable tbody tr");
+
+    rows.forEach(r=>{
+        const id=r.cells[0].innerText.toLowerCase();
+        const name=r.cells[2].innerText.toLowerCase();
+
+        r.style.display=(id.includes(q) || name.includes(q)) ? "" : "none";
+    });
+}
+
+/* ADD USER */
+document.getElementById("addUserForm").onsubmit=function(e){
+    e.preventDefault();
+    showSpinner();
+
+    const payload={
+        name:document.getElementById("new_name").value,
+        userid:document.getElementById("new_userid").value,
+        password:document.getElementById("new_password").value,
+        role:document.getElementById("new_role").value
+    };
+
+    fetch("/admin/users/add",{
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body:JSON.stringify(payload)
+    })
+    .then(r=>r.json())
+    .then(d=>{
+        hideSpinner();
+        showSuccess("User added successfully!");
+        setTimeout(()=>location.reload(),1500);
+    });
+};
+
+/* DEACTIVATE USER */
+function deactivateUser(id){
+    if(!confirm("Deactivate this user?")) return;
+    showSpinner();
+
+    fetch("/admin/users/deactivate",{
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body:JSON.stringify({ id })
+    })
+    .then(r=>r.json())
+    .then(d=>{
+        hideSpinner();
+        showSuccess("User deactivated!");
+        setTimeout(()=>location.reload(),1500);
+    });
+}
+
+/* ACTIVATE USER */
+function activateUser(id){
+    if(!confirm("Activate this user?")) return;
+    showSpinner();
+
+    fetch("/admin/users/activate",{
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body:JSON.stringify({ id })
+    })
+    .then(r=>r.json())
+    .then(d=>{
+        hideSpinner();
+        showSuccess("User activated!");
+        setTimeout(()=>location.reload(),1500);
+    });
+}
+
+/* EDIT USER */
+function openEditModal(id,name,role){
+    alert("Edit modal coming next if you want it.");
+}
+
+</script>
+
+</body>
+</html>

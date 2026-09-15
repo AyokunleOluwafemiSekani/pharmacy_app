@@ -1,0 +1,62 @@
+timestamp,user,role,action,details
+2026-09-11T09:00:50.098335,Ayokunle Oluwafemi,Admin,LOGIN,Ayokunle Oluwafemi logged in
+2026-09-10T20:30:39.416443,Ayokunle Oluwafemi,Admin,LOGIN,Ayokunle Oluwafemi logged in
+2026-09-10T20:30:13.296578,Ayokunle Oluwafemi,Admin,LOGOUT,Ayokunle Oluwafemi logged out
+2026-09-10T20:29:44.912371,Ayokunle Oluwafemi,Admin,Add User,Added user: Oluwagbeminiy Adedamola Olarinoye
+2026-09-10T20:19:24.231155,Ayokunle Oluwafemi,Admin,LOGIN,Ayokunle Oluwafemi logged in
+2026-09-10T12:22:18.284557,Ayokunle Oluwafemi,Admin,LOGIN,Ayokunle Oluwafemi logged in
+2026-09-10T12:22:12.387916,Olaosegba Tosin,Pharmacist,LOGOUT,Olaosegba Tosin logged out
+2026-09-10T12:18:48.683569,Olaosegba Tosin,Pharmacist,LOGIN,Olaosegba Tosin logged in
+2026-09-10T12:18:31.631355,Ayokunle Oluwafemi,Admin,LOGOUT,Ayokunle Oluwafemi logged out
+2026-09-10T10:39:19.748191,Ayokunle Oluwafemi,Admin,LOGIN,Ayokunle Oluwafemi logged in
+2026-09-10T10:39:13.444756,Ayokunle Oluwafemi,Admin,LOGOUT,Ayokunle Oluwafemi logged out
+2026-09-10T03:23:20.465474,Ayokunle Oluwafemi,Admin,LOGIN,Ayokunle Oluwafemi logged in
+2026-09-10T03:22:19.408875,Ayokunle Oluwafemi,Admin,LOGIN,Ayokunle Oluwafemi logged in
+2026-09-09T19:55:16.046816,Ayokunle Oluwafemi,Admin,LOGIN,Ayokunle Oluwafemi logged in
+2026-09-09T19:55:08.511724,Kolade Mayowa,Pharmacist,LOGOUT,Kolade Mayowa logged out
+2026-09-09T19:54:01.497775,Kolade Mayowa,Pharmacist,LOGIN,Kolade Mayowa logged in
+2026-09-09T19:52:48.386369,Ayokunle Oluwafemi,Admin,LOGOUT,Ayokunle Oluwafemi logged out
+2026-09-09T19:51:32.383874,Ayokunle Oluwafemi,Admin,LOGIN,Ayokunle Oluwafemi logged in
+2026-09-09T19:51:18.965815,Olaosegba Tosin,Pharmacist,LOGOUT,Olaosegba Tosin logged out
+2026-09-09T19:36:02.467423,Olaosegba Tosin,Pharmacist,LOGIN,Olaosegba Tosin logged in
+2026-09-09T19:35:56.352234,Ayokunle Oluwafemi,Admin,LOGOUT,Ayokunle Oluwafemi logged out
+2026-09-09T19:33:58.678297,Ayokunle Oluwafemi,Admin,LOGIN,Ayokunle Oluwafemi logged in
+2026-09-09T19:33:53.995154,Olaosegba Tosin,Pharmacist,LOGOUT,Olaosegba Tosin logged out
+2026-09-09T19:20:40.422483,Olaosegba Tosin,Pharmacist,LOGIN,Olaosegba Tosin logged in
+2026-09-09T19:19:57.854162,Ayokunle Oluwafemi,Admin,LOGOUT,Ayokunle Oluwafemi logged out
+2026-09-09T19:19:48.569780,Ayokunle Oluwafemi,Admin,LOGIN,Ayokunle Oluwafemi logged in
+2026-09-09T19:19:36.362321,Ayokunle Oluwafemi,Admin,LOGOUT,Ayokunle Oluwafemi logged out
+2026-09-09T19:18:17.569843,Ayokunle Oluwafemi,Admin,LOGIN,Ayokunle Oluwafemi logged in
+2026-09-09T16:52:37.953261,Ayokunle Oluwafemi,Admin,LOGOUT,Ayokunle Oluwafemi logged out
+2026-09-09T16:42:18.821119,Ayokunle Oluwafemi,Admin,Edit User,"Edited user: Kolade Mayowa, Role changed to Pharmacist"
+2026-09-09T16:28:26.630417,Ayokunle Oluwafemi,Admin,Edit User,"Edited user: Kolade Mayowa, Role changed to Pharmacist"
+2026-09-09T16:27:53.806307,Ayokunle Oluwafemi,Admin,LOGIN,Ayokunle Oluwafemi logged in
+2026-09-09T16:27:47.462541,Olaosegba Tosin,Pharmacist,LOGOUT,Olaosegba Tosin logged out
+2026-09-09T16:20:05.677153,Olaosegba Tosin,Pharmacist,LOGIN,Olaosegba Tosin logged in
+2026-09-09T16:18:15.422190,Ayokunle Oluwafemi,Admin,LOGOUT,Ayokunle Oluwafemi logged out
+2026-09-09T16:12:45.812213,Ayokunle Oluwafemi,Admin,Edit User,"Edited user: Kolade Mayowa, Role changed to Pharmacist"
+2026-09-09T16:11:20.764791,Ayokunle Oluwafemi,Admin,Delete User,Deleted user: Kolade Mayowa
+2026-09-09T16:10:20.067464,Ayokunle Oluwafemi,Admin,Edit User,"Edited user: Kolade Mayowa, Role changed to Pharmacist"
+2026-09-09T16:05:54.876608,Ayokunle Oluwafemi,Admin,Edit User,"Edited user: Kolade Mayowa, Role changed to Pharmacist"
+2026-09-09T16:02:59.027673,Ayokunle Oluwafemi,Admin,Edit User,"Edited user: Kolade Mayowa, Role changed to Pharmacist"
+2026-09-09T15:57:00.541224,Ayokunle Oluwafemi,Admin,Edit User,"Edited user: Kolade Mayowa, Role changed to Pharmacist"
+2026-09-09T15:56:30.627374,Ayokunle Oluwafemi,Admin,Edit User,"Edited user: Kolade Mayowa, Role changed to Pharmacist"
+2026-09-09T14:17:56.260531,Ayokunle Oluwafemi,Admin,Reset Password,Reset password for user: Kolade Mayowa
+2026-09-09T08:06:05.518674,Ayokunle Oluwafemi,Admin,LOGIN,Ayokunle Oluwafemi logged in
+2026-09-08T20:22:20.464550,Ayokunle Oluwafemi,Admin,LOGIN,Ayokunle Oluwafemi logged in
+2026-09-08T16:27:47.650508,Ayokunle Oluwafemi,Admin,LOGOUT,Ayokunle Oluwafemi logged out
+2026-09-08T16:26:46.981015,Ayokunle Oluwafemi,Admin,LOGIN,Ayokunle Oluwafemi logged in
+2026-09-08T16:26:41.572663,Olaosegba Tosin,Pharmacist,LOGOUT,Olaosegba Tosin logged out
+2026-09-08T16:24:43.124734,Olaosegba Tosin,Pharmacist,LOGIN,Olaosegba Tosin logged in
+2026-09-08T16:24:18.294368,Ayokunle Oluwafemi,Admin,LOGOUT,Ayokunle Oluwafemi logged out
+2026-09-08T16:17:31.933751,Ayokunle Oluwafemi,Admin,LOGIN,Ayokunle Oluwafemi logged in
+2026-09-08T16:17:15.552200,Ayokunle Oluwafemi,Admin,LOGOUT,Ayokunle Oluwafemi logged out
+2026-09-08T15:14:02.267216,Ayokunle Oluwafemi,Admin,LOGIN,Ayokunle Oluwafemi logged in
+2026-09-08T15:13:21.071541,Ayokunle Oluwafemi,Admin,LOGOUT,Ayokunle Oluwafemi logged out
+2026-09-08T13:57:38.730689,Ayokunle Oluwafemi,Admin,LOGIN,Ayokunle Oluwafemi logged in
+2026-09-08T10:56:44.619416,Ayokunle Oluwafemi,Admin,LOGIN,User Ayokunle Oluwafemi (Sekani) logged in as Admin
+2026-09-08T10:56:39.572393,Ayokunle Oluwafemi,Admin,LOGOUT,User Ayokunle Oluwafemi (Sekani) logged out
+2026-09-08T10:50:20.508788,Ayokunle Oluwafemi,Admin,LOGIN,User Ayokunle Oluwafemi (Sekani) logged in as Admin
+2026-09-08T10:38:40.908522,Ayokunle Oluwafemi,Admin,LOGIN,User Ayokunle Oluwafemi (Sekani) logged in as Admin
+2026-09-08T10:36:15.527274,Ayokunle Oluwafemi,Admin,LOGIN,User Ayokunle Oluwafemi (Sekani) logged in as Admin
+2026-09-08T10:33:04.411845,Ayokunle Oluwafemi,Admin,LOGIN,User Ayokunle Oluwafemi (Sekani) logged in as Admin

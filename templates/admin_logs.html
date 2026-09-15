@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="page-title">Admin Activity Logs</h2>
+<p class="page-subtitle">Monitor system events, admin actions, errors, and security activity.</p>
+
+<!-- Search + Filter Bar -->
+<div class="log-controls">
+    <input type="text" id="logSearch" placeholder="Search logs..." onkeyup="filterLogs()">
+    <select id="logFilter" onchange="filterLogs()">
+        <option value="">All Types</option>
+        <option value="login">Login</option>
+        <option value="backup">Backup</option>
+        <option value="restore">Restore</option>
+        <option value="error">Error</option>
+        <option value="system">System</option>
+    </select>
+</div>
+
+<div class="table-container smooth-table">
+<table class="responsive-table" id="logTable">
+    <thead>
+        <tr>
+            <th>Time</th>
+            <th>Type</th>
+            <th>Message</th>
+            <th>IP</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for log in logs %}
+        <tr class="log-row" data-type="{{ log.type }}">
+            <td data-label="Time">
+                <div class="log-time">
+                    <i class="fa-solid fa-clock"></i> {{ log.time }}
+                </div>
+            </td>
+
+            <td data-label="Type">
+                <span class="badge {{ log.type }}-badge">
+                    <i class="fa-solid 
+                        {% if log.type == 'login' %}fa-right-to-bracket{% endif %}
+                        {% if log.type == 'backup' %}fa-database{% endif %}
+                        {% if log.type == 'restore' %}fa-rotate-left{% endif %}
+                        {% if log.type == 'error' %}fa-triangle-exclamation{% endif %}
+                        {% if log.type == 'system' %}fa-gear{% endif %}
+                    "></i>
+                    {{ log.type|capitalize }}
+                </span>
+            </td>
+
+            <td data-label="Message">{{ log.message }}</td>
+
+            <td data-label="IP">
+                <div class="log-ip">
+                    <i class="fa-solid fa-network-wired"></i> {{ log.ip }}
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+
+<style>
+/* Layout */
+.log-controls {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.log-controls input,
+.log-controls select {
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 15px;
+    width: 200px;
+}
+
+/* Badges */
+.badge {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    color: white;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.login-badge { background: #3b82f6; }
+.backup-badge { background: #4C7D7E; }
+.restore-badge { background: #6f42c1; }
+.error-badge { background: #d9534f; }
+.system-badge { background: #6c757d; }
+
+/* Icons inside table */
+.log-time i,
+.log-ip i {
+    margin-right: 6px;
+    opacity: 0.7;
+}
+
+/* Hover effect */
+.log-row:hover {
+    background: rgba(0,0,0,0.03);
+    transition: 0.2s;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .log-controls {
+        flex-direction: column;
+    }
+}
+</style>
+
+<script>
+function filterLogs() {
+    const search = document.getElementById("logSearch").value.toLowerCase();
+    const filter = document.getElementById("logFilter").value;
+    const rows = document.querySelectorAll(".log-row");
+
+    rows.forEach(row => {
+        const type = row.getAttribute("data-type");
+        const text = row.innerText.toLowerCase();
+
+        const matchesSearch = text.includes(search);
+        const matchesFilter = filter === "" || filter === type;
+
+        row.style.display = (matchesSearch && matchesFilter) ? "" : "none";
+    });
+}
+</script>
+
+{% endblock %}

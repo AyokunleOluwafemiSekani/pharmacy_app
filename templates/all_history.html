@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-4">
+
+    <h2 class="mb-4">All History</h2>
+
+    <!-- ============================
+         RESTOCK HISTORY
+    ============================= -->
+    <h4>Restock History</h4>
+    <table class="table table-bordered table-striped mb-5">
+        <thead class="table-dark">
+            <tr>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Drug Name</th>
+                <th>Quantity Added</th>
+                <th>Transaction ID</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in restock %}
+            <tr>
+                <td>{{ r.Date }}</td>
+                <td>{{ r.Time }}</td>
+                <td>{{ r["Drug Name"] }}</td>
+                <td>{{ r["Quantity Added"] }}</td>
+                <td>{{ r["Transaction ID"] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- ============================
+         POS SALES HISTORY
+    ============================= -->
+    <h4>POS Sales History</h4>
+    <table class="table table-bordered table-striped mb-5">
+        <thead class="table-dark">
+            <tr>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Drug Name</th>
+                <th>Category</th>
+                <th>Quantity Sold</th>
+                <th>Sales Price</th>
+                <th>Bill</th>
+                <th>Transaction ID</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in pos %}
+            <tr>
+                <td>{{ p.Date }}</td>
+                <td>{{ p.Time }}</td>
+                <td>{{ p["DRUG NAME"] }}</td>
+                <td>{{ p.Category }}</td>
+                <td>{{ p["Quantity Sold"] }}</td>
+                <td>{{ p["Sales Price"] }}</td>
+                <td>{{ p.Bill }}</td>
+                <td>{{ p["Transaction ID"] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- ============================
+         INPATIENT HISTORY
+    ============================= -->
+    <h4>Inpatient History</h4>
+    <table class="table table-bordered table-striped mb-5">
+        <thead class="table-dark">
+            <tr>
+                <th>Date</th>
+                <th>Drug Name</th>
+                <th>Patient Name</th>
+                <th>Category</th>
+                <th>Sales Price</th>
+                <th>Quantity Sold</th>
+                <th>Bill Total</th>
+                <th>Transaction ID</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for i in inpatient %}
+            <tr>
+                <td>{{ i.Date }}</td>
+                <td>{{ i["Drug Name"] }}</td>
+                <td>{{ i["Patient Name"] }}</td>
+                <td>{{ i.Categories }}</td>
+                <td>{{ i["Sales Price"] }}</td>
+                <td>{{ i["Quantity Sold"] }}</td>
+                <td>{{ i["Bill Total"] }}</td>
+                <td>{{ i["Transaction ID"] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- ============================
+         DUTY LOG HISTORY
+    ============================= -->
+    <h4>Duty Log History</h4>
+    <table class="table table-bordered table-striped mb-5">
+        <thead class="table-dark">
+            <tr>
+                <th>Date</th>
+                <th>Time</th>
+                <th>User</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for d in duty %}
+            <tr>
+                <td>{{ d.Date }}</td>
+                <td>{{ d.Time }}</td>
+                <td>{{ d.User }}</td>
+                <td>{{ d.Action }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+
+{% endblock %}

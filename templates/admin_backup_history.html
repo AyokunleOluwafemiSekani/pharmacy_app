@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="page-title">Backup History</h2>
+
+<div class="table-container smooth-table">
+<table class="responsive-table">
+    <thead>
+        <tr>
+            <th>Source</th>
+            <th>Name</th>
+            <th>Date</th>
+            <th>Size</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for b in backups %}
+        <tr>
+            <td data-label="Source">
+                {% if b.source == "local" %}
+                    <span class="badge local-badge">Local</span>
+                {% else %}
+                    <span class="badge cloud-badge">Cloud</span>
+                {% endif %}
+            </td>
+
+            <td data-label="Name">{{ b.name }}</td>
+            <td data-label="Date">{{ b.date }}</td>
+            <td data-label="Size">{{ b.size }}</td>
+
+            <td data-label="Actions">
+                {% if b.source == "local" %}
+                    <button class="btn small-btn download-btn"
+                        onclick="window.location.href='/admin/backups/download?file={{ b.name }}'">
+                        <i class="fa-solid fa-download"></i>
+                    </button>
+
+                    <button class="btn small-btn restore-btn"
+                        onclick="window.location.href='/admin/backups/restore?file={{ b.name }}'">
+                        <i class="fa-solid fa-rotate-left"></i>
+                    </button>
+
+                {% else %}
+                    <button class="btn small-btn download-btn"
+                        onclick="window.location.href='/admin/backups/cloud-download?id={{ b.id }}&name={{ b.name }}'">
+                        <i class="fa-solid fa-cloud-arrow-down"></i>
+                    </button>
+
+                    <button class="btn small-btn restore-btn"
+                        onclick="window.location.href='/admin/backups/cloud-restore?id={{ b.id }}&name={{ b.name }}'">
+                        <i class="fa-solid fa-cloud"></i>
+                    </button>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+
+<style>
+.badge {
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    color: white;
+}
+
+.local-badge {
+    background: #4C7D7E;
+}
+
+.cloud-badge {
+    background: #3b82f6;
+}
+</style>
+
+{% endblock %}

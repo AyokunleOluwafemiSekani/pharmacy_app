@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<title>Drug List – Pharmacy</title>
+
+<!-- Inter Font -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+:root {
+    --deep-ash-green: #2F4F4F;
+    --medium-ash-green: #3C5F5F;
+    --light-ash: #E8ECEB;
+    --hospital-blue: #4C7D7E;
+    --white: #FFFFFF;
+}
+/* ACTIVE LINK HIGHLIGHT + GLOW */
+.sidebar a.active {
+    background: var(--hospital-blue);
+    padding-left: 28px;
+    font-weight: bold;
+    box-shadow: inset 0 0 10px rgba(255,255,255,0.4),
+                0 0 12px rgba(76,125,126,0.8);
+}
+/* TOP BAR ROLE INDICATOR */
+.role-indicator {
+    position: fixed;
+    top: 15px;
+    left: 80px;
+    z-index: 2500;
+}
+
+/* ROLE BADGES WITH COLORS + GLOW + PULSE */
+.role-badge {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 600;
+    color: white;
+    animation: pulseGlow 2s infinite;
+}
+
+/* Admin = Red */
+.role-admin {
+    background: #B30000;
+    box-shadow: 0 0 12px rgba(179,0,0,0.7);
+}
+
+/* Auditor = Blue */
+.role-auditor {
+    background: #0055FF;
+    box-shadow: 0 0 12px rgba(0,85,255,0.7);
+}
+
+/* Pharmacist = Green */
+.role-pharmacist {
+    background: #009933;
+    box-shadow: 0 0 12px rgba(0,153,51,0.7);
+}
+
+/* Administrator = Deep Ash */
+.role-administrator {
+    background: #2F4F4F;
+    box-shadow: 0 0 12px rgba(47,79,79,0.7);
+}
+
+/* Pulse Animation */
+@keyframes pulseGlow {
+    0% { transform: scale(1); box-shadow: 0 0 12px rgba(255,255,255,0.4); }
+    50% { transform: scale(1.05); box-shadow: 0 0 18px rgba(255,255,255,0.7); }
+    100% { transform: scale(1); box-shadow: 0 0 12px rgba(255,255,255,0.4); }
+}
+
+/* GLOBAL */
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--light-ash);
+}
+
+/* ACTIVE LINK HIGHLIGHT */
+.sidebar a.active {
+    background: var(--hospital-blue);
+    padding-left: 28px;
+    font-weight: bold;
+}
+
+
+
+body.dark-mode {
+    background: var(--dark-bg);
+    color: var(--dark-text);
+}
+
+/* FIXED TOP CONTROLS */
+#topControls {
+    position: fixed;
+    top: 15px;
+    right: 25px;
+    display: flex;
+    gap: 10px;
+    z-index: 2000;
+}
+
+.top-btn {
+    background: var(--deep-ash-green);
+    color: white;
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+    transition: 0.3s ease;
+}
+
+.top-btn:hover {
+    background: var(--hospital-blue);
+    transform: translateY(-1px);
+}
+
+ ROLE BADGES */
+.role-badge {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 600;
+    color: white;
+    animation: pulseGlow 2s infinite;
+}
+
+.role-admin { background: #B30000; }
+.role-auditor { background: #0055FF; }
+.role-pharmacist { background: #009933; }
+.role-administrator { background: #2F4F4F; }
+
+@keyframes pulseGlow {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* SIDEBAR */
+.sidebar {
+    height: 100%;
+    width: 260px;
+    position: fixed;
+    top: 0;
+    left: -260px;
+    background: var(--deep-ash-green);
+    padding-top: 20px;
+    transition: left 0.35s ease;
+    z-index: 1000;
+    overflow-y: auto;
+    box-shadow: 3px 0 10px rgba(0,0,0,0.25);
+}
+/* MULTIPLE LOGO WATERMARK */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('/static/ibukunolu logo.jpeg');
+            background-repeat: repeat;
+            background-size: 260px;
+            opacity: 0.05;
+            z-index: -1;
+        }
+
+.profile-section {
+    text-align: center;
+    padding: 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+}
+
+.profile-pic {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 3px solid white;
+    object-fit: cover;
+    margin-bottom: 10px;
+}
+
+.sidebar a {
+    display: block;
+    padding: 14px 20px;
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+    transition: 0.25s ease;
+}
+
+.sidebar a:hover {
+    background: var(--hospital-blue);
+    padding-left: 28px;
+}
+
+/* TOGGLE BUTTON */
+.toggle-btn {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    background: var(--deep-ash-green);
+    color: white;
+    border: none;
+    padding: 10px 14px;
+    font-size: 22px;
+    border-radius: 6px;
+    cursor: pointer;
+    z-index: 2100;
+}
+.toggle-btn:hover {
+    background: var(--hospital-blue);
+}
+
+/* MAIN CONTENT */
+#mainContent {
+    padding: 80px 25px 25px 25px;
+    margin-left: 20px;
+    transition: margin-left 0.35s ease;
+}
+
+/* CARD */
+.drug-card {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+}
+
+body.dark-mode .drug-card {
+    background: var(--dark-card);
+    color: var(--dark-text);
+}
+
+h2 {
+    margin-bottom: 15px;
+    color: var(--deep-ash-green);
+}
+
+body.dark-mode h2 {
+    color: var(--dark-text);
+}
+
+/* SEARCH BAR + BUTTONS */
+.controls {
+    background: white;
+    padding: 15px;
+    border-radius: 12px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+}
+
+body.dark-mode .controls {
+    background: var(--dark-card);
+}
+
+.search-input {
+    padding: 12px 14px;
+    border-radius: 999px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    min-width: 220px;
+    transition: 0.3s ease;
+}
+
+.search-input:focus {
+    border-color: var(--hospital-blue);
+    box-shadow: 0 0 6px rgba(76,125,126,0.5);
+    outline: none;
+}
+
+.controls button {
+    padding: 10px 16px;
+    background: var(--deep-ash-green);
+    color: white;
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.controls button:hover {
+    background: var(--hospital-blue);
+    transform: translateY(-1px);
+}
+
+/* TABLE WRAPPER — ALWAYS VISIBLE SCROLLBAR */
+.table-wrapper {
+    width: 100%;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    border-radius: 10px;
+}
+
+.table-wrapper::-webkit-scrollbar {
+    height: 12px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb {
+    background: var(--medium-ash-green);
+    border-radius: 10px;
+}
+
+.table-wrapper::-webkit-scrollbar-track {
+    background: #ddd;
+}
+
+/* TABLE */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    min-width: 1000px;
+}
+
+body.dark-mode table {
+    background: var(--dark-card);
+}
+
+th {
+    background: var(--deep-ash-green);
+    color: white;
+    padding: 10px;
+    font-size: 13px;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+}
+
+body.dark-mode th {
+    background: #1b2b2b;
+}
+
+td {
+    padding: 8px;
+    border-bottom: 1px solid #ccc;
+    font-size: 13px;
+}
+
+body.dark-mode td {
+    border-bottom: 1px solid var(--dark-border);
+}
+
+/* Back to top button */
+#backToTop {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    background: var(--hospital-blue);
+    color: white;
+    border: none;
+    border-radius: 999px;
+    padding: 10px 14px;
+    font-size: 18px;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+    display: none;
+    z-index: 2000;
+    transition: 0.3s ease;
+}
+
+#backToTop:hover {
+    background: var(--medium-ash-green);
+    transform: translateY(-2px);
+}
+</style>
+
+</head>
+
+<body>
+
+<!-- TOP CONTROLS -->
+<div id="topControls">
+    <button id="darkModeToggle" class="top-btn"><i class="fa-solid fa-moon"></i> Dark Mode</button>
+</div>
+
+<!-- SIDEBAR -->
+<div id="sidebar" class="sidebar">
+    <div class="profile-section">
+        <img src="/static/ibukunolu logo.jpeg" class="profile-pic">
+        <h3>{{ user }}</h3>
+
+        <!-- ROLE BADGE -->
+        <span class="role-badge
+            {% if role == 'Admin' %}role-admin{% endif %}
+            {% if role == 'Auditor' %}role-auditor{% endif %}
+            {% if role == 'Pharmacist' %}role-pharmacist{% endif %}
+            {% if role == 'Administrator' %}role-administrator{% endif %}
+        ">
+            {{ role }}
+        </span>
+    </div>
+
+    <a href="/profile" class="{% if request.path == '/profile' %}active{% endif %}">
+        <i class="fa-solid fa-user"></i> My Profile
+    </a>
+
+    <a href="/dashboard" class="{% if request.path == '/dashboard' %}active{% endif %}">
+        <i class="fa-solid fa-house"></i> Dashboard
+    </a>
+
+    {% if has_permission("pos") %}
+    <a href="/pos" class="{% if request.path == '/pos' %}active{% endif %}">
+        <i class="fa-solid fa-prescription-bottle-medical"></i> POS / Dispense
+    </a>
+    {% endif %}
+
+    {% if has_permission("stock") %}
+    <a href="/stock" class="{% if request.path == '/stock' %}active{% endif %}">
+        <i class="fa-solid fa-boxes-stacked"></i> Stock View
+    </a>
+    {% endif %}
+
+    {% if has_permission("drug_list") %}
+    <a href="/druglist" class="{% if request.path == '/druglist' %}active{% endif %}">
+        <i class="fa-solid fa-list"></i> Drug List
+    </a>
+    {% endif %}
+
+    {% if has_permission("drug_entry") %}
+    <a href="/drug_entry" class="{% if request.path == '/drug_entry' %}active{% endif %}">
+        <i class="fa-solid fa-cart-plus"></i> Drug Entry
+    </a>
+    {% endif %}
+
+    {% if has_permission("inpatient") %}
+    <a href="/inpatient_data" class="{% if request.path == '/inpatient_data' %}active{% endif %}">
+        <i class="fa-solid fa-bed-pulse"></i> InPatient Data
+    </a>
+    {% endif %}
+
+    {% if has_permission("dutylog") %}
+    <a href="/audit_trail" class="{% if request.path == '/audit_trail' %}active{% endif %}">
+        <i class="fa-solid fa-file-lines"></i> Audit Trail
+    </a>
+    {% endif %}
+
+    {% if has_permission("kpi") %}
+    <a href="/kpi_dashboard" class="{% if request.path == '/kpi_dashboard' %}active{% endif %}">
+        <i class="fa-solid fa-chart-line"></i> KPI Dashboard
+    </a>
+    {% endif %}
+
+    {% if has_permission("admin_panel") %}
+    <a href="/admin/dashboard" class="{% if request.path == '/admin/dashboard' %}active{% endif %}">
+        <i class="fa-solid fa-user-gear"></i> Admin Panel
+    </a>
+    {% endif %}
+
+    <a href="/logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+</div>
+
+
+
+<!-- TOGGLE BUTTON -->
+<button id="toggleBtn" class="toggle-btn"><i class="fa-solid fa-bars"></i></button>
+
+<!-- MAIN CONTENT -->
+<div id="mainContent">
+
+<div class="drug-card">
+
+<h2>Drug List</h2>
+
+<div class="controls">
+    <input type="text" id="searchDrug" class="search-input" placeholder="Search Drug Name">
+    <input type="text" id="searchCategory" class="search-input" placeholder="Search Category">
+
+    <button onclick="filterTable()"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+    <button onclick="resetFilters()"><i class="fa-solid fa-rotate-left"></i> Reset</button>
+    <button onclick="exportExcel()"><i class="fa-solid fa-file-excel"></i> Export Excel</button>
+    <button onclick="window.print()"><i class="fa-solid fa-print"></i> Print</button>
+</div>
+
+<div class="table-wrapper">
+<table id="drugTable">
+<thead>
+<tr>
+    <th>Drug Name</th>
+    <th>Category</th>
+    <th>Sales Price</th>
+    <th>Cost Price</th>
+    <th>Starting Balance</th>
+</tr>
+</thead>
+
+<tbody id="tableBody">
+{% for row in drugs %}
+<tr>
+    <td>{{ row['drug_name'] }}</td>
+    <td>{{ row['categories'] }}</td>
+    <td>{{ row['sales_price'] }}</td>
+    <td>{{ row['cost_price'] }}</td>
+    <td>{{ row['starting_balance'] }}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+
+</div>
+</div>
+
+<!-- BACK TO TOP BUTTON -->
+<button id="backToTop" onclick="scrollToTop()"><i class="fa-solid fa-arrow-up"></i></button>
+
+<script>
+function filterTable() {
+    let drug = document.getElementById("searchDrug").value.toLowerCase();
+    let category = document.getElementById("searchCategory").value.toLowerCase();
+
+    let rows = document.querySelectorAll("#tableBody tr");
+
+    rows.forEach(row => {
+        let drugName = row.cells[0].innerText.toLowerCase();
+        let cat = row.cells[1].innerText.toLowerCase();
+
+        row.style.display = (drugName.includes(drug) && cat.includes(category)) ? "" : "none";
+    });
+}
+
+function resetFilters() {
+    document.getElementById("searchDrug").value = "";
+    document.getElementById("searchCategory").value = "";
+
+    let rows = document.querySelectorAll("#tableBody tr");
+    rows.forEach(row => row.style.display = "");
+}
+
+function exportExcel() {
+    let table = document.getElementById("drugTable").outerHTML;
+    let url = 'data:application/vnd.ms-excel,' + escape(table);
+    let link = document.createElement("a");
+    link.href = url;
+    link.download = "DrugList.xls";
+    link.click();
+}
+
+/* SIDEBAR TOGGLE */
+document.getElementById("toggleBtn").onclick = function () {
+    let sidebar = document.getElementById("sidebar");
+    let main = document.getElementById("mainContent");
+
+    if (sidebar.style.left === "0px") {
+        sidebar.style.left = "-260px";
+        main.style.marginLeft = "20px";
+    } else {
+        sidebar.style.left = "0px";
+        main.style.marginLeft = "260px";
+    }
+};
+
+/* DARK MODE TOGGLE */
+document.getElementById("darkModeToggle").onclick = function () {
+    document.body.classList.toggle("dark-mode");
+};
+
+/* BACK TO TOP VISIBILITY */
+window.addEventListener("scroll", function () {
+    let btn = document.getElementById("backToTop");
+    if (window.scrollY > 200) {
+        btn.style.display = "block";
+    } else {
+        btn.style.display = "none";
+    }
+});
+
+function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+}
+</script>
+
+</body>
+</html>

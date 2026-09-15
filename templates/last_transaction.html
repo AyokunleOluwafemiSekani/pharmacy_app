@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Last Transaction</title>
+
+    <style>
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: #ECF0F1;
+            padding: 30px;
+        }
+
+        h2 {
+            color: #2C3E50;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        th {
+            background: #2C3E50;
+            color: white;
+            padding: 10px;
+            text-align: left;
+        }
+
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+
+        button {
+            background: #2C3E50;
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 15px;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            background: #1ABC9C;
+        }
+    </style>
+</head>
+
+<body>
+
+<h2>Last Transaction — ID: {{ transaction_id }}</h2>
+
+{% if rows %}
+<table>
+    <tr>
+        <th>Date</th>
+        <th>Time</th>
+        <th>Drug Name</th>
+        <th>Category</th>
+        <th>Opening Balance</th>
+        <th>Transaction Type</th>
+        <th>Quantity Sold</th>
+        <th>Qty Remaining</th>
+        <th>Cost Price</th>
+        <th>Sales Price</th>
+        <th>Customer Type</th>
+        <th>Bill</th>
+        <th>Sales Price Sum</th>
+        <th>Sum of Cost Price</th>
+    </tr>
+
+    {% for row in rows %}
+    <tr>
+        <td>{{ row["Date"] }}</td>
+        <td>{{ row["Time"] }}</td>
+        <td>{{ row["DRUG NAME"] }}</td>
+        <td>{{ row["Category"] }}</td>
+        <td>{{ row["Opening Balance"] }}</td>
+        <td>{{ row["Transaction Type"] }}</td>
+        <td>{{ row["Quantity Sold"] }}</td>
+        <td>{{ row["qty Remaining"] }}</td>
+        <td>{{ row["Cost Price"] }}</td>
+        <td>{{ row["Sales Price"] }}</td>
+        <td>{{ row["Customer Type"] }}</td>
+        <td>{{ row["Bill"] }}</td>
+        <td>{{ row["Sales Price Sum"] }}</td>
+        <td>{{ row["Sum of Cost Price"] }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<h3>No transactions found.</h3>
+{% endif %}
+
+<button onclick="window.location.href='/pos'">Back to POS</button>
+<button onclick="window.location.href='/undo_transaction/{{ transaction_id }}'">
+    Undo Transaction
+</button>
+
+</body>
+</html>

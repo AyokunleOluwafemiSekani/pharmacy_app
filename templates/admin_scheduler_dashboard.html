@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="page-title">Backup Scheduler Dashboard</h2>
+
+<p class="page-subtitle">Monitor automatic backup activity and scheduler health.</p>
+
+<div class="glass-card summary-card">
+    <h3><i class="fa-solid fa-gear"></i> Scheduler Status</h3>
+
+    <p><strong>Enabled:</strong>
+        {% if status.enabled %}
+            <span class="badge ok-badge">Yes</span>
+        {% else %}
+            <span class="badge fail-badge">No</span>
+        {% endif %}
+    </p>
+
+    <p><strong>Next Backup:</strong> {{ status.next_run }}</p>
+    <p><strong>Last Backup:</strong> {{ status.last_run }}</p>
+
+    <p><strong>Last Status:</strong>
+        {% if status.last_status == "Success" %}
+            <span class="badge ok-badge">Success</span>
+        {% elif status.last_status == "Failed" %}
+            <span class="badge fail-badge">Failed</span>
+        {% else %}
+            <span class="badge neutral-badge">N/A</span>
+        {% endif %}
+    </p>
+
+    <button class="btn" onclick="window.location.href='/admin/backups/auto-backup'">
+        <i class="fa-solid fa-sliders"></i> Configure Auto‑Backup
+    </button>
+</div>
+
+<style>
+.badge {
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    color: white;
+}
+
+.ok-badge {
+    background: #4C7D7E;
+}
+
+.fail-badge {
+    background: #d9534f;
+}
+
+.neutral-badge {
+    background: #6c757d;
+}
+</style>
+
+{% endblock %}

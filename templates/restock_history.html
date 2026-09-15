@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-4">
+    <h2 class="mb-3">Restock History</h2>
+
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Drug Name</th>
+                <th>Quantity Added</th>
+                <th>Transaction ID</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for row in records %}
+            <tr>
+                <td>{{ row.Date }}</td>
+                <td>{{ row.Time }}</td>
+                <td>{{ row["Drug Name"] }}</td>
+                <td>{{ row["Quantity Added"] }}</td>
+                <td>{{ row["Transaction ID"] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if records|length == 0 %}
+    <p class="text-muted">No restock history available.</p>
+    {% endif %}
+</div>
+
+{% endblock %}

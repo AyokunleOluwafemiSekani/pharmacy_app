@@ -1,0 +1,199 @@
+/* ===== GLOBAL COLORS ===== */
+:root {
+    --primary-blue: #2C3E50;      /* deep ash sky blue */
+    --hospital-green: #1ABC9C;    /* medical green */
+    --sky-blue: #3498DB;          /* accent */
+    --soft-ash: #ECF0F1;          /* background */
+    --danger-red: #B30000;
+}
+
+/* ===== BODY ===== */
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: var(--soft-ash);
+    margin: 0;
+    overflow-x: hidden;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+    height: 100%;
+    width: 260px;
+    position: fixed;
+    top: 0;
+    left: -260px;
+    background: var(--primary-blue);
+    padding-top: 20px;
+    transition: all 0.35s ease;
+    z-index: 1000;
+    overflow-y: auto;
+    box-shadow: 3px 0 10px rgba(0,0,0,0.25);
+}
+
+.sidebar.open {
+    left: 0;
+}
+
+.sidebar a {
+    display: block;
+    padding: 14px 20px;
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+    transition: background 0.25s ease, padding-left 0.25s ease;
+}
+
+.sidebar a:hover {
+    background: var(--hospital-green);
+    padding-left: 28px;
+}
+
+/* ===== PROFILE SECTION ===== */
+.profile-section {
+    text-align: center;
+    padding: 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+    animation: fadeIn 0.8s ease;
+}
+
+.profile-pic {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 3px solid white;
+    object-fit: cover;
+    margin-bottom: 10px;
+}
+
+/* ===== TOGGLE BUTTON ===== */
+.toggle-btn {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    background: var(--primary-blue);
+    color: white;
+    border: none;
+    padding: 10px 14px;
+    font-size: 22px;
+    border-radius: 6px;
+    cursor: pointer;
+    z-index: 1100;
+    transition: background 0.3s ease;
+}
+
+.toggle-btn:hover {
+    background: var(--hospital-green);
+}
+
+/* ===== MAIN CONTENT ===== */
+#mainContent {
+    padding: 25px;
+    margin-left: 20px;
+    transition: margin-left 0.35s ease;
+}
+
+.sidebar.open ~ #mainContent {
+    margin-left: 280px;
+}
+
+/* ===== TABLE ===== */
+.table-container {
+    max-height: 75vh;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    background: white;
+    border-radius: 8px;
+    animation: fadeInUp 0.6s ease;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    background: var(--primary-blue);
+    color: white;
+    padding: 10px;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    cursor: pointer;
+}
+
+td {
+    padding: 8px;
+    border-bottom: 1px solid #ddd;
+    text-align: center;
+}
+
+tr:hover {
+    background: #E8F8F5;
+}
+
+/* ===== BUTTONS ===== */
+.btn {
+    background: var(--hospital-green);
+    color: white;
+    padding: 10px 18px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+    transition: background 0.3s ease;
+}
+
+.btn:hover {
+    background: var(--sky-blue);
+}
+
+.delete-btn {
+    background: var(--danger-red);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+}
+
+/* ===== INPUT ===== */
+input {
+    padding: 10px;
+    width: 300px;
+    border-radius: 6px;
+    border: 1px solid #aaa;
+    margin-bottom: 15px;
+}
+
+/* ===== BACK TO TOP ===== */
+#backToTop {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    background: var(--primary-blue);
+    color: white;
+    padding: 12px 18px;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    display: none;
+    z-index: 2000;
+    transition: background 0.3s ease;
+}
+
+#backToTop:hover {
+    background: var(--hospital-green);
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}

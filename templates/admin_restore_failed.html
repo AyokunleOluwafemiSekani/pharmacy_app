@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="page-title">Restore Failed</h2>
+
+<div class="glass-card summary-card">
+    <h3><i class="fa-solid fa-circle-xmark"></i> Restore Failed</h3>
+    <p>The backup <strong>{{ backup }}</strong> could not be restored.</p>
+    <p>Please check integrity or try another backup.</p>
+
+    <button class="btn" onclick="window.location.href='/admin/backups/restore-wizard'">
+        <i class="fa-solid fa-arrow-left"></i> Back to Restore Wizard
+    </button>
+</div>
+
+{% endblock %}

@@ -1,0 +1,481 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+    :root {
+        --bg: #F4F6F7;
+        --text: #2C3E50;
+        --card: #ffffff;
+        --header: #2C3E50;
+        --header-text: #ffffff;
+        --hover: #ECF0F1;
+        --accent: #1ABC9C;
+    }
+
+    .dark-mode {
+        --bg: #1E1E1E;
+        --text: #E0E0E0;
+        --card: #2C2C2C;
+        --header: #000000;
+        --header-text: #E0E0E0;
+        --hover: #3A3A3A;
+    }
+
+    body {
+        background: var(--bg);
+        color: var(--text);
+        transition: 0.3s;
+    }
+
+    .log-wrapper {
+        background: var(--card);
+        padding: 25px;
+        border-radius: 14px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+        margin-top: 25px;
+        animation: fadeIn 0.4s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    h2 {
+        color: var(--text);
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+
+    .filter-box {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+    }
+
+    .filter-box input {
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        font-size: 14px;
+        width: 180px;
+        background: var(--card);
+        color: var(--text);
+    }
+
+    .filter-box button {
+        background: var(--accent);
+        color: white;
+        padding: 10px 18px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        font-size: 14px;
+        transition: 0.3s;
+    }
+
+    .filter-box button:hover {
+        background: #16A085;
+    }
+
+    .search-bar {
+        margin-bottom: 15px;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .search-bar input {
+        padding: 10px;
+        width: 250px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        font-size: 14px;
+        background: var(--card);
+        color: var(--text);
+    }
+
+    .dark-toggle {
+        padding: 10px 18px;
+        background: #34495E;
+        color: white;
+        border-radius: 8px;
+        cursor: pointer;
+        border: none;
+    }
+
+    .export-btn {
+        padding: 10px 18px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        color: white;
+        margin-right: 10px;
+        font-size: 14px;
+        transition: 0.3s;
+    }
+
+    .csv-btn { background: #27AE60; }
+    .pdf-btn { background: #C0392B; }
+
+    .csv-btn:hover { background: #1E8449; }
+    .pdf-btn:hover { background: #922B21; }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--card);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    th {
+        background: var(--header);
+        color: var(--header-text);
+        padding: 12px;
+        font-size: 14px;
+        text-align: left;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        cursor: pointer;
+    }
+
+    td {
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+        font-size: 14px;
+        transition: 0.2s;
+        color: var(--text);
+    }
+
+    tr {
+        transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+
+    tr:hover {
+        transform: scale(1.01);
+    }
+
+    .badge {
+        padding: 6px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+        color: white;
+        font-weight: bold;
+        display: inline-block;
+    }
+
+    .badge-security { background: #2980B9; }
+    .badge-pos { background: #1ABC9C; }
+    .badge-stock { background: #8E44AD; }
+    .badge-inpatient { background: #D35400; }
+    .badge-admin { background: #C0392B; }
+    .badge-system { background: #7F8C8D; }
+
+    .delete-btn {
+        background: #E74C3C;
+        color: white;
+        padding: 6px 10px;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        font-size: 12px;
+    }
+
+    .pagination {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .pagination button {
+        padding: 8px 14px;
+        border-radius: 6px;
+        border: none;
+        background: #3498DB;
+        color: white;
+        cursor: pointer;
+    }
+
+    .filtered-out {
+        display: none !important;
+    }
+
+    .page-hidden {
+        display: none !important;
+    }
+
+    /* MODAL */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.6);
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+    }
+
+    .modal-content {
+        background: var(--card);
+        padding: 20px;
+        border-radius: 10px;
+        width: 400px;
+        animation: popIn 0.3s ease;
+    }
+
+    @keyframes popIn {
+        from { transform: scale(0.8); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+    }
+
+    .close-btn {
+        background: #C0392B;
+        color: white;
+        padding: 8px 12px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        float: right;
+    }
+</style>
+
+<div class="log-wrapper">
+    <h2><i class="fa-solid fa-file-lines"></i> System Log</h2>
+
+    <!-- FILTERS -->
+    <form method="POST" action="/admin/system_log/filter" class="filter-box">
+        <input type="text" name="user" placeholder="Filter by user" value="{{ filters.user if filters }}">
+        <input type="text" name="role" placeholder="Filter by role" value="{{ filters.role if filters }}">
+        <input type="text" name="action" placeholder="Filter by action" value="{{ filters.action if filters }}">
+        <input type="date" name="date" value="{{ filters.date if filters }}">
+        <button type="submit"><i class="fa-solid fa-filter"></i> Apply Filters</button>
+    </form>
+
+    <!-- SEARCH + DARK MODE -->
+    <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="Search logs...">
+        <button class="dark-toggle" onclick="toggleDarkMode()">Dark Mode</button>
+    </div>
+
+    <!-- EXPORT BUTTONS -->
+    <div style="margin-bottom:15px;">
+        <a href="/admin/logs/export_csv">
+            <button type="button" class="export-btn csv-btn">
+                <i class="fa-solid fa-file-csv"></i> Export CSV
+            </button>
+        </a>
+        <a href="/admin/logs/export_pdf">
+            <button type="button" class="export-btn pdf-btn">
+                <i class="fa-solid fa-file-pdf"></i> Export PDF
+            </button>
+        </a>
+    </div>
+
+    <!-- LOG TABLE -->
+    <table id="logTable">
+        <thead>
+            <tr>
+                <th onclick="sortTable(0)">Timestamp</th>
+                <th onclick="sortTable(1)">User</th>
+                <th onclick="sortTable(2)">Role</th>
+                <th onclick="sortTable(3)">Category</th>
+                <th onclick="sortTable(4)">Action</th>
+                <th>Details</th>
+                <th>View</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+
+        <tbody id="logBody">
+            {% for log in logs %}
+            {% set a = log.action.lower() %}
+            {% if "login" in a or "logout" in a %}
+                {% set category = "Security" %}
+                {% set badge = "badge-security" %}
+            {% elif "pos" in a or "dispense" in a %}
+                {% set category = "POS" %}
+                {% set badge = "badge-pos" %}
+            {% elif "stock" in a %}
+                {% set category = "Stock" %}
+                {% set badge = "badge-stock" %}
+            {% elif "inpatient" in a %}
+                {% set category = "InPatient" %}
+                {% set badge = "badge-inpatient" %}
+            {% elif "admin" in a or "user" in a %}
+                {% set category = "Admin" %}
+                {% set badge = "badge-admin" %}
+            {% else %}
+                {% set category = "System" %}
+                {% set badge = "badge-system" %}
+            {% endif %}
+
+            <tr>
+                <td>{{ log.timestamp }}</td>
+                <td>{{ log.user }}</td>
+                <td>{{ log.role }}</td>
+                <td><span class="badge {{ badge }}">{{ category }}</span></td>
+                <td>{{ log.action }}</td>
+                <td>{{ log.details }}</td>
+
+                <td>
+                    <button class="export-btn csv-btn" onclick="openModal('{{ log.timestamp }}','{{ log.user }}','{{ log.role }}','{{ category }}','{{ log.action }}','{{ log.details }}')">
+                        View
+                    </button>
+                </td>
+
+                <td>
+                    {% if role == "Admin" %}
+                    <form method="POST" action="/admin/logs/delete">
+                        <input type="hidden" name="timestamp" value="{{ log.timestamp }}">
+                        <button class="delete-btn">Delete</button>
+                    </form>
+                    {% else %}
+                    <span style="color:#7F8C8D;">N/A</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- PAGINATION -->
+    <div class="pagination">
+        <button onclick="prevPage()">Previous</button>
+        <span id="pageIndicator" style="font-weight:bold; color:var(--text);">
+            Page 1 of 1
+        </span>
+        <button onclick="nextPage()">Next</button>
+    </div>
+</div>
+
+<!-- MODAL -->
+<div id="detailsModal" class="modal">
+    <div class="modal-content">
+        <button class="close-btn" onclick="closeModal()">Close</button>
+        <h3>Log Details</h3>
+        <p><strong>Timestamp:</strong> <span id="m_timestamp"></span></p>
+        <p><strong>User:</strong> <span id="m_user"></span></p>
+        <p><strong>Role:</strong> <span id="m_role"></span></p>
+        <p><strong>Category:</strong> <span id="m_category"></span></p>
+        <p><strong>Action:</strong> <span id="m_action"></span></p>
+        <p><strong>Details:</strong> <span id="m_details"></span></p>
+    </div>
+</div>
+
+<script>
+    function toggleDarkMode() {
+        document.body.classList.toggle("dark-mode");
+    }
+
+    function openModal(timestamp, user, role, category, action, details) {
+        document.getElementById("m_timestamp").innerText = timestamp;
+        document.getElementById("m_user").innerText = user;
+        document.getElementById("m_role").innerText = role;
+        document.getElementById("m_category").innerText = category;
+        document.getElementById("m_action").innerText = action;
+        document.getElementById("m_details").innerText = details;
+
+        document.getElementById("detailsModal").style.display = "flex";
+    }
+
+    function closeModal() {
+        document.getElementById("detailsModal").style.display = "none";
+    }
+
+    document.getElementById("searchInput").addEventListener("keyup", function() {
+        let filter = this.value.toLowerCase();
+        let rows = document.querySelectorAll("#logTable tbody tr");
+
+        rows.forEach(row => {
+            let text = row.textContent.toLowerCase();
+            if (text.includes(filter)) {
+                row.classList.remove("filtered-out");
+            } else {
+                row.classList.add("filtered-out");
+            }
+        });
+
+        showPage(0);
+    });
+
+    function sortTable(col) {
+        let table = document.getElementById("logTable");
+        let rows = Array.from(table.rows).slice(1);
+        let asc = table.getAttribute("data-sort") !== "asc";
+
+        rows.sort((a, b) => {
+            let A = a.cells[col].innerText.toLowerCase();
+            let B = b.cells[col].innerText.toLowerCase();
+            return asc ? A.localeCompare(B) : B.localeCompare(A);
+        });
+
+        table.setAttribute("data-sort", asc ? "asc" : "desc");
+
+        let body = document.getElementById("logBody");
+        body.innerHTML = "";
+        rows.forEach(r => body.appendChild(r));
+
+        showPage(0);
+    }
+
+    let currentPage = 0;
+    const rowsPerPage = 10;
+
+    function getFilteredRows() {
+        let rows = document.querySelectorAll("#logTable tbody tr");
+        return Array.from(rows).filter(r => !r.classList.contains("filtered-out"));
+    }
+
+    function updatePageIndicator() {
+        let filteredRows = getFilteredRows();
+        let totalPages = Math.ceil(filteredRows.length / rowsPerPage);
+        if (totalPages < 1) totalPages = 1;
+
+        document.getElementById("pageIndicator").innerText =
+            `Page ${currentPage + 1} of ${totalPages}`;
+    }
+
+    function showPage(page) {
+        let filteredRows = getFilteredRows();
+        let totalPages = Math.ceil(filteredRows.length / rowsPerPage);
+
+        if (page < 0 || page >= totalPages) return;
+
+        let allRows = document.querySelectorAll("#logTable tbody tr");
+        allRows.forEach(r => r.classList.add("page-hidden"));
+
+        filteredRows.forEach((row, index) => {
+            if (index >= page * rowsPerPage && index < (page + 1) * rowsPerPage) {
+                row.classList.remove("page-hidden");
+            }
+        });
+
+        currentPage = page;
+        updatePageIndicator();
+    }
+
+    function nextPage() {
+        let filteredRows = getFilteredRows();
+        let totalPages = Math.ceil(filteredRows.length / rowsPerPage);
+
+        if (currentPage < totalPages - 1) {
+            showPage(currentPage + 1);
+        }
+    }
+
+    function prevPage() {
+        if (currentPage > 0) {
+            showPage(currentPage - 1);
+        }
+    }
+
+    showPage(0);
+</script>
+
+{% endblock %}

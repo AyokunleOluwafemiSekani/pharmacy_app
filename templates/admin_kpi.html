@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="page-title">KPI Configuration</h2>
+<p class="page-subtitle">Control what metrics appear on the KPI dashboard.</p>
+
+<form method="POST" action="/admin/kpi/save" class="kpi-settings-form">
+
+    <!-- KPI Toggles -->
+    <div class="settings-grid">
+
+        <div class="setting-card">
+            <label>
+                <input type="checkbox" name="show_sales_today" {% if settings.show_sales_today %}checked{% endif %}>
+                <span>Sales Today</span>
+            </label>
+        </div>
+
+        <div class="setting-card">
+            <label>
+                <input type="checkbox" name="show_sales_month" {% if settings.show_sales_month %}checked{% endif %}>
+                <span>Sales This Month</span>
+            </label>
+        </div>
+
+        <div class="setting-card">
+            <label>
+                <input type="checkbox" name="show_transactions" {% if settings.show_transactions %}checked{% endif %}>
+                <span>Total Transactions</span>
+            </label>
+        </div>
+
+        <div class="setting-card">
+            <label>
+                <input type="checkbox" name="show_customers" {% if settings.show_customers %}checked{% endif %}>
+                <span>Total Customers</span>
+            </label>
+        </div>
+
+        <div class="setting-card">
+            <label>
+                <input type="checkbox" name="show_top_products" {% if settings.show_top_products %}checked{% endif %}>
+                <span>Top Selling Products</span>
+            </label>
+        </div>
+
+        <div class="setting-card">
+            <label>
+                <input type="checkbox" name="show_low_stock" {% if settings.show_low_stock %}checked{% endif %}>
+                <span>Low Stock Alerts</span>
+            </label>
+        </div>
+
+    </div>
+
+    <!-- KPI Thresholds -->
+    <h3 class="section-title">Threshold Settings</h3>
+
+    <div class="threshold-card">
+        <label>Low Stock Threshold</label>
+        <input type="number" name="low_stock_threshold" value="{{ settings.low_stock_threshold }}" min="1">
+    </div>
+
+    <!-- Date Range -->
+    <h3 class="section-title">Date Range</h3>
+
+    <div class="threshold-card">
+        <label>Select KPI Date Range</label>
+        <select name="date_range">
+            <option value="daily" {% if settings.date_range == 'daily' %}selected{% endif %}>Daily</option>
+            <option value="weekly" {% if settings.date_range == 'weekly' %}selected{% endif %}>Weekly</option>
+            <option value="monthly" {% if settings.date_range == 'monthly' %}selected{% endif %}>Monthly</option>
+        </select>
+    </div>
+
+    <button class="btn save-btn" type="submit">
+        <i class="fa-solid fa-save"></i> Save Settings
+    </button>
+
+</form>
+
+<style>
+.kpi-settings-form {
+    margin-top: 20px;
+}
+
+.settings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+}
+
+.setting-card {
+    background: white;
+    padding: 18px;
+    border-radius: 12px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+}
+
+.setting-card label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 16px;
+}
+
+.threshold-card {
+    background: white;
+    padding: 18px;
+    border-radius: 12px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+}
+
+.threshold-card input,
+.threshold-card select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 8px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+.save-btn {
+    margin-top: 20px;
+    background: #4C7D7E;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 10px;
+}
+</style>
+
+{% endblock %}

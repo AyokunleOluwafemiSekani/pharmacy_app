@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pharmacy Login</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            height: 100vh;
+            background-image: url('/static/IBK BACK 2.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Dark overlay */
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.55);
+            z-index: 1;
+        }
+
+        /* Glass login box */
+        .login-box {
+            position: relative;
+            z-index: 2;
+            width: 420px;
+            max-width: 90%;
+            background: rgba(255,255,255,0.25);
+            backdrop-filter: blur(6px);
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.4);
+            text-align: center;
+        }
+
+        .login-box h2 {
+            margin: 0 0 10px 0;
+            color: #ffffff;
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .login-box h3 {
+            margin: 0 0 25px 0;
+            color: #e0e0e0;
+            font-size: 17px;
+            font-weight: 600;
+        }
+
+        .input-group {
+            margin-bottom: 18px;
+            text-align: left;
+        }
+
+        .input-group label {
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 12px;
+            margin-top: 6px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 15px;
+        }
+
+        .show-pass {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #ffffff;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #003366;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        button:hover {
+            background: #00509e;
+        }
+
+        .error {
+            color: #ffdddd;
+            background: rgba(255,0,0,0.25);
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        /* Footer */
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(6, 190, 236, 0.65);
+            color: white;
+            text-align: center;
+            padding: 8px;
+            font-size: 14px;
+            letter-spacing: 1px;
+            z-index: 3;
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 480px) {
+            .login-box {
+                padding: 25px;
+                width: 95%;
+            }
+
+            .login-box h2 {
+                font-size: 20px;
+            }
+
+            .login-box h3 {
+                font-size: 15px;
+            }
+        }
+    </style>
+
+    <script>
+        function togglePassword() {
+            const passField = document.getElementById("password");
+            passField.type = passField.type === "password" ? "text" : "password";
+        }
+    </script>
+</head>
+
+<body>
+
+<div class="overlay"></div>
+
+<div class="login-box">
+
+    <h2>IBUKUN-OLU SPECIALIST HOSPITAL</h2>
+    <h3>PHARMACY DISPENSE & STOCK SYSTEM</h3>
+
+    {% if error %}
+        <div class="error">{{ error }}</div>
+    {% endif %}
+
+    <form method="POST">
+
+        <div class="input-group">
+            <label>User Id</label>
+            <input type="text" name="username" placeholder="Enter your User Id" required>
+        </div>
+
+        <div class="input-group">
+            <label>Password</label>
+            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+        </div>
+
+        <div class="input-group">
+            <label>Select Role</label>
+            <select name="role" required>
+                <option value="">-- Choose Role --</option>
+                <option value="Admin">Admin</option>
+                <option value="Pharmacist">Pharmacist</option>
+                <option value="Auditor">Auditor</option>
+                <option value="Administrator">Administrator</option>
+                <option value="Director">Director</option>
+            </select>
+        </div>
+
+        <div class="show-pass">
+            <input type="checkbox" onclick="togglePassword()">
+            <label>Show Password</label>
+        </div>
+
+        <button type="submit">Login</button>
+
+    </form>
+
+</div>
+
+<div class="footer">
+    Powered by Ibukun-Olu ICT Unit
+</div>
+
+</body>
+</html>

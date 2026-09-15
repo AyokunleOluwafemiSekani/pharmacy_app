@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="page-title">Admin Settings</h2>
+
+<!-- SUCCESS BANNER -->
+<div id="successBanner" class="success-banner"></div>
+
+<!-- SETTINGS CARD -->
+<div class="settings-card">
+    <h3 class="section-title">System Configuration</h3>
+
+    <div class="form-group">
+        <label>Hospital Name</label>
+        <input id="hospital_name" value="{{ settings.hospital_name }}" placeholder="Enter hospital name">
+    </div>
+
+    <div class="form-group">
+        <label>Enable Auto-Backup</label>
+        <select id="auto_backup">
+            <option value="on" {% if settings.auto_backup == 'on' %}selected{% endif %}>On</option>
+            <option value="off" {% if settings.auto_backup == 'off' %}selected{% endif %}>Off</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Backup Frequency</label>
+        <select id="backup_freq">
+            <option value="daily" {% if settings.backup_freq == 'daily' %}selected{% endif %}>Daily</option>
+            <option value="weekly" {% if settings.backup_freq == 'weekly' %}selected{% endif %}>Weekly</option>
+            <option value="monthly" {% if settings.backup_freq == 'monthly' %}selected{% endif %}>Monthly</option>
+        </select>
+    </div>
+
+    <button class="btn save-btn" onclick="saveSettings()">
+        <i class="fa-solid fa-floppy-disk"></i> Save Settings
+    </button>
+</div>
+
+<style>
+/* Page Title */
+.page-title {
+    font-size: 26px;
+    margin-bottom: 20px;
+    animation: fadeIn 0.6s ease;
+}
+
+/* Settings Card */
+.settings-card {
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 12px;
+    max-width: 520px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+    animation: slideUp 0.5s ease;
+}
+
+/* Section Title */
+.section-title {
+    font-size: 20px;
+    margin-bottom: 18px;
+    color: #2F4F4F;
+    font-weight: 600;
+}
+
+/* Form Group */
+.form-group {
+    margin-bottom: 18px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 6px;
+    color: #444;
+}
+
+/* Inputs */
+.settings-card input,
+.settings-card select {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #d0d7de;
+    font-size: 14px;
+    transition: 0.25s ease;
+    background: #f9f9f9;
+}
+
+.settings-card input:focus,
+.settings-card select:focus {
+    border-color: #4C7D7E;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(76,125,126,0.15);
+}
+
+/* Save Button */
+.save-btn {
+    width: 100%;
+    margin-top: 10px;
+    background: #4C7D7E;
+    color: white;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 15px;
+    transition: 0.25s ease;
+}
+
+.save-btn:hover {
+    background: #3b6364;
+    transform: translateY(-2px);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+
+<script>
+function saveSettings(){
+    showSpinner();
+
+    const payload = {
+        hospital_name: document.getElementById("hospital_name").value,
+        auto_backup: document.getElementById("auto_backup").value,
+        backup_freq: document.getElementById("backup_freq").value
+    };
+
+    fetch("/admin/settings/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+    })
+    .then(r => r.json())
+    .then(d => {
+        hideSpinner();
+        showSuccess("Settings saved successfully!");
+    })
+    .catch(err => {
+        hideSpinner();
+        showSuccess("Error saving settings.");
+    });
+}
+</script>
+
+{% endblock %}

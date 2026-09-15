@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="page-title">Backup History Logs</h2>
+
+<div class="table-container smooth-table">
+<table class="responsive-table">
+    <thead>
+        <tr>
+            <th>Backup File</th>
+            <th>Date</th>
+            <th>Size</th>
+            <th>Encrypted</th>
+            <th>Integrity</th>
+            <th>Cloud Sync</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for log in logs %}
+        <tr>
+            <td data-label="Backup File">{{ log.filename }}</td>
+            <td data-label="Date">{{ log.date }}</td>
+            <td data-label="Size">{{ log.size }}</td>
+            <td data-label="Encrypted">
+                {% if log.encrypted %}
+                    <span class="status-active">Yes</span>
+                {% else %}
+                    <span class="status-deactivated">No</span>
+                {% endif %}
+            </td>
+            <td data-label="Integrity">
+                {% if log.integrity == "OK" %}
+                    <span class="status-active">OK</span>
+                {% else %}
+                    <span class="status-deactivated">Failed</span>
+                {% endif %}
+            </td>
+            <td data-label="Cloud Sync">
+                {% if log.cloud == "Synced" %}
+                    <span class="status-active">Synced</span>
+                {% else %}
+                    <span class="status-deactivated">Pending</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+
+<style>
+/* Responsive Table */
+.responsive-table td[data-label] {
+    display: block;
+    text-align: right;
+}
+@media (min-width: 700px) {
+    .responsive-table td[data-label] {
+        display: table-cell;
+        text-align: left;
+    }
+}
+
+/* Status */
+.status-active { color: green; font-weight: bold; }
+.status-deactivated { color: red; font-weight: bold; }
+
+/* Table */
+.table-container { margin-top: 20px; }
+table { width: 100%; border-collapse: collapse; }
+th {
+    background: #4C7D7E;
+    color: white;
+    padding: 12px;
+}
+td {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+</style>
+
+{% endblock %}

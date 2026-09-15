@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Access Restricted</title>
+
+<style>
+body {
+    font-family: 'Inter', sans-serif;
+    background: #2F4F4F;
+    color: white;
+    text-align: center;
+    padding-top: 140px;
+    margin: 0;
+}
+
+/* Top Role Indicator */
+.role-indicator {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 3000;
+}
+
+/* Role Badge Base */
+.role-badge {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 600;
+    color: white;
+    animation: pulseGlow 2s infinite;
+}
+
+/* Admin = Red */
+.role-admin { background: #B30000; box-shadow: 0 0 12px rgba(179,0,0,0.7); }
+
+/* Auditor = Blue */
+.role-auditor { background: #0055FF; box-shadow: 0 0 12px rgba(0,85,255,0.7); }
+
+/* Pharmacist = Green */
+.role-pharmacist { background: #009933; box-shadow: 0 0 12px rgba(0,153,51,0.7); }
+
+/* Administrator = Deep Ash */
+.role-administrator { background: #2F4F4F; box-shadow: 0 0 12px rgba(47,79,79,0.7); }
+
+/* Pulse Animation */
+@keyframes pulseGlow {
+    0% { transform: scale(1); box-shadow: 0 0 12px rgba(255,255,255,0.4); }
+    50% { transform: scale(1.05); box-shadow: 0 0 18px rgba(255,255,255,0.7); }
+    100% { transform: scale(1); box-shadow: 0 0 12px rgba(255,255,255,0.4); }
+}
+
+/* Main Box */
+.box {
+    background: #1b2b2b;
+    padding: 40px;
+    border-radius: 12px;
+    width: 60%;
+    margin: auto;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    animation: fadeIn 0.8s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+h1 {
+    font-size: 32px;
+    margin-bottom: 20px;
+}
+
+p {
+    font-size: 18px;
+}
+
+/* Return Button */
+.return-btn {
+    margin-top: 25px;
+    padding: 12px 20px;
+    background: var(--hospital-blue);
+    color: white;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 16px;
+    display: inline-block;
+    transition: 0.3s ease;
+}
+
+.return-btn:hover {
+    background: #3C5F5F;
+    transform: translateY(-2px);
+}
+</style>
+</head>
+
+<body>
+
+<!-- TOP ROLE INDICATOR -->
+<div class="role-indicator">
+    <span class="role-badge 
+        {% if role == 'Admin' %}role-admin{% endif %}
+        {% if role == 'Auditor' %}role-auditor{% endif %}
+        {% if role == 'Pharmacist' %}role-pharmacist{% endif %}
+        {% if role == 'Administrator' %}role-administrator{% endif %}
+    ">
+        {{ role }}
+    </span>
+</div>
+
+<!-- MAIN BOX -->
+<div class="box">
+    <h1>🚫 This Page is above your Pay Grade </h1>
+    <p>Hello {{ user }} ({{ role }}), you do not have permission to view this page.</p>
+
+    <a href="/dashboard" class="return-btn">
+        <i class="fa-solid fa-arrow-left"></i> Return to Dashboard
+    </a>
+</div>
+
+</body>
+</html>

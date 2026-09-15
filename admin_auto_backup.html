@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="page-title">Auto Backup Settings</h2>
+
+<div class="settings-card">
+    <h3 class="section-title">Automatic Daily Backup</h3>
+
+    <form method="POST" action="/admin/auto-backup/toggle">
+
+        <div class="toggle-row">
+            <label class="toggle-label">
+                <i class="fa-solid fa-robot"></i> Auto Backup
+            </label>
+
+            <label class="switch">
+                <input type="checkbox" name="auto_backup" {% if auto_backup_enabled %}checked{% endif %}>
+                <span class="slider round"></span>
+            </label>
+        </div>
+
+        <p class="next-backup">
+            Next Scheduled Backup: <strong>{{ next_backup_time }}</strong>
+        </p>
+
+        <button class="btn save-btn" type="submit">
+            <i class="fa-solid fa-check"></i> Save Settings
+        </button>
+    </form>
+</div>
+
+<style>
+.settings-card {
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(12px);
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    max-width: 500px;
+}
+
+.toggle-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.toggle-label {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.next-backup {
+    margin-bottom: 20px;
+    font-size: 14px;
+    color: #555;
+}
+
+/* Toggle Switch */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 55px;
+    height: 28px;
+}
+
+.switch input { display: none; }
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 22px;
+    width: 22px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #4C7D7E;
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+</style>
+
+{% endblock %}

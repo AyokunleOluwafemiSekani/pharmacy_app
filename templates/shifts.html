@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pharmacist Shift Tracking</title>
+    <style>
+        body { font-family:'Segoe UI'; background:#eef1f5; margin:0; padding-top:80px; }
+        .header { background:#003366; color:white; padding:15px; position:fixed; top:0; width:100%; }
+        .container { width:1200px; margin:auto; padding:20px; }
+        table { width:100%; border-collapse:collapse; background:white; }
+        th, td { padding:8px; border-bottom:1px solid #ddd; text-align:left; }
+        th { background:#f2f2f2; }
+        .footer {
+            position:fixed; bottom:0; left:0; width:100%;
+            background:rgba(0,0,0,0.65); color:white;
+            text-align:center; padding:8px; font-size:14px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    Logged in as: {{ user }} ({{ role }})
+</div>
+
+<div class="container">
+    <h2>Pharmacist Shift Tracking</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Pharmacist</th>
+                <th>Login Time</th>
+                <th>Logout Time</th>
+                <th>Duration</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in shifts %}
+            <tr>
+                <td>{{ s.pharmacist }}</td>
+                <td>{{ s.login_time }}</td>
+                <td>{{ s.logout_time }}</td>
+                <td>{{ s.duration }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="footer">
+    Powered by Ibukun-Olu ICT Unit
+</div>
+
+</body>
+</html>
