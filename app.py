@@ -1606,6 +1606,11 @@ def admin_system_logs():
     logs = sorted(logs, key=lambda x: x["time"], reverse=True)
     return render_template("admin_logs.html", logs=logs)
 
+from flask import redirect
+
+@app.route("/")
+def home():
+    return redirect("/login")
 
 # ---------------------------------------------------------
 # RUN APP
