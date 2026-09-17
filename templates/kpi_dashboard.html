@@ -1,406 +1,361 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="stylesheet" href="/static/style.css">
-    <meta charset="UTF-8">
-    <title>Pharmacy KPI Dashboard</title>
+<meta charset="UTF-8">
+<title>Pharmacy KPI Dashboard</title>
 
-    <!-- ICONS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <!-- CHART.JS -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="/static/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <style>
-        :root {
-            --ash: #e5e7eb;
-            --ash-light: #f3f4f6;
-            --white: #ffffff;
-            --primary: #003366;
-            --primary-light: #00509e;
-            --accent: #00c2ff;
-            --text-main: #1f2933;
-            --text-muted: #6b7280;
-            --shadow-soft: 0 4px 20px rgba(0,0,0,0.08);
-        }
+<style>
+:root {
+    --ash: #e5e7eb;
+    --ash-light: #f3f4f6;
+    --white: #ffffff;
+    --primary: #003366;
+    --primary-light: #00509e;
+    --accent: #00c2ff;
+    --text-main: #1f2933;
+    --text-muted: #6b7280;
+    --shadow-soft: 0 4px 20px rgba(0,0,0,0.08);
+}
 
-        body {
-            margin: 0;
-            font-family: "Segoe UI", Arial, sans-serif;
-            background: linear-gradient(135deg, #facc15, #22c55e); /* yellow + green */
-            transition: margin-left 0.3s ease;
-        }
+body {
+    margin: 0;
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: linear-gradient(135deg, #facc15, #22c55e);
+    transition: margin-left 0.3s ease;
+}
 
-        /* ===== SIDEBAR ===== */
-        .sidebar {
-            height: 100%;
-            width: 260px;
-            position: fixed;
-            top: 0;
-            left: -260px;
-            background: var(--primary);
-            padding-top: 20px;
-            transition: left 0.3s ease;
-            z-index: 2000;
-            overflow-y: auto;
-        }
+/* DARK MODE */
+body.dark {
+    background: #0f172a;
+}
+body.dark .welcome-banner {
+    background: linear-gradient(135deg, #111827, #1f2937);
+}
+body.dark .chart-card {
+    background: linear-gradient(135deg, #111827, #1f2937);
+}
+body.dark .filter-card {
+    background: #111827;
+    color: #e5e7eb;
+}
+body.dark .filter-label {
+    color: #9ca3af;
+}
+body.dark .filter-select,
+body.dark .filter-date {
+    background: #1f2937;
+    border-color: #374151;
+    color: #e5e7eb;
+}
+body.dark .sidebar {
+    background: #111827;
+}
+body.dark .toggle-btn {
+    background: #111827;
+}
 
-        .profile-section {
-            text-align: center;
-            padding: 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.2);
-        }
+/* SIDEBAR */
+.sidebar {
+    height: 100%;
+    width: 260px;
+    position: fixed;
+    top: 0;
+    left: -260px;
+    background: var(--primary);
+    padding-top: 20px;
+    transition: left 0.3s ease;
+    z-index: 2000;
+    overflow-y: auto;
+}
+.profile-section {
+    text-align: center;
+    padding: 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+}
+.profile-pic {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 3px solid white;
+    object-fit: cover;
+    margin-bottom: 10px;
+}
+.profile-section h3 {
+    color: white;
+    margin: 5px 0 0 0;
+    font-size: 18px;
+    font-weight: 600;
+}
+.profile-section p {
+    color: #d0d0d0;
+    margin: 0;
+    font-size: 14px;
+}
+.sidebar a {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    color: white;
+    text-decoration: none;
+    font-size: 15px;
+    border-bottom: 1px solid rgba(255,255,255,0.12);
+}
+.sidebar a i {
+    margin-right: 12px;
+    width: 20px;
+    text-align: center;
+}
+.sidebar a:hover {
+    background: var(--primary-light);
+}
 
-        .profile-pic {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            border: 3px solid white;
-            object-fit: cover;
-            margin-bottom: 10px;
-        }
+/* TOGGLE BUTTON */
+.toggle-btn {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 10px 14px;
+    font-size: 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    z-index: 2100;
+    box-shadow: var(--shadow-soft);
+}
+.toggle-btn:hover {
+    background: var(--primary-light);
+}
 
-        .profile-section h3 {
-            color: white;
-            margin: 5px 0 0 0;
-            font-size: 18px;
-            font-weight: 600;
-        }
+/* MAIN LAYOUT */
+.layout {
+    display: flex;
+    padding: 20px;
+    margin-left: 20px;
+    transition: margin-left 0.3s ease;
+}
+.main-content {
+    flex: 1;
+    max-width: 1100px;
+}
+.right-panel {
+    width: 280px;
+    margin-left: 20px;
+}
 
-        .profile-section p {
-            color: #d0d0d0;
-            margin: 0;
-            font-size: 14px;
-        }
+/* WELCOME BANNER */
+.welcome-banner {
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    color: white;
+    padding: 20px;
+    border-radius: 14px;
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    box-shadow: var(--shadow-soft);
+}
+.welcome-banner span {
+    font-size: 14px;
+    opacity: 0.9;
+}
 
-        .sidebar a {
-            display: flex;
-            align-items: center;
-            padding: 12px 20px;
-            color: white;
-            text-decoration: none;
-            font-size: 15px;
-            border-bottom: 1px solid rgba(255,255,255,0.12);
-        }
+/* KPI GRID */
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 18px;
+    margin-bottom: 20px;
+}
 
-        .sidebar a i {
-            margin-right: 12px;
-            width: 20px;
-            text-align: center;
-        }
+/* KPI CARDS */
+.kpi-card {
+    border-radius: 14px;
+    padding: 16px 18px;
+    box-shadow: var(--shadow-soft);
+    position: relative;
+    overflow: hidden;
+    color: white;
+    transform: translateY(20px);
+    opacity: 0;
+    animation: kpiFadeIn 0.8s ease-out forwards;
+}
+.kpi-card:nth-child(1) { background: #A02B93; }
+.kpi-card:nth-child(2) { background: #196B24; }
+.kpi-card:nth-child(3) { background: #E97132; }
+.kpi-card:nth-child(4) { background: #18cf37; color: black; }
+.kpi-card:nth-child(5) { background: #003366; }
 
-        .sidebar a:hover {
-            background: var(--primary-light);
-        }
+.kpi-icon {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    font-size: 22px;
+    opacity: 0.25;
+    transition: transform 0.4s ease;
+}
+.kpi-label {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: rgba(255,255,255,0.8);
+    margin-bottom: 6px;
+}
+.kpi-value {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+.kpi-sub {
+    font-size: 12px;
+    color: rgba(255,255,255,0.8);
+}
+.kpi-card:hover {
+    transform: translateY(-6px);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.18);
+}
+.kpi-card:hover .kpi-icon {
+    transform: scale(1.25) rotate(10deg);
+}
+@keyframes kpiFadeIn {
+    0% { transform: translateY(20px); opacity: 0; }
+    100% { transform: translateY(0px); opacity: 1; }
+}
 
-        /* ===== TOGGLE BUTTON ===== */
-        .toggle-btn {
-            position: fixed;
-            top: 15px;
-            left: 15px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 10px 14px;
-            font-size: 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            z-index: 2100;
-            box-shadow: var(--shadow-soft);
-        }
+/* CHART CARDS */
+.chart-card {
+    background: linear-gradient(135deg, #d1d5db, #003366);
+    padding: 18px 20px;
+    border-radius: 14px;
+    box-shadow: var(--shadow-soft);
+    margin-bottom: 18px;
+    color: white;
+}
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+.chart-header h3 {
+    margin: 0;
+    font-size: 16px;
+}
+.chart-header span {
+    font-size: 12px;
+    color: rgba(255,255,255,0.8);
+}
+.chart-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
 
-        .toggle-btn:hover {
-            background: var(--primary-light);
-        }
+/* FILTER PANEL */
+.filter-card {
+    background: var(--white);
+    padding: 16px 18px;
+    border-radius: 14px;
+    box-shadow: var(--shadow-soft);
+    margin-bottom: 18px;
+    position: sticky;
+    top: 80px;
+}
+.filter-card h3 {
+    margin: 0 0 12px 0;
+    font-size: 15px;
+    color: var(--text-main);
+}
+.filter-group {
+    margin-bottom: 12px;
+}
+.filter-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+    display: block;
+}
+.filter-select,
+.filter-date {
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid #ccd3dd;
+    font-size: 13px;
+    background: var(--ash-light);
+}
 
-        /* ===== MAIN LAYOUT ===== */
-        .layout {
-            display: flex;
-            padding: 20px;
-            margin-left: 20px;
-            transition: margin-left 0.3s ease;
-        }
+/* FOOTER */
+.footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(0,0,0,0.65);
+    color: white;
+    text-align: center;
+    padding: 8px;
+    font-size: 13px;
+    z-index: 1500;
+}
 
-        .main-content {
-            flex: 1;
-            max-width: 1100px;
-        }
+/* DRILL-DOWN MODAL */
+#drillModal {
+    display:none;
+    position:fixed;
+    top:0;left:0;width:100%;height:100%;
+    background:rgba(0,0,0,0.6);
+    z-index:3000;
+}
+#drillModalInner {
+    background:white;
+    width:70%;
+    max-height:70%;
+    overflow-y:auto;
+    margin:60px auto;
+    padding:20px;
+    border-radius:12px;
+}
+#drillClose {
+    float:right;
+    font-size:22px;
+    cursor:pointer;
+}
 
-        .right-panel {
-            width: 280px;
-            margin-left: 20px;
-        }
-
-        .welcome-banner {
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            color: white;
-            padding: 20px;
-            border-radius: 14px;
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 25px;
-            box-shadow: var(--shadow-soft);
-        }
-
-        .welcome-banner span {
-            font-size: 14px;
-            opacity: 0.9;
-        }
-
-        /* ===== KPI GRID ===== */
-        .kpi-grid {
-            display: grid;
-            grid-template-columns: repeat(5, minmax(0, 1fr));
-            gap: 18px;
-            margin-bottom: 25px;
-        }
-
-        /* ===== ANIMATED KPI CARDS ===== */
-        .kpi-card {
-            border-radius: 14px;
-            padding: 16px 18px;
-            box-shadow: var(--shadow-soft);
-            position: relative;
-            overflow: hidden;
-            color: white;
-
-            transform: translateY(20px);
-            opacity: 0;
-            animation: kpiFadeIn 0.8s ease-out forwards;
-        }
-
-        .kpi-card:nth-child(1) { background: #A02B93; }
-        .kpi-card:nth-child(2) { background: #196B24; }
-        .kpi-card:nth-child(3) { background: #E97132; }
-        .kpi-card:nth-child(4) { background: #18cf37; color: black; }
-        .kpi-card:nth-child(5) { background: #003366; }
-
-        .kpi-icon {
-            position: absolute;
-            top: 14px;
-            right: 14px;
-            font-size: 22px;
-            opacity: 0.25;
-            transition: transform 0.4s ease;
-        }
-
-        .kpi-label {
-            font-size: 13px;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            color: rgba(255,255,255,0.8);
-            margin-bottom: 6px;
-        }
-
-        .kpi-value {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-
-        .kpi-sub {
-            font-size: 12px;
-            color: rgba(255,255,255,0.8);
-        }
-
-        .kpi-card:hover {
-            transform: translateY(-6px);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.18);
-        }
-
-        .kpi-card:hover .kpi-icon {
-            transform: scale(1.25) rotate(10deg);
-        }
-
-        .kpi-card::after {
-            content: "";
-            position: absolute;
-            top: -40%;
-            left: -40%;
-            width: 180%;
-            height: 180%;
-            background: radial-gradient(circle, rgba(255,255,255,0.25), transparent 70%);
-            opacity: 0;
-            transition: opacity 0.4s ease;
-        }
-
-        .kpi-card:hover::after {
-            opacity: 1;
-        }
-
-        @keyframes kpiFadeIn {
-            0% {
-                transform: translateY(20px);
-                opacity: 0;
-            }
-            100% {
-                transform: translateY(0px);
-                opacity: 1;
-            }
-        }
-
-        .kpi-card:nth-child(1) { animation-delay: 0.1s; }
-        .kpi-card:nth-child(2) { animation-delay: 0.2s; }
-        .kpi-card:nth-child(3) { animation-delay: 0.3s; }
-        .kpi-card:nth-child(4) { animation-delay: 0.4s; }
-        .kpi-card:nth-child(5) { animation-delay: 0.5s; }
-
-        /* ===== ANIMATED CHART CARDS ===== */
-        .chart-card {
-            background: linear-gradient(135deg, #d1d5db, #003366); /* deep ash + blue */
-            padding: 18px 20px;
-            border-radius: 14px;
-            box-shadow: var(--shadow-soft);
-            margin-bottom: 22px;
-            color: white;
-
-            transform: translateY(25px) scale(0.98);
-            opacity: 0;
-            animation: chartFadeIn 0.9s ease-out forwards;
-        }
-
-        .chart-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .chart-header h3 {
-            margin: 0;
-            font-size: 16px;
-        }
-
-        .chart-header span {
-            font-size: 12px;
-            color: rgba(255,255,255,0.8);
-        }
-
-        .chart-row {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 18px;
-        }
-
-        .chart-card:hover {
-            transform: translateY(-4px) scale(1.01);
-            box-shadow: 0 10px 28px rgba(0,0,0,0.22);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        @keyframes chartFadeIn {
-            0% {
-                transform: translateY(25px) scale(0.98);
-                opacity: 0;
-            }
-            100% {
-                transform: translateY(0px) scale(1);
-                opacity: 1;
-            }
-        }
-
-        .chart-card:nth-of-type(1) { animation-delay: 0.2s; }
-        .chart-card:nth-of-type(2) { animation-delay: 0.3s; }
-        .chart-card:nth-of-type(3) { animation-delay: 0.4s; }
-        .chart-card:nth-of-type(4) { animation-delay: 0.5s; }
-        .chart-card:nth-of-type(5) { animation-delay: 0.6s; }
-
-        /* ===== RIGHT FILTER PANEL ===== */
-        .filter-card {
-            background: var(--white);
-            padding: 16px 18px;
-            border-radius: 14px;
-            box-shadow: var(--shadow-soft);
-            margin-bottom: 18px;
-            position: sticky;
-            top: 80px;
-        }
-
-        .filter-card h3 {
-            margin: 0 0 12px 0;
-            font-size: 15px;
-            color: var(--text-main);
-        }
-
-        .filter-group {
-            margin-bottom: 12px;
-        }
-
-        .filter-label {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-bottom: 4px;
-            display: block;
-        }
-
-        .filter-select,
-        .filter-date {
-            width: 100%;
-            padding: 8px 10px;
-            border-radius: 8px;
-            border: 1px solid #ccd3dd;
-            font-size: 13px;
-            background: var(--ash-light);
-        }
-
-        .filter-select:focus,
-        .filter-date:focus {
-            outline: none;
-            border-color: var(--primary-light);
-            box-shadow: 0 0 0 2px rgba(0,80,158,0.15);
-        }
-
-        .footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: rgba(0,0,0,0.65);
-            color: white;
-            text-align: center;
-            padding: 8px;
-            font-size: 13px;
-            z-index: 1500;
-        }
-
-        @media (max-width: 1200px) {
-            .layout {
-                flex-direction: column;
-            }
-            .right-panel {
-                width: 100%;
-                margin-left: 0;
-                margin-top: 20px;
-            }
-            .kpi-grid {
-                grid-template-columns: repeat(3, minmax(0, 1fr));
-            }
-        }
-
-        @media (max-width: 900px) {
-            .kpi-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
-            .chart-row {
-                grid-template-columns: repeat(1, minmax(0, 1fr));
-            }
-        }
-
-        @media (max-width: 600px) {
-            .kpi-grid {
-                grid-template-columns: repeat(1, minmax(0, 1fr));
-            }
-        }
-    </style>
+/* PRINT */
+@media print {
+    .sidebar,
+    .toggle-btn,
+    .right-panel,
+    .footer {
+        display: none !important;
+    }
+    .layout {
+        margin-left: 0 !important;
+        padding: 0 10px !important;
+    }
+    body {
+        background: white !important;
+    }
+    .chart-card,
+    .kpi-card {
+        box-shadow: none !important;
+    }
+}
+</style>
 </head>
 
 <body>
 
-<!-- ===== SIDEBAR ===== -->
+<!-- SIDEBAR -->
 <div id="sidebar" class="sidebar">
-
     <div class="profile-section">
-       <img src="/static/ibukunolu logo.jpeg" class="profile-pic">
+        <img src="/static/ibukunolu logo.jpeg" class="profile-pic">
         <h3>{{ user }}</h3>
         <p>{{ role }}</p>
     </div>
@@ -414,28 +369,44 @@
     <a href="/inpatient_data"><i class="fa-solid fa-bed-pulse"></i> InPatient Data</a>
     <a href="/audit_trail"><i class="fa-solid fa-file-lines"></i> Audit Trail</a>
     <a href="/kpi_dashboard"><i class="fa-solid fa-chart-line"></i> KPI Dashboard</a>
-
     {% if role == "Admin" %}
     <a href="/admin/dashboard"><i class="fa-solid fa-user-gear"></i> Admin Panel</a>
     {% endif %}
-
     <a href="/logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
 </div>
 
-
 <!-- TOGGLE BUTTON -->
-<button id="toggleBtn" class="toggle-btn">
-    <i class="fa-solid fa-bars"></i>
-</button>
+<button id="toggleBtn" class="toggle-btn"><i class="fa-solid fa-bars"></i></button>
 
 <!-- MAIN LAYOUT -->
 <div id="layout" class="layout">
 
     <!-- MAIN CONTENT -->
     <div class="main-content">
+
         <div class="welcome-banner">
             Pharmacy KPI Dashboard — Welcome, {{ user }}<br>
-            <span>Real-time stock, sales, profit and patient analytics for Ibukun-Olu Specialist Hospital Pharmacy.</span>
+            <span>Real-time stock, sales, profit and patient analytics.</span>
+            <button id="darkModeToggle"
+                    style="float:right;padding:6px 10px;border:none;border-radius:8px;
+                           background:#111827;color:white;font-size:12px;cursor:pointer;">
+                Dark Mode
+            </button>
+        </div>
+
+        <!-- ACTION BUTTONS -->
+        <div style="margin-bottom:15px;">
+            <button onclick="window.print()"
+                style="padding:8px 12px;border:none;border-radius:8px;
+                       background:#2563eb;color:white;font-size:13px;cursor:pointer;">
+                Print KPI Report
+            </button>
+
+            <button onclick="exportRawCSV()"
+                style="padding:8px 12px;border:none;border-radius:8px;margin-left:8px;
+                       background:#10b981;color:white;font-size:13px;cursor:pointer;">
+                Export Raw KPI Data (CSV)
+            </button>
         </div>
 
         <!-- KPI CARDS -->
@@ -444,36 +415,42 @@
                 <div class="kpi-icon"><i class="fa-solid fa-money-bill-trend-up"></i></div>
                 <div class="kpi-label">Total Sales Price</div>
                 <div class="kpi-value" id="kpiSales">₦0.00</div>
-                <div class="kpi-sub">From Stock View (Sales Price Sum)</div>
+                <div class="kpi-sub">Sum of Sales Price</div>
             </div>
-
             <div class="kpi-card">
                 <div class="kpi-icon"><i class="fa-solid fa-coins"></i></div>
                 <div class="kpi-label">Total Cost Price</div>
                 <div class="kpi-value" id="kpiCost">₦0.00</div>
-                <div class="kpi-sub">From Stock View (Sum of Cost Price)</div>
+                <div class="kpi-sub">Sum of Cost Price</div>
             </div>
-
             <div class="kpi-card">
                 <div class="kpi-icon"><i class="fa-solid fa-chart-column"></i></div>
                 <div class="kpi-label">Total Profit</div>
                 <div class="kpi-value" id="kpiProfit">₦0.00</div>
                 <div class="kpi-sub">Sales − Cost</div>
             </div>
-
             <div class="kpi-card">
                 <div class="kpi-icon"><i class="fa-solid fa-box-open"></i></div>
                 <div class="kpi-label">Total Qty Sold</div>
                 <div class="kpi-value" id="kpiQty">0</div>
-                <div class="kpi-sub">From Stock View (Quantity Sold)</div>
+                <div class="kpi-sub">Quantity Sold</div>
             </div>
-
             <div class="kpi-card">
                 <div class="kpi-icon"><i class="fa-solid fa-percent"></i></div>
                 <div class="kpi-label">Profit Margin</div>
                 <div class="kpi-value" id="kpiMargin">0%</div>
                 <div class="kpi-sub">Profit ÷ Sales × 100</div>
             </div>
+        </div>
+
+        <!-- MONTHLY SUMMARY -->
+        <div id="monthlySummary"
+             style="background:white;border-radius:14px;padding:16px 18px;
+                    box-shadow:0 4px 20px rgba(0,0,0,0.08);margin-bottom:18px;font-size:13px;">
+            <h3 style="margin:0 0 8px 0;font-size:15px;color:#111827;">
+                Monthly KPI Summary
+            </h3>
+            <div id="monthlySummaryContent">No data yet.</div>
         </div>
 
         <!-- SALES TREND -->
@@ -485,7 +462,7 @@
             <canvas id="trendChart" height="120"></canvas>
         </div>
 
-        <!-- TWO CHARTS ROW -->
+        <!-- TOP PROFIT & QTY -->
         <div class="chart-row">
             <div class="chart-card">
                 <div class="chart-header">
@@ -494,7 +471,6 @@
                 </div>
                 <canvas id="profitChart" height="120"></canvas>
             </div>
-
             <div class="chart-card">
                 <div class="chart-header">
                     <h3>Top Drugs by Quantity Sold</h3>
@@ -504,7 +480,7 @@
             </div>
         </div>
 
-        <!-- CATEGORY PERFORMANCE + PATIENT TYPE -->
+        <!-- CATEGORY & PATIENT TYPE -->
         <div class="chart-row">
             <div class="chart-card">
                 <div class="chart-header">
@@ -513,7 +489,6 @@
                 </div>
                 <canvas id="categoryChart" height="80"></canvas>
             </div>
-
             <div class="chart-card">
                 <div class="chart-header">
                     <h3>Top Patient Types by Bill</h3>
@@ -523,29 +498,30 @@
             </div>
         </div>
 
-        <!-- STOCK EXPIRY RISK -->
+        <!-- TREND BY PATIENT TYPE -->
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3>Trend by Patient Type</h3>
+                <span>Daily billings grouped by patient category</span>
+            </div>
+            <canvas id="patientTrendChart" height="120"></canvas>
+        </div>
+
+        <!-- EXPIRY RISK -->
         <div class="chart-card">
             <div class="chart-header">
                 <h3>Stock Expiry Risk (Top 10)</h3>
-                <span>Drugs nearing expiry with remaining quantity</span>
+                <span>Drugs nearing expiry</span>
             </div>
             <canvas id="expiryRiskChart" height="100"></canvas>
         </div>
+
     </div>
 
     <!-- RIGHT FILTER PANEL -->
     <div class="right-panel">
         <div class="filter-card">
             <h3><i class="fa-solid fa-filter"></i> Filters</h3>
-
-            <div class="filter-group">
-                <label class="filter-label">Period</label>
-                <select id="periodFilter" class="filter-select">
-                    <option value="Daily">Daily</option>
-                    <option value="Weekly">Weekly</option>
-                    <option value="Monthly" selected>Monthly</option>
-                </select>
-            </div>
 
             <div class="filter-group">
                 <label class="filter-label">Patient Type</label>
@@ -567,243 +543,324 @@
                 <label class="filter-label">End Date</label>
                 <input type="date" id="endDate" class="filter-date">
             </div>
-<button id="applyFiltersBtn"
-        style="width:100%;padding:10px;border:none;border-radius:8px;
-               background:#003366;color:white;font-size:15px;
-               cursor:pointer;margin-top:10px;">
-    Apply Filters
-</button>
 
-            <div class="filter-group">
-                <label class="filter-label">Note</label>
-                <span style="font-size:12px;color:var(--text-muted);">
-                    All KPIs and charts are computed from <strong>Stock View</strong> data:
-                    Sales Price Sum, Sum of Cost Price, Quantity Sold, Customer Type, and expiry information.
-                </span>
-            </div>
+            <button id="applyFiltersBtn"
+                style="width:100%;padding:10px;border:none;border-radius:8px;
+                       background:#003366;color:white;font-size:15px;cursor:pointer;margin-top:10px;">
+                Apply Filters
+            </button>
         </div>
+    </div>
+
+</div>
+
+<!-- DRILL-DOWN MODAL -->
+<div id="drillModal">
+    <div id="drillModalInner">
+        <span id="drillClose">&times;</span>
+        <h3 id="drillTitle">Details</h3>
+        <div id="drillContent" style="font-size:13px;"></div>
     </div>
 </div>
 
 <div class="footer">
-    Ibukun-Olu Specialist Hospital Pharmacy — Stock & Inventory Dashboard • Prepared by Ayokunle Oluwafemi J.
+    Ibukun-Olu Specialist Hospital Pharmacy — KPI Dashboard • Prepared by Ayokunle Oluwafemi J.
 </div>
-
 <script>
-    const sidebar = document.getElementById("sidebar");
-    const layout = document.getElementById("layout");
-    const toggleBtn = document.getElementById("toggleBtn");
+/* SIDEBAR TOGGLE */
+const sidebar = document.getElementById("sidebar");
+const layout = document.getElementById("layout");
+const toggleBtn = document.getElementById("toggleBtn");
 
-    toggleBtn.onclick = function () {
-        if (sidebar.style.left === "0px") {
-            sidebar.style.left = "-260px";
-            layout.style.marginLeft = "20px";
-        } else {
-            sidebar.style.left = "0px";
-            layout.style.marginLeft = "260px";
-        }
-    };
-
-    let trendChart, profitChart, qtyChart, categoryChart, patientTypeChart, expiryRiskChart;
-
-    async function loadCharts() {
-        const period = document.getElementById("periodFilter").value;
-        const patient = document.getElementById("patientFilter").value;
-        const startDate = document.getElementById("startDate").value;
-        const endDate = document.getElementById("endDate").value;
-
-        const params = new URLSearchParams({
-    patient_type: patient,
-    start_date: startDate,
-    end_date: endDate
-});
-
-
-        const response = await fetch(`/api/kpi_advanced?${params.toString()}`);
-        const data = await response.json();
-
-        const totalSales = data.total_sales || 0;
-        const totalCost = data.total_cost || 0;
-        const totalProfit = totalSales - totalCost;
-        const totalQty = data.total_qty || 0;
-        const margin = totalSales > 0 ? (totalProfit / totalSales) * 100 : 0;
-
-        document.getElementById("kpiSales").innerText = "₦" + totalSales.toLocaleString(undefined, {minimumFractionDigits: 2});
-        document.getElementById("kpiCost").innerText = "₦" + totalCost.toLocaleString(undefined, {minimumFractionDigits: 2});
-        document.getElementById("kpiProfit").innerText = "₦" + totalProfit.toLocaleString(undefined, {minimumFractionDigits: 2});
-        document.getElementById("kpiQty").innerText = totalQty.toLocaleString();
-        document.getElementById("kpiMargin").innerText = margin.toFixed(1) + "%";
-
-        if (!trendChart) {
-            trendChart = new Chart(document.getElementById("trendChart"), {
-                type: "line",
-                data: {
-                    labels: data.trend_labels,
-                    datasets: [{
-                        label: "Sales Trend",
-                        data: data.trend_values,
-                        borderColor: "#ffffff",
-                        backgroundColor: "rgba(255,255,255,0.25)",
-                        borderWidth: 3,
-                        tension: 0.3
-                    }]
-                },
-                options: {
-                    plugins: { legend: { labels: { color: "#ffffff" } } },
-                    scales: {
-                        x: { ticks: { color: "#ffffff" } },
-                        y: { ticks: { color: "#ffffff" } }
-                    }
-                }
-            });
-        } else {
-            trendChart.data.labels = data.trend_labels;
-            trendChart.data.datasets[0].data = data.trend_values;
-            trendChart.update();
-        }
-
-        if (!profitChart) {
-            profitChart = new Chart(document.getElementById("profitChart"), {
-                type: "bar",
-                data: {
-                    labels: data.top_profit_labels,
-                    datasets: [{
-                        label: "Profit",
-                        data: data.top_profit_values,
-                        backgroundColor: "#E97132"
-                    }]
-                },
-                options: {
-                    plugins: { legend: { labels: { color: "#ffffff" } } },
-                    scales: {
-                        x: { ticks: { color: "#ffffff" } },
-                        y: { ticks: { color: "#ffffff" } }
-                    }
-                }
-            });
-        } else {
-            profitChart.data.labels = data.top_profit_labels;
-            profitChart.data.datasets[0].data = data.top_profit_values;
-            profitChart.update();
-        }
-
-        if (!qtyChart) {
-            qtyChart = new Chart(document.getElementById("qtyChart"), {
-                type: "bar",
-                data: {
-                    labels: data.top_qty_labels,
-                    datasets: [{
-                        label: "Quantity Sold",
-                        data: data.top_qty_values,
-                        backgroundColor: "#196B24"
-                    }]
-                },
-                options: {
-                    plugins: { legend: { labels: { color: "#ffffff" } } },
-                    scales: {
-                        x: { ticks: { color: "#ffffff" } },
-                        y: { ticks: { color: "#ffffff" } }
-                    }
-                }
-            });
-        } else {
-            qtyChart.data.labels = data.top_qty_labels;
-            qtyChart.data.datasets[0].data = data.top_qty_values;
-            qtyChart.update();
-        }
-
-        if (!categoryChart) {
-            categoryChart = new Chart(document.getElementById("categoryChart"), {
-                type: "pie",
-                data: {
-                    labels: data.category_labels,
-                    datasets: [{
-                        label: "Category Sales",
-                        data: data.category_values,
-                        backgroundColor: [
-                            "#A02B93", "#196B24", "#E97132", "#FFFF00",
-                            "#00c2ff", "#6366f1", "#f97316", "#003366"
-                        ]
-                    }]
-                },
-                options: {
-                    plugins: {
-                        legend: {
-                            position: "bottom",
-                            labels: { color: "#ffffff" }
-                        }
-                    }
-                }
-            });
-        } else {
-            categoryChart.data.labels = data.category_labels;
-            categoryChart.data.datasets[0].data = data.category_values;
-            categoryChart.update();
-        }
-
-        if (!patientTypeChart) {
-            patientTypeChart = new Chart(document.getElementById("patientTypeChart"), {
-                type: "bar",
-                data: {
-                    labels: data.patient_type_labels,
-                    datasets: [{
-                        label: "Total Bill",
-                        data: data.patient_type_values,
-                        backgroundColor: "#FFFF00"
-                    }]
-                },
-                options: {
-                    plugins: { legend: { labels: { color: "#ffffff" } } },
-                    scales: {
-                        x: { ticks: { color: "#ffffff" } },
-                        y: { ticks: { color: "#ffffff" } }
-                    }
-                }
-            });
-        } else {
-            patientTypeChart.data.labels = data.patient_type_labels;
-            patientTypeChart.data.datasets[0].data = data.patient_type_values;
-            patientTypeChart.update();
-        }
-
-        if (!expiryRiskChart) {
-            expiryRiskChart = new Chart(document.getElementById("expiryRiskChart"), {
-                type: "bar",
-                data: {
-                    labels: data.expiry_labels,
-                    datasets: [{
-                        label: "Qty Remaining (Near Expiry)",
-                        data: data.expiry_values,
-                        backgroundColor: "#A02B93"
-                    }]
-                },
-                options: {
-                    indexAxis: "y",
-                    plugins: { legend: { labels: { color: "#ffffff" } } },
-                    scales: {
-                        x: { ticks: { color: "#ffffff" } },
-                        y: { ticks: { color: "#ffffff" } }
-                    }
-                }
-            });
-        } else {
-            expiryRiskChart.data.labels = data.expiry_labels;
-            expiryRiskChart.data.datasets[0].data = data.expiry_values;
-            expiryRiskChart.update();
-        }
+toggleBtn.onclick = function () {
+    if (sidebar.style.left === "0px") {
+        sidebar.style.left = "-260px";
+        layout.style.marginLeft = "20px";
+    } else {
+        sidebar.style.left = "0px";
+        layout.style.marginLeft = "260px";
     }
+};
 
-    loadCharts();
-   
+/* DARK MODE TOGGLE */
+const darkToggle = document.getElementById("darkModeToggle");
+darkToggle.onclick = function () {
+    document.body.classList.toggle("dark");
+};
 
-    document.getElementById("applyFiltersBtn").onclick = loadCharts;
-    document.getElementById("patientFilter").onchange = loadCharts;
-    document.getElementById("startDate").onchange = loadCharts;
-    document.getElementById("endDate").onchange = loadCharts;
-    
+/* DRILL-DOWN MODAL */
+function openDrillDown(title, labels, values) {
+    document.getElementById("drillTitle").innerText = title;
+    let html = "<table style='width:100%;border-collapse:collapse;font-size:13px;'>";
+    html += "<tr><th style='text-align:left;padding:6px;'>Item</th>" +
+            "<th style='text-align:right;padding:6px;'>Value</th></tr>";
+    labels.forEach(function (label, i) {
+        html += "<tr><td style='padding:6px;'>" + label + "</td>" +
+                "<td style='padding:6px;text-align:right;'>" + values[i].toLocaleString() + "</td></tr>";
+    });
+    html += "</table>";
+    document.getElementById("drillContent").innerHTML = html;
+    document.getElementById("drillModal").style.display = "block";
+}
+document.getElementById("drillClose").onclick = function () {
+    document.getElementById("drillModal").style.display = "none";
+};
 
+/* CHART VARIABLES */
+let trendChart, profitChart, qtyChart, categoryChart, patientTypeChart, expiryRiskChart;
+let patientTrendChart;
+
+/* LOAD KPI DATA */
+async function loadCharts() {
+    const patient = document.getElementById("patientFilter").value;
+    const startDate = document.getElementById("startDate").value;
+    const endDate = document.getElementById("endDate").value;
+
+    const params = new URLSearchParams({
+        patient_type: patient,
+        start_date: startDate,
+        end_date: endDate
+    });
+
+    const response = await fetch(`/api/kpi_advanced?${params.toString()}`);
+    const data = await response.json();
+
+    /* KPI CARDS */
+    const totalSales = data.total_sales || 0;
+    const totalCost = data.total_cost || 0;
+    const totalProfit = totalSales - totalCost;
+    const totalQty = data.total_qty || 0;
+    const margin = totalSales > 0 ? (totalProfit / totalSales) * 100 : 0;
+
+    document.getElementById("kpiSales").innerText = "₦" + totalSales.toLocaleString();
+    document.getElementById("kpiCost").innerText = "₦" + totalCost.toLocaleString();
+    document.getElementById("kpiProfit").innerText = "₦" + totalProfit.toLocaleString();
+    document.getElementById("kpiQty").innerText = totalQty.toLocaleString();
+    document.getElementById("kpiMargin").innerText = margin.toFixed(1) + "%";
+
+    /* MONTHLY SUMMARY */
+    const summaryDiv = document.getElementById("monthlySummaryContent");
+    summaryDiv.innerHTML =
+        "<p><strong>Total Sales:</strong> ₦" + totalSales.toLocaleString() + "</p>" +
+        "<p><strong>Total Cost:</strong> ₦" + totalCost.toLocaleString() + "</p>" +
+        "<p><strong>Total Profit:</strong> ₦" + totalProfit.toLocaleString() + "</p>" +
+        "<p><strong>Total Qty Sold:</strong> " + totalQty.toLocaleString() + "</p>" +
+        "<p><strong>Profit Margin:</strong> " + margin.toFixed(1) + "%</p>";
+
+    /* DESTROY OLD CHARTS */
+    function destroy(chart) { if (chart) chart.destroy(); }
+
+    /* SALES TREND */
+    destroy(trendChart);
+    trendChart = new Chart(document.getElementById("trendChart"), {
+        type: "line",
+        data: {
+            labels: data.trend_labels,
+            datasets: [{
+                label: "Sales Trend",
+                data: data.trend_values,
+                borderColor: "#ffffff",
+                backgroundColor: "rgba(255,255,255,0.25)",
+                borderWidth: 3,
+                tension: 0.3
+            }]
+        },
+        options: {
+            plugins: { legend: { labels: { color: "#ffffff" } } },
+            scales: {
+                x: { ticks: { color: "#ffffff" } },
+                y: { ticks: { color: "#ffffff" } }
+            }
+        }
+    });
+
+    /* TOP PROFIT */
+    destroy(profitChart);
+    profitChart = new Chart(document.getElementById("profitChart"), {
+        type: "bar",
+        data: {
+            labels: data.top_profit_labels,
+            datasets: [{
+                label: "Profit",
+                data: data.top_profit_values,
+                backgroundColor: "#E97132"
+            }]
+        },
+        options: {
+            onClick: function () {
+                openDrillDown("Top Drugs by Profit",
+                              data.top_profit_labels,
+                              data.top_profit_values);
+            },
+            plugins: { legend: { labels: { color: "#ffffff" } } },
+            scales: {
+                x: { ticks: { color: "#ffffff" } },
+                y: { ticks: { color: "#ffffff" } }
+            }
+        }
+    });
+
+    /* TOP QTY */
+    destroy(qtyChart);
+    qtyChart = new Chart(document.getElementById("qtyChart"), {
+        type: "bar",
+        data: {
+            labels: data.top_qty_labels,
+            datasets: [{
+                label: "Quantity Sold",
+                data: data.top_qty_values,
+                backgroundColor: "#196B24"
+            }]
+        },
+        options: {
+            onClick: function () {
+                openDrillDown("Top Drugs by Quantity Sold",
+                              data.top_qty_labels,
+                              data.top_qty_values);
+            },
+            plugins: { legend: { labels: { color: "#ffffff" } } },
+            scales: {
+                x: { ticks: { color: "#ffffff" } },
+                y: { ticks: { color: "#ffffff" } }
+            }
+        }
+    });
+
+    /* CATEGORY PIE */
+    destroy(categoryChart);
+    categoryChart = new Chart(document.getElementById("categoryChart"), {
+        type: "pie",
+        data: {
+            labels: data.category_labels,
+            datasets: [{
+                label: "Category Sales",
+                data: data.category_values,
+                backgroundColor: [
+                    "#A02B93", "#196B24", "#E97132", "#FFFF00",
+                    "#00c2ff", "#6366f1", "#f97316", "#003366"
+                ]
+            }]
+        },
+        options: {
+            plugins: {
+                legend: {
+                    position: "bottom",
+                    labels: { color: "#ffffff" }
+                }
+            }
+        }
+    });
+
+    /* PATIENT TYPE */
+    destroy(patientTypeChart);
+    patientTypeChart = new Chart(document.getElementById("patientTypeChart"), {
+        type: "bar",
+        data: {
+            labels: data.patient_type_labels,
+            datasets: [{
+                label: "Total Bill",
+                data: data.patient_type_values,
+                backgroundColor: "#FFFF00"
+            }]
+        },
+        options: {
+            onClick: function () {
+                openDrillDown("Top Patient Types by Bill",
+                              data.patient_type_labels,
+                              data.patient_type_values);
+            },
+            plugins: { legend: { labels: { color: "#ffffff" } } },
+            scales: {
+                x: { ticks: { color: "#ffffff" } },
+                y: { ticks: { color: "#ffffff" } }
+            }
+        }
+    });
+
+    /* TREND BY PATIENT TYPE
+       Expect data.patient_type_trend as:
+       { "HMO": [..], "Inpatient": [..], ... } aligned with trend_labels */
+    destroy(patientTrendChart);
+    const patientTrendDatasets = [];
+    if (data.patient_type_trend) {
+        const colors = ["#A02B93", "#196B24", "#E97132", "#003366", "#00c2ff"];
+        data.patient_type_labels.forEach(function (type, i) {
+            patientTrendDatasets.push({
+                label: type,
+                data: data.patient_type_trend[type] || [],
+                borderWidth: 2,
+                borderColor: colors[i % colors.length],
+                fill: false,
+                tension: 0.3
+            });
+        });
+    }
+    patientTrendChart = new Chart(document.getElementById("patientTrendChart"), {
+        type: "line",
+        data: {
+            labels: data.trend_labels,
+            datasets: patientTrendDatasets
+        },
+        options: {
+            plugins: { legend: { labels: { color: "#ffffff" } } },
+            scales: {
+                x: { ticks: { color: "#ffffff" } },
+                y: { ticks: { color: "#ffffff" } }
+            }
+        }
+    });
+
+    /* EXPIRY RISK */
+    destroy(expiryRiskChart);
+    expiryRiskChart = new Chart(document.getElementById("expiryRiskChart"), {
+        type: "bar",
+        data: {
+            labels: data.expiry_labels,
+            datasets: [{
+                label: "Qty Remaining (Near Expiry)",
+                data: data.expiry_values,
+                backgroundColor: "#A02B93"
+            }]
+        },
+        options: {
+            indexAxis: "y",
+            plugins: { legend: { labels: { color: "#ffffff" } } },
+            scales: {
+                x: { ticks: { color: "#ffffff" } },
+                y: { ticks: { color: "#ffffff" } }
+            }
+        }
+    });
+}
+
+/* EXPORT RAW KPI DATA (CSV) */
+function exportRawCSV() {
+    fetch("/api/kpi_advanced")
+        .then(res => res.json())
+        .then(data => {
+            let csv = "Field,Value\n";
+            for (let key in data) {
+                csv += `${key},${JSON.stringify(data[key])}\n`;
+            }
+            const blob = new Blob([csv], { type: "text/csv" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "kpi_raw_data.csv";
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+}
+
+/* FILTER EVENTS */
+document.getElementById("applyFiltersBtn").onclick = loadCharts;
+document.getElementById("patientFilter").onchange = loadCharts;
+document.getElementById("startDate").onchange = loadCharts;
+document.getElementById("endDate").onchange = loadCharts;
+
+/* INITIAL LOAD */
+loadCharts();
 </script>
 
 </body>
 </html>
-

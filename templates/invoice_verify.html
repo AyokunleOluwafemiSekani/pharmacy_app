@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Invoice Verification – Ibukun Olu Specialist Hospital</title>
+<style>
+    body {
+        font-family: "Segoe UI", sans-serif;
+        background: #f4f7f9;
+        margin: 0;
+        padding: 0;
+    }
+    .container {
+        max-width: 800px;
+        margin: 40px auto;
+        background: white;
+        padding: 30px 40px;
+        border-radius: 14px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+    }
+    .header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    .logo {
+        width: 120px;
+        height: 120px;
+        object-fit: contain;
+        margin-bottom: 10px;
+    }
+    .title {
+        font-size: 26px;
+        font-weight: bold;
+        color: #2C3E50;
+    }
+    .status-ok {
+        color: #1ABC9C;
+        font-weight: bold;
+        font-size: 18px;
+        margin-top: 10px;
+    }
+    .status-bad {
+        color: #E74C3C;
+        font-weight: bold;
+        font-size: 18px;
+        margin-top: 10px;
+    }
+    .section {
+        margin-top: 20px;
+        font-size: 16px;
+        line-height: 1.6;
+    }
+    .items {
+        font-family: Consolas, monospace;
+        font-size: 14px;
+        margin-top: 15px;
+        background: #fafafa;
+        padding: 15px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+    }
+    .items-header {
+        font-weight: bold;
+        border-bottom: 1px solid #333;
+        padding-bottom: 6px;
+        margin-bottom: 8px;
+    }
+    .item-row {
+        padding: 4px 0;
+        border-bottom: 1px dashed #ccc;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <img src="/static/ibukunolu logo.jpeg" class="logo">
+        <div class="title">Invoice Verification</div>
+        <div style="margin-top:5px;color:#555;">
+            Ibukun Olu Specialist Hospital
+        </div>
+    </div>
+
+    {% if not found %}
+        <div class="status-bad">
+            ❌ Invoice {{ invoice_number }} not found or invalid.
+        </div>
+        <div class="section">
+            This invoice number does not exist in our system.<br>
+            Please contact the hospital pharmacy or accounts department for clarification.
+        </div>
+    {% else %}
+        <div class="status-ok">
+            ✔ Invoice {{ invoice_number }} is valid and verified.
+        </div>
+
+        <div class="section">
+            <strong>Total Amount:</strong> ₦{{ "%.2f"|format(total_bill) }}<br>
+            <strong>Total Quantity:</strong> {{ total_qty }} items<br>
+            <strong>Status:</strong> Verified Hospital Invoice ✔
+        </div>
+
+        <div class="items">
+            <div class="items-header">
+                DATE        DRUG NAME               QTY   PRICE   TOTAL
+            </div>
+
+            {% for row in bill_items %}
+            <div class="item-row">
+                {{ row["date"] }}
+                {{ row["drug_name"] }}
+                {{ row["qty_sold"] }}
+                ₦{{ row["sales_price"] }}
+                ₦{{ row["bill_total"] }}
+            </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+
+</body>
+</html>

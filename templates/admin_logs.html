@@ -2,21 +2,34 @@
 {% block content %}
 
 <h2 class="page-title">Admin Activity Logs</h2>
-<p class="page-subtitle">Monitor system events, admin actions, errors, and security activity.</p>
+<p class="page-subtitle">Monitor system events, user actions, errors, and security activity.</p>
 
-<!-- Search + Filter Bar -->
+<!-- Controls -->
 <div class="log-controls">
     <input type="text" id="logSearch" placeholder="Search logs..." onkeyup="filterLogs()">
     <select id="logFilter" onchange="filterLogs()">
         <option value="">All Types</option>
         <option value="login">Login</option>
+        <option value="logout">Logout</option>
+        <option value="drug_entry">Drug Entry</option>
         <option value="backup">Backup</option>
         <option value="restore">Restore</option>
         <option value="error">Error</option>
         <option value="system">System</option>
     </select>
+
+    <a href="/admin/logs/export" class="export-btn">
+        <i class="fa-solid fa-file-csv"></i> Export CSV
+    </a>
+
+    <button id="refreshBtn" onclick="refreshLogs()" class="refresh-btn">
+        <i class="fa-solid fa-rotate"></i> Refresh
+    </button>
 </div>
 
+<div id="loader" class="loader" style="display:none;"></div>
+
+<!-- Logs Table -->
 <div class="table-container smooth-table">
 <table class="responsive-table" id="logTable">
     <thead>
@@ -24,97 +37,111 @@
             <th>Time</th>
             <th>Type</th>
             <th>Message</th>
+            <th>User</th>
+            <th>Role</th>
             <th>IP</th>
+            <th>Device</th>
+            <th>Browser</th>
+            <th>Location</th>
         </tr>
     </thead>
 
     <tbody>
         {% for log in logs %}
-        <tr class="log-row" data-type="{{ log.type }}">
-            <td data-label="Time">
-                <div class="log-time">
-                    <i class="fa-solid fa-clock"></i> {{ log.time }}
-                </div>
-            </td>
-
-            <td data-label="Type">
-                <span class="badge {{ log.type }}-badge">
-                    <i class="fa-solid 
-                        {% if log.type == 'login' %}fa-right-to-bracket{% endif %}
-                        {% if log.type == 'backup' %}fa-database{% endif %}
-                        {% if log.type == 'restore' %}fa-rotate-left{% endif %}
-                        {% if log.type == 'error' %}fa-triangle-exclamation{% endif %}
-                        {% if log.type == 'system' %}fa-gear{% endif %}
-                    "></i>
-                    {{ log.type|capitalize }}
-                </span>
-            </td>
-
-            <td data-label="Message">{{ log.message }}</td>
-
-            <td data-label="IP">
-                <div class="log-ip">
-                    <i class="fa-solid fa-network-wired"></i> {{ log.ip }}
-                </div>
-            </td>
+        <tr class="log-row" data-type="{{ log.type }}"
+            onclick='showDetails({{ log|tojson }})'>
+            <td>{{ log.time }}</td>
+            <td>{{ log.type }}</td>
+            <td>{{ log.message }}</td>
+            <td>{{ log.user }}</td>
+            <td>{{ log.role }}</td>
+            <td>{{ log.ip }}</td>
+            <td>{{ log.device }}</td>
+            <td>{{ log.browser }}</td>
+            <td>{{ log.location }}</td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
 </div>
 
+<!-- Full Details Modal -->
+<div id="detailsModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+
+        <h3>Log Details</h3>
+
+        <p><strong>Time:</strong> <span id="d_time"></span></p>
+        <p><strong>Type:</strong> <span id="d_type"></span></p>
+        <p><strong>Message:</strong> <span id="d_message"></span></p>
+        <p><strong>User:</strong> <span id="d_user"></span></p>
+        <p><strong>Role:</strong> <span id="d_role"></span></p>
+        <p><strong>IP:</strong> <span id="d_ip"></span></p>
+        <p><strong>Device:</strong> <span id="d_device"></span></p>
+        <p><strong>Browser:</strong> <span id="d_browser"></span></p>
+        <p><strong>Location:</strong> <span id="d_location"></span></p>
+    </div>
+</div>
+
 <style>
-/* Layout */
 .log-controls {
     display: flex;
     gap: 15px;
     margin-bottom: 20px;
 }
 
-.log-controls input,
-.log-controls select {
+.export-btn {
     padding: 10px 14px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    font-size: 15px;
-    width: 200px;
-}
-
-/* Badges */
-.badge {
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-size: 13px;
+    background: #198754;
     color: white;
-    display: inline-flex;
+    border-radius: 8px;
+    text-decoration: none;
+}
+
+.refresh-btn {
+    padding: 10px 14px;
+    background: #003366;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.loader {
+    width: 40px;
+    height: 40px;
+    border: 5px solid #ccc;
+    border-top-color: #003366;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 10px auto;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6);
+    justify-content: center;
     align-items: center;
-    gap: 6px;
 }
 
-.login-badge { background: #3b82f6; }
-.backup-badge { background: #4C7D7E; }
-.restore-badge { background: #6f42c1; }
-.error-badge { background: #d9534f; }
-.system-badge { background: #6c757d; }
-
-/* Icons inside table */
-.log-time i,
-.log-ip i {
-    margin-right: 6px;
-    opacity: 0.7;
+.modal-content {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    width: 400px;
 }
 
-/* Hover effect */
-.log-row:hover {
-    background: rgba(0,0,0,0.03);
-    transition: 0.2s;
-}
-
-/* Responsive */
-@media (max-width: 600px) {
-    .log-controls {
-        flex-direction: column;
-    }
+.close-btn {
+    float: right;
+    cursor: pointer;
+    font-size: 22px;
 }
 </style>
 
@@ -133,6 +160,36 @@ function filterLogs() {
 
         row.style.display = (matchesSearch && matchesFilter) ? "" : "none";
     });
+}
+
+function refreshLogs() {
+    document.getElementById("loader").style.display = "block";
+
+    fetch("/admin/logs")
+        .then(response => response.text())
+        .then(html => {
+            document.open();
+            document.write(html);
+            document.close();
+        });
+}
+
+function showDetails(log) {
+    document.getElementById("d_time").innerText = log.time;
+    document.getElementById("d_type").innerText = log.type;
+    document.getElementById("d_message").innerText = log.message;
+    document.getElementById("d_user").innerText = log.user;
+    document.getElementById("d_role").innerText = log.role;
+    document.getElementById("d_ip").innerText = log.ip;
+    document.getElementById("d_device").innerText = log.device;
+    document.getElementById("d_browser").innerText = log.browser;
+    document.getElementById("d_location").innerText = log.location;
+
+    document.getElementById("detailsModal").style.display = "flex";
+}
+
+function closeModal() {
+    document.getElementById("detailsModal").style.display = "none";
 }
 </script>
 

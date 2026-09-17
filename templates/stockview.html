@@ -1,14 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
 <meta charset="UTF-8">
 <title>Stock View – Pharmacy</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- Inter Font -->
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-<!-- Icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
@@ -18,81 +15,34 @@
     --light-ash: #E8ECEB;
     --hospital-blue: #4C7D7E;
     --white: #FFFFFF;
-}
-/* ACTIVE LINK HIGHLIGHT + GLOW */
-.sidebar a.active {
-    background: var(--hospital-blue);
-    padding-left: 28px;
-    font-weight: bold;
-    box-shadow: inset 0 0 10px rgba(255,255,255,0.4),
-                0 0 12px rgba(76,125,126,0.8);
-}
-/* TOP BAR ROLE INDICATOR */
-.role-indicator {
-    position: fixed;
-    top: 15px;
-    left: 80px;
-    z-index: 2500;
-}
-/* ROLE BADGES WITH COLORS + GLOW + PULSE */
-.role-badge {
-    display: inline-block;
-    padding: 8px 16px;
-    border-radius: 999px;
-    font-size: 14px;
-    font-weight: 600;
-    color: white;
-    animation: pulseGlow 2s infinite;
-}
 
-
-
-
-/* Auditor = Blue */
-.role-auditor {
-    background: #0055FF;
-    box-shadow: 0 0 12px rgba(0,85,255,0.7);
-}
-
-/* Pharmacist = Green */
-.role-pharmacist {
-    background: #009933;
-    box-shadow: 0 0 12px rgba(0,153,51,0.7);
-}
-
-/* Administrator = Deep Ash */
-.role-administrator {
-    background: #2F4F4F;
-    box-shadow: 0 0 12px rgba(47,79,79,0.7);
-}
-
-/* Pulse Animation */
-@keyframes pulseGlow {
-    0% { transform: scale(1); box-shadow: 0 0 12px rgba(255,255,255,0.4); }
-    50% { transform: scale(1.05); box-shadow: 0 0 18px rgba(255,255,255,0.7); }
-    100% { transform: scale(1); box-shadow: 0 0 12px rgba(255,255,255,0.4); }
-}
-/* SIDEBAR SLIDE ANIMATION */
-.sidebar {
-    animation: slideIn 0.5s ease;
-}
-
-@keyframes slideIn {
-    from { transform: translateX(-260px); }
-    to { transform: translateX(0); }
+    --dark-bg: #121212;
+    --dark-card: #1e1e1e;
+    --dark-text: #e0e0e0;
+    --dark-border: #444;
 }
 
 /* GLOBAL */
 body {
     font-family: 'Inter', sans-serif;
     background: var(--light-ash);
+    margin: 0;
+    padding: 0;
 }
 
-/* ACTIVE LINK HIGHLIGHT */
-.sidebar a.active {
-    background: var(--hospital-blue);
-    padding-left: 28px;
-    font-weight: bold;
+/* WATERMARK */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('/static/ibukunolu logo.jpeg');
+    background-repeat: repeat;
+    background-size: 260px;
+    opacity: 0.06;
+    z-index: -1;
 }
 
 body.dark-mode {
@@ -100,7 +50,11 @@ body.dark-mode {
     color: var(--dark-text);
 }
 
-/* FIXED TOP CONTROLS */
+body.dark-mode::before {
+    opacity: 0.04; /* watermark still visible in dark mode */
+}
+
+/* TOP CONTROLS */
 #topControls {
     position: fixed;
     top: 15px;
@@ -120,6 +74,9 @@ body.dark-mode {
     font-size: 14px;
     box-shadow: 0 3px 10px rgba(0,0,0,0.25);
     transition: 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .top-btn:hover {
@@ -176,6 +133,35 @@ body.dark-mode .sidebar {
     padding-left: 28px;
 }
 
+.sidebar a.active {
+    background: var(--hospital-blue);
+    padding-left: 28px;
+    font-weight: bold;
+    box-shadow: inset 0 0 10px rgba(255,255,255,0.4),
+                0 0 12px rgba(76,125,126,0.8);
+}
+
+/* ROLE BADGE */
+.role-badge {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 600;
+    color: white;
+    animation: pulseGlow 2s infinite;
+}
+
+.role-auditor { background: #0055FF; box-shadow: 0 0 12px rgba(0,85,255,0.7); }
+.role-pharmacist { background: #009933; box-shadow: 0 0 12px rgba(0,153,51,0.7); }
+.role-administrator { background: #2F4F4F; box-shadow: 0 0 12px rgba(47,79,79,0.7); }
+
+@keyframes pulseGlow {
+    0% { transform: scale(1); box-shadow: 0 0 12px rgba(255,255,255,0.4); }
+    50% { transform: scale(1.05); box-shadow: 0 0 18px rgba(255,255,255,0.7); }
+    100% { transform: scale(1); box-shadow: 0 0 12px rgba(255,255,255,0.4); }
+}
+
 /* TOGGLE BUTTON */
 .toggle-btn {
     position: fixed;
@@ -203,7 +189,42 @@ body.dark-mode .sidebar {
     transition: margin-left 0.35s ease;
 }
 
-/* CARD */
+/* KPI BAR */
+.kpi-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.kpi-card {
+    background: var(--white);
+    border-radius: 10px;
+    padding: 12px 14px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+}
+
+body.dark-mode .kpi-card {
+    background: var(--dark-card);
+    color: var(--dark-text);
+}
+
+.kpi-title {
+    font-size: 12px;
+    text-transform: uppercase;
+    color: #666;
+}
+
+body.dark-mode .kpi-title {
+    color: #aaa;
+}
+
+.kpi-value {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+/* STOCK CARD */
 .stock-card {
     background: var(--white);
     border-radius: 12px;
@@ -216,7 +237,7 @@ body.dark-mode .stock-card {
     color: var(--dark-text);
 }
 
-/* SEARCH BAR + BUTTONS */
+/* CONTROLS */
 .controls {
     background: white;
     padding: 15px;
@@ -232,19 +253,28 @@ body.dark-mode .controls {
     background: var(--dark-card);
 }
 
-.search-input {
-    padding: 12px 14px;
+.search-input,
+.filter-input {
+    padding: 10px 12px;
     border-radius: 999px;
     border: 1px solid #ccc;
     font-size: 14px;
-    min-width: 220px;
+    min-width: 180px;
     transition: 0.3s ease;
 }
 
-.search-input:focus {
+.search-input:focus,
+.filter-input:focus {
     border-color: var(--hospital-blue);
     box-shadow: 0 0 6px rgba(76,125,126,0.5);
     outline: none;
+}
+
+body.dark-mode .search-input,
+body.dark-mode .filter-input {
+    background: #2a2a2a;
+    border: 1px solid #555;
+    color: var(--dark-text);
 }
 
 .controls button {
@@ -266,24 +296,21 @@ body.dark-mode .controls {
     transform: translateY(-1px);
 }
 
-/* TABLE WRAPPER — ALWAYS VISIBLE SCROLLBAR */
+/* TABLE WRAPPER */
 .table-wrapper {
     width: 100%;
-    overflow-x: scroll;
-    overflow-y: hidden;
+    overflow-x: auto;
     border-radius: 10px;
 }
 
-/* Always visible scrollbar */
+/* Scrollbar */
 .table-wrapper::-webkit-scrollbar {
-    height: 12px;
+    height: 10px;
 }
-
 .table-wrapper::-webkit-scrollbar-thumb {
     background: var(--medium-ash-green);
     border-radius: 10px;
 }
-
 .table-wrapper::-webkit-scrollbar-track {
     background: #ddd;
 }
@@ -308,6 +335,7 @@ th {
     position: sticky;
     top: 0;
     z-index: 5;
+    cursor: pointer;
 }
 
 body.dark-mode th {
@@ -324,12 +352,12 @@ body.dark-mode td {
     border-bottom: 1px solid var(--dark-border);
 }
 
-/* Color-coded remarks */
+/* REMARK COLORS */
 .danger { background: #ffcccc !important; color: #900; font-weight: bold; }
 .warning { background: #fff0b3 !important; color: #b36b00; font-weight: bold; }
 .ok { background: #d6f5d6 !important; color: #006600; font-weight: bold; }
 
-/* Pagination */
+/* PAGINATION */
 .pagination {
     text-align: center;
     padding: 15px;
@@ -353,9 +381,10 @@ body.dark-mode td {
 .page-info {
     font-size: 14px;
     font-weight: bold;
+    margin: 0 10px;
 }
 
-/* Back to top button */
+/* BACK TO TOP */
 #backToTop {
     position: fixed;
     bottom: 25px;
@@ -377,25 +406,58 @@ body.dark-mode td {
     background: var(--medium-ash-green);
     transform: translateY(-2px);
 }
-</style>
 
+/* SPINNER */
+#spinner {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: none;
+    z-index: 5000;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+    #mainContent {
+        padding: 90px 12px 20px 12px;
+    }
+
+    .controls {
+        flex-direction: column;
+    }
+
+    .search-input,
+    .filter-input {
+        width: 100%;
+    }
+
+    .kpi-bar {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    table {
+        min-width: 900px;
+    }
+}
+</style>
 </head>
 
 <body>
 
 <!-- TOP CONTROLS -->
 <div id="topControls">
-    <button id="darkModeToggle" class="top-btn"><i class="fa-solid fa-moon"></i> Dark Mode</button>
+    <button id="darkModeToggle" class="top-btn">
+        <i class="fa-solid fa-moon"></i> Dark Mode
+    </button>
 </div>
 
 <!-- SIDEBAR -->
 <div id="sidebar" class="sidebar">
     <div class="profile-section">
-      <img src="/static/ibukunolu logo.jpeg" class="profile-pic">
-
+        <img src="/static/ibukunolu logo.jpeg" class="profile-pic">
         <h3>{{ user }}</h3>
 
-        <!-- ROLE BADGE -->
         <span class="role-badge
             {% if role == 'Admin' %}role-admin{% endif %}
             {% if role == 'Auditor' %}role-auditor{% endif %}
@@ -409,7 +471,6 @@ body.dark-mode td {
     <a href="/profile" class="{% if request.path == '/profile' %}active{% endif %}">
         <i class="fa-solid fa-user"></i> My Profile
     </a>
-
     <a href="/dashboard" class="{% if request.path == '/dashboard' %}active{% endif %}">
         <i class="fa-solid fa-house"></i> Dashboard
     </a>
@@ -465,127 +526,317 @@ body.dark-mode td {
     <a href="/logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
 </div>
 
-
 <!-- TOGGLE BUTTON -->
 <button id="toggleBtn" class="toggle-btn"><i class="fa-solid fa-bars"></i></button>
 
 <!-- MAIN CONTENT -->
 <div id="mainContent">
 
-<div class="stock-card">
+    <!-- KPI BAR -->
+    <div class="kpi-bar">
+        <div class="kpi-card">
+            <div class="kpi-title">Total Sales Value</div>
+            <div class="kpi-value" id="kpiTotalSales">₦0</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-title">Total Cost Value</div>
+            <div class="kpi-value" id="kpiTotalCost">₦0</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-title">Profit</div>
+            <div class="kpi-value" id="kpiProfit">₦0</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-title">Low Stock Drugs</div>
+            <div class="kpi-value" id="kpiLowStock">0</div>
+        </div>
+    </div>
 
-<h2>Stock View</h2>
+    <div class="stock-card">
+        <h2>Stock View</h2>
 
-<div class="controls">
-    <input type="text" id="searchDrug" class="search-input" placeholder="Search Drug Name">
-    <input type="text" id="searchCategory" class="search-input" placeholder="Search Category">
+        <div class="controls">
+            <input type="text" id="searchDrug" class="search-input" placeholder="Search Drug Name">
+            <input type="text" id="searchCategory" class="search-input" placeholder="Search Category">
 
-    <button onclick="filterTable()"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
-    <button onclick="resetFilters()"><i class="fa-solid fa-rotate-left"></i> Reset</button>
-    <button onclick="showLowStock()"><i class="fa-solid fa-triangle-exclamation"></i> Low Stock</button>
-    <button onclick="exportExcel()"><i class="fa-solid fa-file-excel"></i> Excel</button>
-    <button onclick="window.print()"><i class="fa-solid fa-print"></i> Print</button>
-</div>
+            <input type="date" id="filterStartDate" class="filter-input">
+            <input type="date" id="filterEndDate" class="filter-input">
 
-<div class="table-wrapper">
-<table id="stockTable">
-<thead>
-<tr>
-    <th>Date</th>
-    <th>Time</th>
-    <th>Drug Name</th>
-    <th>Category</th>
-    <th>Opening Balance</th>
-    <th>Transaction Type</th>
-    <th>Qty Sold</th>
-    <th>Qty Remaining</th>
-    <th>Cost Price</th>
-    <th>Sales Price</th>
-    <th>Customer Type</th>
-    <th>Transaction ID</th>
-    <th>Remark</th>
-    <th>Bill</th>
-    <th>Sum of Sales Price</th>
-    <th>Sum of Cost Value</th>
-</tr>
-</thead>
+            <select id="filterTransactionType" class="filter-input">
+                <option value="">All Transaction Types</option>
+                <option value="Sale">Sale</option>
+                <option value="Restock">Restock</option>
+                <option value="Adjustment">Adjustment</option>
+            </select>
 
-<tbody id="tableBody">
-{% for row in stock %}
-<tr>
-    <td>{{ row['date'] }}</td>
-    <td>{{ row['time'] }}</td>
-    <td>{{ row['drug_name'] }}</td>
-    <td>{{ row['categories'] }}</td>
-    <td>{{ row['opening_balance'] }}</td>
-    <td>{{ row['transaction_type'] }}</td>
-    <td>{{ row['quantity_sold'] }}</td>
-    <td>{{ row['quantity_remaining'] }}</td>
-    <td>{{ row['cost_price'] }}</td>
-    <td>{{ row['sales_price'] }}</td>
-    <td>{{ row['customer_type'] }}</td>
-    <td>{{ row['transaction_id'] }}</td>
+            <button onclick="applyFilters()"><i class="fa-solid fa-filter"></i> Apply Filters</button>
+            <button onclick="resetFilters()"><i class="fa-solid fa-rotate-left"></i> Reset</button>
+            <button onclick="showLowStock()"><i class="fa-solid fa-triangle-exclamation"></i> Low Stock</button>
+            <button onclick="exportExcel()"><i class="fa-solid fa-file-excel"></i> Excel</button>
+            <button onclick="exportCSV()"><i class="fa-solid fa-file-csv"></i> CSV</button>
+            <button onclick="window.print()"><i class="fa-solid fa-print"></i> Print</button>
+        </div>
 
-    <td class="
-        {% if row['remark'] == 'Drug Out of Stock' %}
-            danger
-        {% elif row['remark'] == 'Restock Drug Immediately' %}
-            danger
-        {% elif row['remark'] == 'Almost Out of Stock' %}
-            warning
-        {% else %}
-            ok
-        {% endif %}
-    ">
-        {{ row['remark'] }}
-    </td>
+        <div class="table-wrapper">
+            <table id="stockTable">
+                <thead>
+                    <tr>
+                        <th onclick="sortBy('date')">Date</th>
+                        <th onclick="sortBy('time')">Time</th>
+                        <th onclick="sortBy('drug_name')">Drug Name</th>
+                        <th onclick="sortBy('categories')">Category</th>
+                        <th>Opening Balance</th>
+                        <th onclick="sortBy('transaction_type')">Transaction Type</th>
+                        <th>Qty Sold</th>
+                        <th onclick="sortBy('quantity_remaining')">Qty Remaining</th>
+                        <th>Cost Price</th>
+                        <th>Sales Price</th>
+                        <th>Customer Type</th>
+                        <th>Transaction ID</th>
+                        <th>Remark</th>
+                        <th>Bill</th>
+                        <th>Sum of Sales Price</th>
+                        <th>Sum of Cost Value</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    {% for row in stock %}
+                    <tr data-date="{{ row['date'] }}"
+                        data-time="{{ row['time'] }}"
+                        data-drug="{{ row['drug_name'] }}"
+                        data-category="{{ row['categories'] }}"
+                        data-transaction="{{ row['transaction_type'] }}"
+                        data-remaining="{{ row['quantity_remaining'] }}">
+                        <td>{{ row['date'] }}</td>
+                        <td>{{ row['time'] }}</td>
+                        <td>{{ row['drug_name'] }}</td>
+                        <td>{{ row['categories'] }}</td>
+                        <td>{{ row['opening_balance'] }}</td>
+                        <td>{{ row['transaction_type'] }}</td>
+                        <td>{{ row['quantity_sold'] }}</td>
+                        <td>{{ row['quantity_remaining'] }}</td>
+                        <td>{{ row['cost_price'] }}</td>
+                        <td>{{ row['sales_price'] }}</td>
+                        <td>{{ row['customer_type'] }}</td>
+                        <td>{{ row['transaction_id'] }}</td>
+                        <td class="
+                            {% if row['remark'] == 'Drug Out of Stock' %}
+                                danger
+                            {% elif row['remark'] == 'Restock Drug Immediately' %}
+                                danger
+                            {% elif row['remark'] == 'Almost Out of Stock' %}
+                                warning
+                            {% else %}
+                                ok
+                            {% endif %}
+                        ">
+                            {{ row['remark'] }}
+                        </td>
+                        <td>{{ row['bill'] }}</td>
+                        <td>{{ row['sales_price_sum'] }}</td>
+                        <td>{{ row['sum_cost_value'] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
-    <td>{{ row['bill'] }}</td>
-    <td>{{ row['sales_price_sum'] }}</td>
-    <td>{{ row['sum_cost_value'] }}</td>
-</tr>
-{% endfor %}
-</tbody>
-</table>
-</div>
-
-<div class="pagination">
-    <button onclick="prevPage()">Prev</button>
-    <span class="page-info" id="pageInfo"></span>
-    <button onclick="nextPage()">Next</button>
-</div>
-
-</div>
+        <div class="pagination">
+            <button onclick="prevPage()">Prev</button>
+            <span class="page-info" id="pageInfo"></span>
+            <button onclick="nextPage()">Next</button>
+        </div>
+    </div>
 </div>
 
 <!-- BACK TO TOP BUTTON -->
 <button id="backToTop" onclick="scrollToTop()"><i class="fa-solid fa-arrow-up"></i></button>
 
+<!-- SPINNER -->
+<div id="spinner">
+    <i class="fa-solid fa-spinner fa-spin" style="font-size: 50px; color: var(--hospital-blue);"></i>
+</div>
+
 <script>
+
+/* -----------------------------------------
+   GLOBAL VARIABLES
+----------------------------------------- */
 let rowsPerPage = 50;
 let currentPage = 1;
+let stockRows = [];
+let latestStockMap = {};
+let sortDirection = {};
+const tableBody = document.getElementById("tableBody");
 
+/* -----------------------------------------
+   PARSE DATE + TIME INTO REAL JS DATE
+----------------------------------------- */
+function parseDateTime(dateStr, timeStr) {
+    if (!dateStr || !timeStr) return new Date(0);
+    return new Date(dateStr + "T" + timeStr);
+}
+
+/* -----------------------------------------
+   INITIALIZE STOCK DATA
+----------------------------------------- */
+window.onload = function () {
+    const rows = document.querySelectorAll("#tableBody tr");
+
+rows.forEach(row => {
+    stockRows.push({
+        element: row,
+        date: row.dataset.date || "",
+        time: row.dataset.time || "",
+        drug: row.dataset.drug || "",
+        category: row.dataset.category || "",
+        transaction: row.dataset.transaction || "",
+        remaining: parseInt(row.dataset.remaining || "0"),
+        datetime: parseDateTime(row.dataset.date, row.dataset.time)
+    });
+
+    // APPLY REMARK COLOR CODING HERE
+    const remarkCell = row.cells[12];
+    const remark = (remarkCell.innerText || "").trim();
+
+    if (remark === "Drug Out of Stock" || remark === "Restock Drug Immediately") {
+        remarkCell.className = "danger";     // RED
+    } 
+    else if (remark === "Almost Out of Stock") {
+        remarkCell.className = "warning";    // YELLOW
+    } 
+    else {
+        remarkCell.className = "ok";         // GREEN
+    }
+});
+
+    cleanNaN();
+    computeLatestStockLevels();
+    computeKPIs();
+    renderTable();
+};
+
+/* -----------------------------------------
+   CLEAN NaN / NaT / EMPTY
+----------------------------------------- */
+function cleanNaN() {
+    document.querySelectorAll("#tableBody tr").forEach(row => {
+        row.querySelectorAll("td").forEach(cell => {
+            const txt = cell.innerText.trim();
+            if (txt === "NaN" || txt === "NaT" || txt === "") {
+                cell.innerText = "-";
+            }
+        });
+    });
+}
+
+/* -----------------------------------------
+   SPINNER
+----------------------------------------- */
+function showSpinner() {
+    document.getElementById("spinner").style.display = "block";
+}
+function hideSpinner() {
+    document.getElementById("spinner").style.display = "none";
+}
+
+/* -----------------------------------------
+   COMPUTE LATEST STOCK PER DRUG
+----------------------------------------- */
+function computeLatestStockLevels() {
+    latestStockMap = {};
+
+    stockRows.forEach(row => {
+        const drug = row.drug;
+
+        if (!latestStockMap[drug]) {
+            latestStockMap[drug] = {
+                datetime: row.datetime,
+                remaining: row.remaining
+            };
+        } else {
+            if (row.datetime > latestStockMap[drug].datetime) {
+                latestStockMap[drug] = {
+                    datetime: row.datetime,
+                    remaining: row.remaining
+                };
+            }
+        }
+    });
+}
+
+/* -----------------------------------------
+   LOW STOCK FILTER (latest remaining < 20)
+----------------------------------------- */
+function showLowStock() {
+    showSpinner();
+
+    setTimeout(() => {
+        computeLatestStockLevels();
+
+        const lowStockDrugs = Object.keys(latestStockMap).filter(drug =>
+            latestStockMap[drug].remaining < 20
+        );
+
+        stockRows.forEach(row => {
+            row.element.style.display = lowStockDrugs.includes(row.drug) ? "" : "none";
+        });
+
+        updatePaginationAfterFilter();
+        hideSpinner();
+    }, 150);
+}
+
+/* -----------------------------------------
+   KPI CALCULATIONS
+----------------------------------------- */
+function computeKPIs() {
+    let totalSales = 0;
+    let totalCost = 0;
+    let lowStockCount = 0;
+
+    stockRows.forEach(row => {
+        const sales = parseFloat(row.element.cells[14].innerText || "0");
+        const cost = parseFloat(row.element.cells[15].innerText || "0");
+
+        totalSales += isNaN(sales) ? 0 : sales;
+        totalCost += isNaN(cost) ? 0 : cost;
+    });
+
+    Object.keys(latestStockMap).forEach(drug => {
+        if (latestStockMap[drug].remaining < 20) lowStockCount++;
+    });
+
+    document.getElementById("kpiTotalSales").innerText = "₦" + totalSales.toLocaleString();
+    document.getElementById("kpiTotalCost").innerText = "₦" + totalCost.toLocaleString();
+    document.getElementById("kpiProfit").innerText = "₦" + (totalSales - totalCost).toLocaleString();
+    document.getElementById("kpiLowStock").innerText = lowStockCount;
+}
+
+/* -----------------------------------------
+   PAGINATION
+----------------------------------------- */
 function renderTable() {
-    let table = document.getElementById("stockTable");
-    let rows = table.rows;
-    let totalRows = rows.length - 1;
-    let totalPages = Math.ceil(totalRows / rowsPerPage);
+    const rows = document.querySelectorAll("#tableBody tr");
+    const totalRows = rows.length;
+    const totalPages = Math.ceil(totalRows / rowsPerPage);
 
-    for (let i = 1; i < rows.length; i++) rows[i].style.display = "none";
+    rows.forEach(row => row.style.display = "none");
 
-    let start = (currentPage - 1) * rowsPerPage + 1;
-    let end = start + rowsPerPage;
+    const start = (currentPage - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
 
-    for (let i = start; i < end && i < rows.length; i++) rows[i].style.display = "";
+    for (let i = start; i < end && i < totalRows; i++) {
+        rows[i].style.display = "";
+    }
 
-    document.getElementById("pageInfo").innerHTML =
+    document.getElementById("pageInfo").innerText =
         "Page " + currentPage + " of " + totalPages;
 }
 
 function nextPage() {
-    let table = document.getElementById("stockTable");
-    let totalRows = table.rows.length - 1;
-    let totalPages = Math.ceil(totalRows / rowsPerPage);
+    const rows = document.querySelectorAll("#tableBody tr");
+    const totalPages = Math.ceil(rows.length / rowsPerPage);
 
     if (currentPage < totalPages) {
         currentPage++;
@@ -600,53 +851,137 @@ function prevPage() {
     }
 }
 
-function filterTable() {
-    let drug = document.getElementById("searchDrug").value.toLowerCase();
-    let category = document.getElementById("searchCategory").value.toLowerCase();
+function updatePaginationAfterFilter() {
+    currentPage = 1;
+    renderTable();
+}
 
-    let rows = document.querySelectorAll("#tableBody tr");
+/* -----------------------------------------
+   FILTERS (Search + Category + Date + Type)
+----------------------------------------- */
+function applyFilters() {
+    showSpinner();
 
-    rows.forEach(row => {
-        let drugName = row.cells[2].innerText.toLowerCase();
-        let cat = row.cells[3].innerText.toLowerCase();
+    setTimeout(() => {
+        const drug = document.getElementById("searchDrug").value.toLowerCase();
+        const category = document.getElementById("searchCategory").value.toLowerCase();
+        const startDate = document.getElementById("filterStartDate").value;
+        const endDate = document.getElementById("filterEndDate").value;
+        const type = document.getElementById("filterTransactionType").value;
 
-        row.style.display = (drugName.includes(drug) && cat.includes(category)) ? "" : "none";
-    });
+        const start = startDate ? new Date(startDate) : null;
+        const end = endDate ? new Date(endDate) : null;
+
+        stockRows.forEach(row => {
+            let show = true;
+
+            if (drug && !row.drug.toLowerCase().includes(drug)) show = false;
+            if (category && !row.category.toLowerCase().includes(category)) show = false;
+
+            if (start && row.datetime < start) show = false;
+            if (end && row.datetime > end) show = false;
+
+            if (type && row.transaction !== type) show = false;
+
+            row.element.style.display = show ? "" : "none";
+        });
+
+        updatePaginationAfterFilter();
+        hideSpinner();
+    }, 150);
 }
 
 function resetFilters() {
     document.getElementById("searchDrug").value = "";
     document.getElementById("searchCategory").value = "";
-    renderTable();
+    document.getElementById("filterStartDate").value = "";
+    document.getElementById("filterEndDate").value = "";
+    document.getElementById("filterTransactionType").value = "";
+
+    stockRows.forEach(row => row.element.style.display = "");
+
+    updatePaginationAfterFilter();
 }
 
-function showLowStock() {
-    let rows = document.querySelectorAll("#tableBody tr");
+/* -----------------------------------------
+   SORTING
+----------------------------------------- */
+function sortBy(column) {
+    const keyMap = {
+        date: "datetime",
+        time: "datetime",
+        drug_name: "drug",
+        categories: "category",
+        transaction_type: "transaction",
+        quantity_remaining: "remaining"
+    };
 
-    rows.forEach(row => {
-        let remark = row.cells[12].innerText;
+    const key = keyMap[column];
+    if (!key) return;
 
-        row.style.display =
-            (remark === "Drug Out of Stock" ||
-             remark === "Restock Drug Immediately" ||
-             remark === "Almost Out of Stock")
-            ? "" : "none";
+    sortDirection[key] = !sortDirection[key];
+
+    stockRows.sort((a, b) => {
+        let valA = a[key];
+        let valB = b[key];
+
+        if (key === "datetime") {
+            return sortDirection[key] ? valA - valB : valB - valA;
+        }
+
+        if (key === "remaining") {
+            return sortDirection[key] ? valA - valB : valB - valA;
+        }
+
+        return sortDirection[key]
+            ? valA.localeCompare(valB)
+            : valB.localeCompare(valA);
     });
+
+    stockRows.forEach(row => tableBody.appendChild(row.element));
+
+    updatePaginationAfterFilter();
 }
 
+/* -----------------------------------------
+   EXPORT TO EXCEL
+----------------------------------------- */
 function exportExcel() {
-    let table = document.getElementById("stockTable").outerHTML;
-    let url = 'data:application/vnd.ms-excel,' + escape(table);
-    let link = document.createElement("a");
+    const table = document.getElementById("stockTable").outerHTML;
+    const url = 'data:application/vnd.ms-excel,' + escape(table);
+    const link = document.createElement("a");
     link.href = url;
     link.download = "StockView.xls";
     link.click();
 }
 
-/* SIDEBAR TOGGLE */
+/* -----------------------------------------
+   EXPORT TO CSV
+----------------------------------------- */
+function exportCSV() {
+    let rows = document.querySelectorAll("#stockTable tr");
+    let csv = [];
+
+    rows.forEach(row => {
+        let cols = row.querySelectorAll("td, th");
+        let rowData = [];
+        cols.forEach(col => rowData.push(col.innerText.replace(/,/g, "")));
+        csv.push(rowData.join(","));
+    });
+
+    let blob = new Blob([csv.join("\n")], { type: "text/csv" });
+    let link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "StockView.csv";
+    link.click();
+}
+
+/* -----------------------------------------
+   SIDEBAR TOGGLE
+----------------------------------------- */
 document.getElementById("toggleBtn").onclick = function () {
-    let sidebar = document.getElementById("sidebar");
-    let main = document.getElementById("mainContent");
+    const sidebar = document.getElementById("sidebar");
+    const main = document.getElementById("mainContent");
 
     if (sidebar.style.left === "0px") {
         sidebar.style.left = "-260px";
@@ -657,37 +992,25 @@ document.getElementById("toggleBtn").onclick = function () {
     }
 };
 
-/* DARK MODE TOGGLE */
+/* -----------------------------------------
+   DARK MODE
+----------------------------------------- */
 document.getElementById("darkModeToggle").onclick = function () {
     document.body.classList.toggle("dark-mode");
 };
 
-/* BACK TO TOP VISIBILITY */
+/* -----------------------------------------
+   BACK TO TOP BUTTON
+----------------------------------------- */
 window.addEventListener("scroll", function () {
-    let btn = document.getElementById("backToTop");
-    if (window.scrollY > 200) {
-        btn.style.display = "block";
-    } else {
-        btn.style.display = "none";
-    }
+    const btn = document.getElementById("backToTop");
+    btn.style.display = window.scrollY > 200 ? "block" : "none";
 });
 
 function scrollToTop() {
     window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-/* SHOW BACK TO TOP BUTTON */
-window.addEventListener("scroll", function () {
-    let btn = document.getElementById("backToTop");
-    if (window.scrollY > 200) {
-        btn.style.display = "block";
-    } else {
-        btn.style.display = "none";
-    }
-});
-
-/* INITIALIZE PAGE */
-window.onload = renderTable;
 </script>
 
 </body>

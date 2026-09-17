@@ -164,38 +164,56 @@
         <div class="error">{{ error }}</div>
     {% endif %}
 
-    <form method="POST">
+    <form method="POST" autocomplete="on">
 
-        <div class="input-group">
-            <label>User Id</label>
-            <input type="text" name="username" placeholder="Enter your User Id" required>
-        </div>
+    <!-- USERNAME: browser can save -->
+    <div class="input-group">
+        <label>User Id</label>
+        <input type="text"
+               name="username"
+               placeholder="Enter your User Id"
+               autocomplete="username"
+               required>
+    </div>
 
-        <div class="input-group">
-            <label>Password</label>
-            <input type="password" id="password" name="password" placeholder="Enter your password" required>
-        </div>
+    <!-- DUMMY PASSWORD FIELD (blocks auto-save) -->
+    <input type="password"
+           style="display:none"
+           tabindex="-1"
+           autocomplete="off">
 
-        <div class="input-group">
-            <label>Select Role</label>
-            <select name="role" required>
-                <option value="">-- Choose Role --</option>
-                <option value="Admin">Admin</option>
-                <option value="Pharmacist">Pharmacist</option>
-                <option value="Auditor">Auditor</option>
-                <option value="Administrator">Administrator</option>
-                <option value="Director">Director</option>
-            </select>
-        </div>
+    <!-- REAL PASSWORD: browser will NOT save -->
+    <div class="input-group">
+        <label>Password</label>
+        <input type="password"
+               id="password"
+               name="password"
+               placeholder="Enter your password"
+               autocomplete="new-password"
+               required>
+    </div>
 
-        <div class="show-pass">
-            <input type="checkbox" onclick="togglePassword()">
-            <label>Show Password</label>
-        </div>
+    <div class="input-group">
+        <label>Select Role</label>
+        <select name="role" required>
+            <option value="">-- Choose Role --</option>
+            <option value="Admin">Admin</option>
+            <option value="Pharmacist">Pharmacist</option>
+            <option value="Auditor">Auditor</option>
+            <option value="Administrator">Administrator</option>
+            <option value="Director">Director</option>
+            <option value="HIM Officer">HIM Officer</option>
+        </select>
+    </div>
 
-        <button type="submit">Login</button>
+    <div class="show-pass">
+        <input type="checkbox" onclick="togglePassword()">
+        <label>Show Password</label>
+    </div>
 
-    </form>
+    <button type="submit">Login</button>
+
+</form>
 
 </div>
 

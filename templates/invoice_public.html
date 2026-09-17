@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Inpatient Bill Receipt – Ibukun Olu Specialist Hospital</title>
+<title>Verified Hospital Invoice – Ibukun Olu Specialist Hospital</title>
 
 <style>
     body {
@@ -12,7 +12,7 @@
         padding: 0;
     }
 
-    .receipt-container {
+    .invoice-container {
         width: 100%;
         max-width: 900px;
         margin: 40px auto;
@@ -24,7 +24,6 @@
         overflow: hidden;
     }
 
-    /* WATERMARK */
     .watermark {
         position: absolute;
         top: 50%;
@@ -38,7 +37,6 @@
         white-space: nowrap;
     }
 
-    /* HEADER */
     .header {
         text-align: center;
         margin-bottom: 20px;
@@ -69,14 +67,12 @@
         margin: 25px 0;
     }
 
-    /* SECTION */
     .section {
         font-size: 17px;
         margin: 12px 0;
         line-height: 1.6;
     }
 
-    /* ITEMS TABLE */
     .items {
         font-family: Consolas, monospace;
         font-size: 15px;
@@ -99,7 +95,6 @@
         border-bottom: 1px dashed #ccc;
     }
 
-    /* TOTAL */
     .total-box {
         background: #f0f8f4;
         padding: 15px;
@@ -110,7 +105,6 @@
         margin-top: 20px;
     }
 
-    /* VERIFIED SEAL */
     .verified-seal {
         margin-top: 25px;
         text-align: center;
@@ -131,8 +125,8 @@
         left: -60px;
         top: 50%;
         transform: translateY(-50%);
-        width: 45px;
-        height: 45px;
+        width: 40px;
+        height: 40px;
         background-image: url("/static/ibukunolu logo.jpeg");
         background-size: cover;
         background-position: center;
@@ -140,7 +134,6 @@
         border: 2px solid #1ABC9C;
     }
 
-    /* SIGNATURE */
     .signature-block {
         margin-top: 40px;
         font-size: 16px;
@@ -166,7 +159,6 @@
         font-weight: bold;
     }
 
-    /* QR CODE */
     .qr-section {
         text-align: center;
         margin-top: 30px;
@@ -181,37 +173,26 @@
         border-radius: 6px;
     }
 
-    /* BUTTONS */
-    .buttons {
-        margin-top: 30px;
-        text-align: center;
-    }
-
-    .btn {
-        display: inline-block;
-        padding: 12px 20px;
-        margin: 8px;
-        border-radius: 8px;
-        color: white;
-        text-decoration: none;
-        font-size: 15px;
-        font-weight: bold;
-    }
-
-    .btn-pdf { background: #2C3E50; }
-    .btn-whatsapp { background: #25D366; }
-    .btn-email { background: #0072C6; }
-    .btn-pos { background: #1ABC9C; }
-
     @media print {
-        .no-print { display: none !important; }
+        body {
+            background: white !important;
+        }
+        .invoice-container {
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            width: 100%;
+            border: none !important;
+        }
+        .no-print {
+            display: none !important;
+        }
     }
 </style>
 </head>
 
 <body>
 
-<div class="receipt-container">
+<div class="invoice-container">
 
     <div class="watermark">IBUKUN OLU</div>
 
@@ -226,18 +207,15 @@
 
     <div class="divider"></div>
 
-    <!-- RECEIPT INFO -->
     <div class="section">
-        <strong>Patient:</strong> {{ patient }}<br>
-        <strong>Admission Date:</strong> {{ admission_date }}<br>
-        <strong>Discharge Date:</strong> {{ discharge_date }}<br>
         <strong>Invoice Number:</strong> {{ invoice_number }}<br>
-        <strong>Generated:</strong> {{ generated_date }}<br>
+        <strong>Total Amount:</strong> ₦{{ "%.2f"|format(total_bill) }}<br>
+        <strong>Total Quantity:</strong> {{ total_qty }} items<br>
+        <strong>Status:</strong> Verified Hospital Invoice ✔
     </div>
 
     <div class="divider"></div>
 
-    <!-- ITEMS -->
     <div class="items">
         <div class="items-header">
             DATE        DRUG NAME               QTY   PRICE   TOTAL
@@ -245,33 +223,29 @@
 
         {% for row in bill_items %}
         <div class="item-row">
-            {{ row["date"] }}  
-            {{ row["drug_name"] }}  
-            {{ row["qty_sold"] }}  
-            ₦{{ row["sales_price"] }}  
+            {{ row["date"] }}
+            {{ row["drug_name"] }}
+            {{ row["qty_sold"] }}
+            ₦{{ row["sales_price"] }}
             ₦{{ row["bill_total"] }}
         </div>
         {% endfor %}
     </div>
 
-    <!-- TOTAL -->
     <div class="total-box">
-        TOTAL BILL: ₦{{ "%.2f"|format(total_bill) }}
+        GRAND TOTAL: ₦{{ "%.2f"|format(total_bill) }}
     </div>
 
-    <!-- VERIFIED SEAL -->
     <div class="verified-seal">
-        VERIFIED INPATIENT RECEIPT ✔
+        VERIFIED HOSPITAL INVOICE ✔
     </div>
 
-    <!-- SIGNATURE -->
     <div class="signature-block">
         <div class="signature-name">Dr. Olarinoye Oluwagbeminiyi</div>
         <div class="signature-role">Medical Director</div>
         <div class="signature-stamp">Digitally Signed & Authenticated</div>
     </div>
 
-    <!-- QR CODE -->
     <div class="qr-section">
         <img src="data:image/png;base64,{{ qr_code }}" class="qr">
         <div style="margin-top:10px; font-size:14px; color:#555;">
@@ -279,23 +253,15 @@
         </div>
     </div>
 
-    <!-- BUTTONS -->
-    <div class="buttons no-print">
-
-        <!-- PDF -->
-        <a href="/invoice/{{ invoice_number }}/pdf" class="btn btn-pdf">Download PDF</a>
-
-        <!-- WhatsApp -->
-        <a href="https://wa.me/?text={{ public_url | urlencode }}" 
-           class="btn btn-whatsapp">Share via WhatsApp</a>
-
-        <!-- Email -->
-        <a href="mailto:?subject=Hospital%20Receipt%20{{ invoice_number }}&body={{ public_url }}"
-           class="btn btn-email">Share via Email</a>
-
-        <!-- Return to POS -->
-        <a href="/pos" class="btn btn-pos">Return to POS</a>
-
+    <div class="no-print" style="text-align:center; margin-top:20px;">
+        <a href="/invoice/{{ invoice_number }}/pdf"
+           style="background:#2C3E50;color:white;padding:10px 18px;border-radius:8px;text-decoration:none;">
+            Download PDF
+        </a>
+        <a href="/invoice/verify/{{ invoice_number }}"
+           style="background:#1ABC9C;color:white;padding:10px 18px;border-radius:8px;text-decoration:none;margin-left:10px;">
+            Verify Invoice
+        </a>
     </div>
 
 </div>

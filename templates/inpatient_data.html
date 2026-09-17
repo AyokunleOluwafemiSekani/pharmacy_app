@@ -23,7 +23,7 @@ body {
     margin: 0;
 }
 
-/* LOADER OVERLAY */
+/* LOADER */
 #loaderOverlay {
     position: fixed;
     top: 0; left: 0;
@@ -42,10 +42,7 @@ body {
     height: 55px;
     animation: spin 1s linear infinite;
 }
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
 /* ROLE BADGE */
 .role-badge {
@@ -182,19 +179,14 @@ body {
 .table-wrapper {
     width: 100%;
     overflow-x: auto;
-    overflow-y: visible;
     border-radius: 10px;
 }
-.table-wrapper::-webkit-scrollbar {
-    height: 12px;
-}
+.table-wrapper::-webkit-scrollbar { height: 12px; }
 .table-wrapper::-webkit-scrollbar-thumb {
     background: var(--medium-ash-green);
     border-radius: 10px;
 }
-.table-wrapper::-webkit-scrollbar-track {
-    background: #ddd;
-}
+.table-wrapper::-webkit-scrollbar-track { background: #ddd; }
 
 /* TABLE */
 table {
@@ -291,29 +283,45 @@ th {
     cursor: pointer;
     display: none;
 }
+
+/* MOBILE */
+@media (max-width: 768px) {
+    #mainContent {
+        padding: 90px 12px 20px 12px;
+    }
+    .controls {
+        flex-direction: column;
+    }
+    .search-input {
+        width: 100%;
+    }
+    table {
+        min-width: 900px;
+    }
+    .modal-content {
+        width: 90%;
+        margin: 40px auto;
+    }
+}
 </style>
 </head>
 
 <body>
 
 <!-- LOADER -->
-<div id="loaderOverlay">
-    <div class="loader"></div>
-</div>
+<div id="loaderOverlay"><div class="loader"></div></div>
 
 <!-- SIDEBAR -->
 <div id="sidebar" class="sidebar">
     <div class="profile-section">
-         <img src="/static/ibukunolu logo.jpeg" class="profile-pic">
+        <img src="/static/ibukunolu logo.jpeg" class="profile-pic">
         <h3>{{ user }}</h3>
         <span class="role-badge
             {% if role == 'Admin' %}role-admin{% endif %}
             {% if role == 'Auditor' %}role-auditor{% endif %}
             {% if role == 'Pharmacist' %}role-pharmacist{% endif %}
             {% if role == 'Administrator' %}role-administrator{% endif %}
-        ">
-            {{ role }}
-        </span>
+        ">{{ role }}</span>
     </div>
 
     <a href="/profile" class="{% if request.path == '/profile' %}active{% endif %}">
@@ -376,6 +384,7 @@ th {
 
 <!-- TOGGLE BUTTON -->
 <button id="toggleBtn" class="toggle-btn"><i class="fa-solid fa-bars"></i></button>
+
 <!-- MAIN CONTENT -->
 <div id="mainContent">
     <div class="data-card">
@@ -424,6 +433,7 @@ th {
                         <th>History</th>
                     </tr>
                 </thead>
+
                 <tbody id="tableBody">
                     {% for row in data %}
                     <tr>
@@ -436,7 +446,10 @@ th {
                         <td>{{ row['bill_total'] }}</td>
                         <td>{{ row['qty_sold'] }}</td>
                         <td>
-                            <button class="view-btn" onclick="runWithLoader(() => viewHistory('{{ row['patient_name'] }}'))">
+                            <button
+                                class="view-btn"
+                                data-patient="{{ row['patient_name'] }}"
+                                onclick="runWithLoader(function(){ viewHistory(this.dataset.patient); })">
                                 View History
                             </button>
                         </td>
@@ -463,23 +476,24 @@ th {
     </div>
 </div>
 
-<!-- BACK TO TOP BUTTON -->
+<!-- BACK TO TOP -->
 <button id="backToTop" onclick="scrollToTop()"><i class="fa-solid fa-arrow-up"></i></button>
+
 <script>
-/* LOADER HANDLER */
+/* ---------------- LOADER ---------------- */
 function runWithLoader(fn) {
     const overlay = document.getElementById("loaderOverlay");
     overlay.style.display = "flex";
-    setTimeout(() => {
+    setTimeout(function () {
         fn();
         overlay.style.display = "none";
-    }, 300);
+    }, 250);
 }
 
-/* SIDEBAR TOGGLE */
+/* ---------------- SIDEBAR TOGGLE ---------------- */
 document.getElementById("toggleBtn").onclick = function () {
-    let sidebar = document.getElementById("sidebar");
-    let main = document.getElementById("mainContent");
+    const sidebar = document.getElementById("sidebar");
+    const main = document.getElementById("mainContent");
 
     if (sidebar.style.left === "0px") {
         sidebar.style.left = "-260px";
@@ -490,33 +504,33 @@ document.getElementById("toggleBtn").onclick = function () {
     }
 };
 
-/* FILTERS */
+/* ---------------- FILTERS (TAG, DON'T HIDE) ---------------- */
 function filterTable() {
-    let patient = document.getElementById("searchPatient").value.toLowerCase();
-    let drug = document.getElementById("searchDrug").value.toLowerCase();
-    let category = document.getElementById("categoryFilter").value.toLowerCase();
-    let dateFrom = document.getElementById("dateFrom").value;
-    let dateTo = document.getElementById("dateTo").value;
+    const patient = document.getElementById("searchPatient").value.toLowerCase();
+    const drug = document.getElementById("searchDrug").value.toLowerCase();
+    const category = document.getElementById("categoryFilter").value.toLowerCase();
+    const dateFrom = document.getElementById("dateFrom").value;
+    const dateTo = document.getElementById("dateTo").value;
 
-    let rows = document.querySelectorAll("#tableBody tr");
+    const start = dateFrom ? new Date(dateFrom) : null;
+    const end = dateTo ? new Date(dateTo) : null;
 
-    rows.forEach(row => {
-        let p = row.cells[2].innerText.toLowerCase();
-        let d = row.cells[1].innerText.toLowerCase();
-        let c = row.cells[3].innerText.toLowerCase();
-        let date = row.cells[0].innerText;
+    const rows = document.querySelectorAll("#tableBody tr");
 
-        let dateValid = true;
-        if (dateFrom && date < dateFrom) dateValid = false;
-        if (dateTo && date > dateTo) dateValid = false;
+    rows.forEach(function (row) {
+        const p = row.cells[2].innerText.toLowerCase();
+        const d = row.cells[1].innerText.toLowerCase();
+        const c = row.cells[3].innerText.toLowerCase();
+        const rowDate = new Date(row.cells[0].innerText);
 
-        let match =
+        const match =
             p.includes(patient) &&
             d.includes(drug) &&
             (category === "" || c === category) &&
-            dateValid;
+            (!start || rowDate >= start) &&
+            (!end || rowDate <= end);
 
-        row.style.display = match ? "" : "none";
+        row.dataset.filtered = match ? "1" : "0";
     });
 
     currentPage = 1;
@@ -530,50 +544,50 @@ function resetFilters() {
     document.getElementById("dateFrom").value = "";
     document.getElementById("dateTo").value = "";
 
-    let rows = document.querySelectorAll("#tableBody tr");
-    rows.forEach(row => row.style.display = "");
+    const rows = document.querySelectorAll("#tableBody tr");
+    rows.forEach(function (row) {
+        row.dataset.filtered = "1";
+    });
 
     currentPage = 1;
     renderTable();
 }
 
-/* EXPORT */
+/* ---------------- EXPORT TO EXCEL ---------------- */
 function exportExcel() {
-    let table = document.getElementById("inpatientTable").outerHTML;
-    let url = 'data:application/vnd.ms-excel,' + escape(table);
-    let link = document.createElement("a");
+    const table = document.getElementById("inpatientTable").outerHTML;
+    const url = 'data:application/vnd.ms-excel,' + escape(table);
+    const link = document.createElement("a");
     link.href = url;
     link.download = "InpatientData.xls";
     link.click();
 }
 
-/* PATIENT HISTORY */
+/* ---------------- PATIENT HISTORY MODAL ---------------- */
 function viewHistory(patientName) {
-    let rows = document.querySelectorAll("#tableBody tr");
-    let html = `
-        <table style="width:100%; border-collapse:collapse;">
-            <tr>
-                <th>Date</th>
-                <th>Drug</th>
-                <th>Qty</th>
-                <th>Bill</th>
-            </tr>
-    `;
+    const rows = document.querySelectorAll("#tableBody tr");
+    let html =
+        '<table style="width:100%; border-collapse:collapse;">' +
+        '<tr>' +
+        '<th>Date</th>' +
+        '<th>Drug</th>' +
+        '<th>Qty</th>' +
+        '<th>Bill</th>' +
+        '</tr>';
 
-    rows.forEach(row => {
+    rows.forEach(function (row) {
         if (row.cells[2].innerText === patientName) {
-            html += `
-                <tr>
-                    <td>${row.cells[0].innerText}</td>
-                    <td>${row.cells[1].innerText}</td>
-                    <td>${row.cells[7].innerText}</td>
-                    <td>${row.cells[6].innerText}</td>
-                </tr>
-            `;
+            html +=
+                '<tr>' +
+                '<td>' + row.cells[0].innerText + '</td>' +
+                '<td>' + row.cells[1].innerText + '</td>' +
+                '<td>' + row.cells[7].innerText + '</td>' +
+                '<td>' + row.cells[6].innerText + '</td>' +
+                '</tr>';
         }
     });
 
-    html += "</table>";
+    html += '</table>';
 
     document.getElementById("historyContent").innerHTML = html;
     document.getElementById("historyModal").style.display = "block";
@@ -583,22 +597,36 @@ function closeHistory() {
     document.getElementById("historyModal").style.display = "none";
 }
 
-/* PAGINATION */
+/* ---------------- PAGINATION ---------------- */
 let rowsPerPage = 50;
 let currentPage = 1;
 
+function getFilteredRows() {
+    return Array.prototype.slice.call(
+        document.querySelectorAll("#tableBody tr")
+    ).filter(function (row) {
+        return row.dataset.filtered === "1";
+    });
+}
+
 function renderTable() {
-    let allRows = Array.from(document.querySelectorAll("#tableBody tr"));
-    let visibleRows = allRows.filter(row => row.style.display !== "none");
+    const filteredRows = getFilteredRows();
+    const totalRows = filteredRows.length;
+    const totalPages = Math.ceil(totalRows / rowsPerPage) || 1;
 
-    let totalRows = visibleRows.length;
-    let totalPages = Math.ceil(totalRows / rowsPerPage) || 1;
+    // hide all rows
+    document.querySelectorAll("#tableBody tr").forEach(function (row) {
+        row.style.display = "none";
+    });
 
-    visibleRows.forEach((row, index) => {
-        row.style.display =
-            (index >= (currentPage - 1) * rowsPerPage &&
-             index < currentPage * rowsPerPage)
-            ? "" : "none";
+    // show only rows for current page
+    filteredRows.forEach(function (row, index) {
+        if (
+            index >= (currentPage - 1) * rowsPerPage &&
+            index < currentPage * rowsPerPage
+        ) {
+            row.style.display = "table-row";
+        }
     });
 
     document.getElementById("pageInfo").innerText =
@@ -606,10 +634,7 @@ function renderTable() {
 }
 
 function nextPage() {
-    let visibleRows = Array.from(document.querySelectorAll("#tableBody tr"))
-        .filter(row => row.style.display !== "none");
-    let totalPages = Math.ceil(visibleRows.length / rowsPerPage) || 1;
-
+    const totalPages = Math.ceil(getFilteredRows().length / rowsPerPage) || 1;
     if (currentPage < totalPages) {
         currentPage++;
         renderTable();
@@ -623,9 +648,9 @@ function prevPage() {
     }
 }
 
-/* BACK TO TOP */
+/* ---------------- BACK TO TOP ---------------- */
 window.addEventListener("scroll", function () {
-    let btn = document.getElementById("backToTop");
+    const btn = document.getElementById("backToTop");
     btn.style.display = window.scrollY > 200 ? "block" : "none";
 });
 
@@ -633,8 +658,13 @@ function scrollToTop() {
     window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-/* INIT */
+/* ---------------- INIT ---------------- */
 window.onload = function () {
+    // mark all rows as visible initially
+    document.querySelectorAll("#tableBody tr").forEach(function (row) {
+        row.dataset.filtered = "1";
+    });
+
     renderTable();
 };
 </script>

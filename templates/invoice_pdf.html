@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Invoice PDF – Ibukun Olu Specialist Hospital</title>
+<style>
+    body {
+        font-family: "Segoe UI", sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+    .invoice-container {
+        width: 100%;
+        max-width: 900px;
+        margin: 20px auto;
+        background: white;
+        padding: 30px 40px;
+        border: 1px solid #ddd;
+        position: relative;
+        overflow: hidden;
+    }
+    .watermark {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        opacity: 0.06;
+        font-size: 100px;
+        font-weight: bold;
+        color: #2C3E50;
+        pointer-events: none;
+        white-space: nowrap;
+    }
+    .header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    .logo {
+        width: 120px;
+        height: 120px;
+        object-fit: contain;
+        margin-bottom: 10px;
+    }
+    .hospital-name {
+        font-size: 26px;
+        font-weight: bold;
+        color: #2C3E50;
+        margin: 5px 0;
+    }
+    .hospital-info {
+        font-size: 13px;
+        color: #555;
+        margin-top: -5px;
+    }
+    .divider {
+        border-bottom: 2px solid #1ABC9C;
+        margin: 20px 0;
+    }
+    .section {
+        font-size: 15px;
+        margin: 10px 0;
+        line-height: 1.6;
+    }
+    .items {
+        font-family: Consolas, monospace;
+        font-size: 13px;
+        margin-top: 10px;
+        background: #fafafa;
+        padding: 10px;
+        border-radius: 6px;
+        border: 1px solid #ddd;
+    }
+    .items-header {
+        font-weight: bold;
+        border-bottom: 1px solid #333;
+        padding-bottom: 4px;
+        margin-bottom: 6px;
+    }
+    .item-row {
+        padding: 3px 0;
+        border-bottom: 1px dashed #ccc;
+    }
+    .total-box {
+        background: #f0f8f4;
+        padding: 10px;
+        border-left: 4px solid #1ABC9C;
+        border-radius: 6px;
+        font-size: 16px;
+        font-weight: bold;
+        margin-top: 15px;
+    }
+    .verified-seal {
+        margin-top: 20px;
+        text-align: center;
+        font-size: 18px;
+        font-weight: bold;
+        color: #1ABC9C;
+        border: 2px solid #1ABC9C;
+        display: inline-block;
+        padding: 8px 20px;
+        border-radius: 8px;
+        letter-spacing: 1px;
+        position: relative;
+    }
+    .verified-seal::before {
+        content: "";
+        position: absolute;
+        left: -50px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 32px;
+        height: 32px;
+        background-image: url("/static/ibukunolu logo.jpeg");
+        background-size: cover;
+        background-position: center;
+        border-radius: 50%;
+        border: 2px solid #1ABC9C;
+    }
+    .signature-block {
+        margin-top: 30px;
+        font-size: 14px;
+        line-height: 1.6;
+        border-top: 2px solid #2C3E50;
+        padding-top: 10px;
+    }
+    .signature-name {
+        font-weight: bold;
+        font-size: 16px;
+        color: #2C3E50;
+    }
+    .signature-role {
+        color: #555;
+    }
+    .signature-stamp {
+        margin-top: 8px;
+        font-size: 12px;
+        color: #1ABC9C;
+        font-weight: bold;
+    }
+</style>
+</head>
+<body>
+
+<div class="invoice-container">
+
+    <div class="watermark">IBUKUN OLU</div>
+
+    <div class="header">
+        <img src="/static/ibukunolu logo.jpeg" class="logo">
+        <div class="hospital-name">IBUKUN OLU SPECIALIST HOSPITAL</div>
+        <div class="hospital-info">
+            Oyin‑Adegoke Close, Oke‑Obaagun, Osun State<br>
+            Tel: +2348068575958
+        </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section">
+        <strong>Invoice Number:</strong> {{ invoice_number }}<br>
+        <strong>Total Amount:</strong> ₦{{ "%.2f"|format(total_bill) }}<br>
+        <strong>Total Quantity:</strong> {{ total_qty }} items<br>
+        <strong>Status:</strong> Verified Hospital Invoice ✔
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="items">
+        <div class="items-header">
+            DATE        DRUG NAME               QTY   PRICE   TOTAL
+        </div>
+
+        {% for row in bill_items %}
+        <div class="item-row">
+            {{ row["date"] }}
+            {{ row["drug_name"] }}
+            {{ row["qty_sold"] }}
+            ₦{{ row["sales_price"] }}
+            ₦{{ row["bill_total"] }}
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="total-box">
+        GRAND TOTAL: ₦{{ "%.2f"|format(total_bill) }}
+    </div>
+
+    <div class="verified-seal">
+        VERIFIED HOSPITAL INVOICE ✔
+    </div>
+
+    <div class="signature-block">
+        <div class="signature-name">Dr. Olarinoye Oluwagbeminiyi</div>
+        <div class="signature-role">Medical Director</div>
+        <div class="signature-stamp">Digitally Signed & Authenticated</div>
+    </div>
+
+</div>
+
+</body>
+</html>
