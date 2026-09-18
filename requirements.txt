@@ -21,3 +21,4 @@ uritemplate
 bcrypt
 pandas
 openpyxl
+user-agents
