@@ -22,3 +22,5 @@ bcrypt
 pandas
 openpyxl
 user-agents
+qrcode
+Pillow
