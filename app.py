@@ -16,7 +16,7 @@ app.secret_key = "super_secret_key"
 
 # Excel file (ONLY used for initial migration)
 EXCEL_PATH = os.path.join("static", "Ibukunolu new pharmacy database.xlsx")
-DB_PATH = "pharmacy.db"
+DB_PATH = "pharmacynew.db"
 
 # ---------------------------------------------------------
 # ROLE PERMISSIONS
@@ -756,7 +756,7 @@ def generate_transaction_id():
     today = datetime.now().strftime("%Y%m%d")
     today_sql = datetime.now().strftime("%Y-%m-%d")
 
-    conn = sqlite3.connect("pharmacy.db")
+    conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
@@ -806,7 +806,7 @@ def stock_view():
     user = session["user"]
     role = session.get("role", "User")
 
-    conn = sqlite3.connect("pharmacy.db")
+    conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
@@ -2026,7 +2026,7 @@ def cloud_monitor():
 import sqlite3, os
 from datetime import datetime
 
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pharmacy.db")
+DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pharmacynew.db")
 
 def get_kpis():
     conn = sqlite3.connect(DB_PATH)
@@ -2085,7 +2085,8 @@ from flask import Flask, request, jsonify
 import sqlite3
 from datetime import datetime
 
-DB_PATH = r"C:\Users\Admin\Downloads\pharmacy_app\pharmacy.db"
+DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pharmacynew.db")
+
 
 
 def get_db():
@@ -2307,7 +2308,7 @@ import sqlite3
 import user_agents
 import requests
 
-DB_PATH = r"C:\Users\Admin\Downloads\pharmacy_app\pharmacy.db"
+DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pharmacynew.db")
 
 def get_location(ip):
     try:
