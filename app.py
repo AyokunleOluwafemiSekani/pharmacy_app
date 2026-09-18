@@ -389,17 +389,12 @@ def migrate_dutylog_from_excel():
 # SAFE INITIALIZER (MUST BE AFTER MIGRATIONS)
 # ---------------------------------------------------------
 def initialize_database():
-    if os.path.exists(DB_PATH):
-        print("pharmacy.db found — using existing database.")
-        enable_wal_mode()
-        return
-
-    print("pharmacy.db not found — creating a fresh database...")
+    fresh_db = not os.path.exists(DB_PATH)
 
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
-    # CREATE TABLES
+    # ALWAYS ensure required tables exist
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS LoginAttempts (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -536,17 +531,19 @@ def initialize_database():
     conn.commit()
     conn.close()
 
-    print("Fresh database created. Running Excel migrations...")
+    # Run migrations ONLY on first creation
+    if fresh_db:
+        print("Fresh database created. Running Excel migrations...")
+        migrate_users_from_excel()
+        migrate_druglist_from_excel()
+        migrate_stock_from_excel()
+        migrate_inpatient_from_excel()
+        migrate_bill_from_excel()
+        migrate_dutylog_from_excel()
+        print("Excel migration completed successfully.")
 
-    migrate_users_from_excel()
-    migrate_druglist_from_excel()
-    migrate_stock_from_excel()
-    migrate_inpatient_from_excel()
-    migrate_bill_from_excel()
-    migrate_dutylog_from_excel()
-
-    print("Excel migration completed successfully.")
     enable_wal_mode()
+
 
 # ---------------------------------------------------------
 # RUN INITIALIZER (LAST)
