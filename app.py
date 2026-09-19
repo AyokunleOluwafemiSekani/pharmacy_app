@@ -724,6 +724,7 @@ def logout():
 # ---------------------------------------------------------
 # POS PAGE
 # ---------------------------------------------------------
+
 @app.route("/pos", methods=["GET"])
 def pos():
     if "user" not in session:
@@ -735,8 +736,8 @@ def pos():
             role=session.get("role")
         ), 403
 
-    drugs = db_query("SELECT * FROM DrugList")
-    stock = db_query("SELECT * FROM Stock")
+    drugs = db_query("SELECT * FROM DrugList ORDER BY drug_name ASC")
+    stock = db_query("SELECT * FROM Stock ORDER BY id DESC")
 
     return render_template(
         "pos.html",
@@ -747,26 +748,25 @@ def pos():
         patient=""
     )
 
+
 @app.route("/pos/success")
 def pos_success():
     cart = session.get("last_cart", [])
-    return render_template("pos_success.html", cart=cart)
+    transaction_id = session.get("last_transaction_id", "N/A")
+    return render_template("pos_success.html", cart=cart, transaction_id=transaction_id)
+
 
 def generate_transaction_id():
-    today = datetime.now().strftime("%Y%m%d")
     today_sql = datetime.now().strftime("%Y-%m-%d")
-
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
-
     cur.execute("SELECT COUNT(*) AS count FROM Stock WHERE date = ?", (today_sql,))
     count = cur.fetchone()["count"]
-
     conn.close()
-
     suffix = count + 1
-    return f"{today}-D{suffix}"
+    return f"{today_sql.replace('-', '')}-D{suffix}"
+
 
 @app.route("/pos/submit", methods=["POST"])
 def pos_submit():
@@ -786,7 +786,115 @@ def pos_submit():
             role=session.get("role")
         ), 403
 
-    # Implement POS transaction logic here as needed
+    customer_type = request.form.get("customer_type", "OutPatient")
+    patient = request.form.get("patient", "")
+    cashier = session.get("user")
+
+    # ⭐ Generate ONE transaction ID for the entire sale
+    transaction_id = generate_transaction_id()
+    session["last_transaction_id"] = transaction_id
+
+    cart = []  # store items for success page
+
+    # Loop through POS rows (1–100)
+    for i in range(1, 101):
+        drug = request.form.get(f"drug_{i}")
+        qty = request.form.get(f"qty_{i}")
+        price = request.form.get(f"price_{i}")
+        total = request.form.get(f"total_{i}")
+
+        if not drug or not qty or float(qty) <= 0:
+            continue
+
+        qty = float(qty)
+        price = float(price)
+        total = float(total)
+
+        cart.append({
+            "drug": drug,
+            "qty": qty,
+            "total": total
+        })
+
+        # Fetch current stock
+        stock_row = db_query("SELECT * FROM DrugList WHERE drug_name = ?", (drug,))
+        if not stock_row:
+            continue
+
+        stock_row = stock_row[0]
+        opening_balance = float(stock_row["starting_balance"])
+        remaining = opening_balance - qty
+
+        # Update DrugList balance
+        db_execute("""
+            UPDATE DrugList SET starting_balance = ?
+            WHERE drug_name = ?
+        """, (remaining, drug))
+
+        # Insert into Stock
+        db_execute("""
+            INSERT INTO Stock (
+                date, time, drug_name, categories, opening_balance,
+                transaction_type, quantity_sold, quantity_remaining,
+                cost_price, sales_price, customer_type, transaction_id,
+                remark, bill, sales_price_sum, sum_cost_value
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            datetime.now().strftime("%Y-%m-%d"),
+            datetime.now().strftime("%H:%M:%S"),
+            drug,
+            stock_row["categories"],
+            opening_balance,
+            "Sale",
+            qty,
+            remaining,
+            stock_row["cost_price"],
+            price,
+            customer_type,
+            transaction_id,
+            "",
+            total,
+            total,
+            stock_row["cost_price"] * qty
+        ))
+
+        # Insert into Transactions
+        db_execute("""
+            INSERT INTO Transactions (
+                drug, qty, price, total, cost, cost_total,
+                customer_type, patient, cashier
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            drug, qty, price, total,
+            stock_row["cost_price"],
+            stock_row["cost_price"] * qty,
+            customer_type, patient, cashier
+        ))
+
+        # ⭐ FLEXIBLE INPATIENT LOGIC
+        if "inpatient" in customer_type.lower():
+            db_execute("""
+                INSERT INTO InpatientData (
+                    date, drug_name, patient_name, categories,
+                    sales_price, transaction_id, bill_total,
+                    qty_sold, invoice_number
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                datetime.now().strftime("%Y-%m-%d"),
+                drug,
+                patient,
+                stock_row["categories"],
+                price,
+                transaction_id,
+                total,
+                qty,
+                transaction_id
+            ))
+
+    session["last_cart"] = cart
     return redirect("/pos/success")
 
 # ---------------------------------------------------------
@@ -920,7 +1028,7 @@ def drug_entry():
 
 
 # ---------------------------------------------------------
-# INPATIENT DATA
+# INPATIENT DATA (FULLY UPGRADED)
 # ---------------------------------------------------------
 @app.route("/inpatient_data")
 def inpatient_data():
@@ -928,12 +1036,26 @@ def inpatient_data():
         return redirect("/login")
 
     if not has_permission("inpatient"):
-        return render_template("no_access.html",
+        return render_template(
+            "no_access.html",
             user=session.get("user"),
             role=session.get("role")
         ), 403
 
-    rows = db_query("SELECT * FROM InpatientData ORDER BY date DESC")
+    rows = db_query("""
+        SELECT
+            date,
+            drug_name,
+            patient_name,
+            categories,
+            sales_price,
+            transaction_id,
+            bill_total,
+            qty_sold,
+            invoice_number
+        FROM InpatientData
+        ORDER BY date DESC, id DESC
+    """)
 
     return render_template(
         "inpatient_data.html",

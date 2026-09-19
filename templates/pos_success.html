@@ -40,6 +40,13 @@ h2 {
     margin-bottom: 10px;
 }
 
+.transaction-id {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--hospital-blue);
+    margin-bottom: 20px;
+}
+
 table {
     width: 100%;
     margin-top: 20px;
@@ -88,6 +95,11 @@ p {
 
 <div class="success-box">
     <h2>Transaction Successful</h2>
+
+    <!-- ⭐ Display Transaction ID -->
+    <div class="transaction-id">
+        Transaction ID: <strong>{{ transaction_id }}</strong>
+    </div>
 
     <table>
         <tr>
