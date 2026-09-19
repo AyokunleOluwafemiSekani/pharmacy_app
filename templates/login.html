@@ -3,6 +3,8 @@
 <head>
     <title>Pharmacy Login</title>
 
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
     <style>
         body {
             margin: 0;
@@ -12,14 +14,20 @@
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
+
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
+
+            padding-top: 60px;
+            padding-bottom: 80px;
+
+            overflow-x: hidden;
+            overflow-y: auto;
         }
 
-        /* Dark overlay */
         .overlay {
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
@@ -28,7 +36,7 @@
             z-index: 1;
         }
 
-        /* Glass login box */
+        /* LOGIN BOX WITH FADE-IN ANIMATION */
         .login-box {
             position: relative;
             z-index: 2;
@@ -36,10 +44,73 @@
             max-width: 90%;
             background: rgba(255,255,255,0.25);
             backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
             padding: 35px;
             border-radius: 12px;
             box-shadow: 0 0 15px rgba(0,0,0,0.4);
             text-align: center;
+
+            animation: fadeIn 1.2s ease-out;
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(40px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        #login-status {
+            margin-bottom: 10px;
+            min-height: 30px;
+        }
+
+        /* Spinner */
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top-color: #00ff9a;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Success checkmark */
+        .checkmark {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 3px solid #00ff9a;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .checkmark::after {
+            content: "";
+            position: absolute;
+            width: 14px;
+            height: 26px;
+            border-right: 3px solid #00ff9a;
+            border-bottom: 3px solid #00ff9a;
+            transform: rotate(45deg);
+            top: 4px;
+            left: 11px;
+        }
+
+        /* Failed shake */
+        .shake {
+            animation: shakeBox 0.4s ease;
+        }
+
+        @keyframes shakeBox {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            50% { transform: translateX(6px); }
+            75% { transform: translateX(-4px); }
+            100% { transform: translateX(0); }
         }
 
         .login-box h2 {
@@ -74,28 +145,55 @@
             margin-top: 6px;
             border-radius: 6px;
             border: 1px solid #ccc;
-            font-size: 15px;
+            font-size: 16px;
+            background: rgba(255,255,255,0.85);
         }
 
-        .show-pass {
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        /* Biometric Login */
+        .bio-login {
+            margin-top: 20px;
             margin-bottom: 15px;
-            font-size: 14px;
-            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            color: white;
+            font-weight: 600;
+            font-size: 15px;
+            transition: 0.3s ease;
+        }
+
+        .bio-login:hover {
+            transform: scale(1.05);
+        }
+
+        .fingerprint {
+            width: 70px;
+            height: 70px;
+            background-image: url('/static/fingerprint.png');
+            background-size: cover;
+            background-position: center;
+            filter: drop-shadow(0 0 8px rgba(255,255,255,0.6));
+            animation: pulsePrint 2s infinite;
+        }
+
+        @keyframes pulsePrint {
+            0% { transform: scale(1); opacity: 0.9; }
+            50% { transform: scale(1.15); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.9; }
         }
 
         button {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             background: #003366;
             color: white;
             border: none;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 17px;
             font-weight: 600;
+            -webkit-tap-highlight-color: transparent;
         }
 
         button:hover {
@@ -111,7 +209,6 @@
             font-weight: 600;
         }
 
-        /* Footer */
         .footer {
             position: fixed;
             bottom: 0;
@@ -125,29 +222,54 @@
             letter-spacing: 1px;
             z-index: 3;
         }
-
-        /* Mobile responsiveness */
-        @media (max-width: 480px) {
-            .login-box {
-                padding: 25px;
-                width: 95%;
-            }
-
-            .login-box h2 {
-                font-size: 20px;
-            }
-
-            .login-box h3 {
-                font-size: 15px;
-            }
-        }
     </style>
 
     <script>
-        function togglePassword() {
-            const passField = document.getElementById("password");
-            passField.type = passField.type === "password" ? "text" : "password";
+        function setStatusSpinner() {
+            document.getElementById("login-status").innerHTML =
+                '<div class="spinner"></div>';
         }
+
+        function setStatusSuccess() {
+            document.getElementById("login-status").innerHTML =
+                '<div class="checkmark"></div>';
+        }
+
+        function setStatusError(msg) {
+            document.getElementById("login-status").innerHTML =
+                '<div class="error">' + (msg || "Login failed") + '</div>';
+        }
+
+        function startBiometricLogin() {
+            const box = document.querySelector(".login-box");
+            setStatusSpinner();
+
+            setTimeout(() => {
+                const success = Math.random() > 0.3;
+
+                if (success) {
+                    setStatusSuccess();
+                    box.style.animation = "bioGlow 1.2s ease";
+                    setTimeout(() => {
+                        document.querySelector("button[type='submit']").click();
+                    }, 1000);
+                } else {
+                    setStatusError("Biometric authentication failed");
+                    box.classList.add("shake");
+                    setTimeout(() => box.classList.remove("shake"), 500);
+                }
+            }, 1200);
+        }
+
+        const style = document.createElement("style");
+        style.innerHTML = `
+        @keyframes bioGlow {
+            0% { box-shadow: 0 0 10px rgba(0,255,150,0.4); }
+            50% { box-shadow: 0 0 25px rgba(0,255,150,0.9); transform: scale(1.02); }
+            100% { box-shadow: 0 0 10px rgba(0,255,150,0.4); transform: scale(1); }
+        }
+        `;
+        document.head.appendChild(style);
     </script>
 </head>
 
@@ -160,65 +282,52 @@
     <h2>IBUKUN-OLU SPECIALIST HOSPITAL</h2>
     <h3>PHARMACY DISPENSE & STOCK SYSTEM</h3>
 
+    <div id="login-status"></div>
+
+    <div class="bio-login" onclick="startBiometricLogin()">
+        <div class="fingerprint"></div>
+        <span>Biometric Login</span>
+    </div>
+
     {% if error %}
         <div class="error">{{ error }}</div>
     {% endif %}
 
     <form method="POST" action="/login" autocomplete="on">
 
-    <!-- USERNAME: browser can save -->
-    <div class="input-group">
-        <label>User Id</label>
-        <input type="text"
-               name="username"
-               placeholder="Enter your User Id"
-               autocomplete="username"
-               required>
-    </div>
+        <div class="input-group">
+            <label>User Id</label>
+            <input type="text" name="username" placeholder="Enter your User Id" autocomplete="username" required>
+        </div>
 
-    <!-- DUMMY PASSWORD FIELD (blocks auto-save) -->
-    <input type="password"
-           style="display:none"
-           tabindex="-1"
-           autocomplete="off">
+        <input type="password" style="display:none" tabindex="-1" autocomplete="off">
 
-    <!-- REAL PASSWORD: browser will NOT save -->
-    <div class="input-group">
-        <label>Password</label>
-        <input type="password"
-               id="password"
-               name="password"
-               placeholder="Enter your password"
-               autocomplete="new-password"
-               required>
-    </div>
+        <div class="input-group">
+            <label>Password</label>
+            <input type="password" id="password" name="password" placeholder="Enter your password" autocomplete="new-password" required>
+        </div>
 
-    <div class="input-group">
-        <label>Select Role</label>
-        <select name="role" required>
-            <option value="">-- Choose Role --</option>
-            <option value="Admin">Admin</option>
-            <option value="Pharmacist">Pharmacist</option>
-            <option value="Auditor">Auditor</option>
-            <option value="Administrator">Administrator</option>
-            <option value="Director">Director</option>
-            <option value="HIM Officer">HIM Officer</option>
-        </select>
-    </div>
+        <div class="input-group">
+            <label>Select Role</label>
+            <select name="role" required>
+                <option value="">-- Choose Role --</option>
+                <option value="Admin">Admin</option>
+                <option value="Pharmacist">Pharmacist</option>
+                <option value="Auditor">Auditor</option>
+                <option value="Administrator">Administrator</option>
+                <option value="Director">Director</option>
+                <option value="HIM Officer">HIM Officer</option>
+            </select>
+        </div>
 
-    <div class="show-pass">
-        <input type="checkbox" onclick="togglePassword()">
-        <label>Show Password</label>
-    </div>
+        <button type="submit">Login</button>
 
-    <button type="submit">Login</button>
-
-</form>
+    </form>
 
 </div>
 
 <div class="footer">
-    Powered by Ibukun-Olu ICT Unit
+    Powered by Ibukun-Olu ICT Unit Under Doctor Adedamola  Administration in Collaboration with Ayokunle Oluwafemi
 </div>
 
 </body>

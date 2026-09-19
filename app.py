@@ -30,6 +30,8 @@ ROLE_PERMISSIONS = {
         "user_management": True,
         "inpatient": True,
         "kpi": True,
+        "low_stock": True,
+        "inpatient_bill": True,
         "drug_list": True,
         "drug_entry": True
     },
@@ -42,18 +44,22 @@ ROLE_PERMISSIONS = {
         "user_management": True,
         "inpatient": True,
         "kpi": True,
+        "low_stock": False,
+        "inpatient_bill": False,
         "drug_list": False,
         "drug_entry": False
     },
 
     "HIM Officer": {
-        "pos": True,
+        "pos": False,
         "stock": False,
         "dutylog": False,
         "admin_panel": False,
         "user_management": False,
         "inpatient": True,
         "kpi": False,
+        "low_stock": False,
+        "inpatient_bill": True,
         "drug_list": False,
         "drug_entry": False
     },
@@ -66,6 +72,8 @@ ROLE_PERMISSIONS = {
         "user_management": False,
         "inpatient": True,
         "kpi": True,
+        "low_stock": True,
+        "inpatient_bill": False,
         "drug_list": True,
         "drug_entry": True
     },
@@ -78,6 +86,8 @@ ROLE_PERMISSIONS = {
         "user_management": False,
         "inpatient": True,
         "kpi": True,
+        "low_stock": True,
+        "inpatient_bill": True,
         "drug_list": False,
         "drug_entry": True
     },
@@ -90,6 +100,8 @@ ROLE_PERMISSIONS = {
         "user_management": True,
         "inpatient": True,
         "kpi": True,
+        "low_stock": False,
+        "inpatient_bill": False,
         "drug_list": True,
         "drug_entry": True
     }
@@ -907,6 +919,152 @@ def stock_view():
     )
 
 # ---------------------------------------------------------
+# LOW STOCK PAGE WITH DATE FILTER + PDF EXPORT
+# ---------------------------------------------------------
+import datetime as dt
+import io
+import base64
+
+@app.route("/stock/low", methods=["GET", "POST"])
+def stock_low():
+    if "user" not in session:
+        return redirect("/login")
+
+    if not has_permission("low_stock"):
+        return render_template(
+            "no_access.html",
+            user=session.get("user"),
+            role=session.get("role")
+        ), 403
+
+    # Critical low stock threshold
+    threshold = 20
+
+    # Filters
+    search = ""
+    sort = "quantity_remaining"
+    start_date = None
+    end_date = None
+
+    # -----------------------------
+    # POST → Date filter
+    # -----------------------------
+    if request.method == "POST":
+        start_date = request.form.get("start_date")
+        end_date = request.form.get("end_date")
+
+        query = """
+            SELECT *
+            FROM Stock
+            WHERE quantity_remaining < ?
+            AND date >= ?
+            AND date <= ?
+        """
+        params = [threshold, start_date, end_date]
+
+    # -----------------------------
+    # GET → Search + Sort
+    # -----------------------------
+    else:
+        search = request.args.get("search", "").strip().lower()
+        sort = request.args.get("sort", "quantity_remaining")
+
+        query = """
+            SELECT *
+            FROM Stock
+            WHERE quantity_remaining < ?
+        """
+        params = [threshold]
+
+        if search:
+            query += " AND LOWER(drug_name) LIKE ?"
+            params.append(f"%{search}%")
+
+    # -----------------------------
+    # Sorting
+    # -----------------------------
+    allowed_sorts = ["drug_name", "categories", "date", "quantity_remaining"]
+    if sort in allowed_sorts:
+        query += f" ORDER BY {sort} ASC"
+    else:
+        query += " ORDER BY quantity_remaining ASC"
+
+    # Execute query
+    rows = db_query(query, tuple(params))
+
+    return render_template(
+        "stock_low.html",
+        user=session.get("user"),
+        role=session.get("role"),
+        rows=rows,
+        search=search,
+        sort=sort,
+        start_date=start_date,
+        end_date=end_date
+    )
+
+
+# ---------------------------------------------------------
+# PDF EXPORT FOR LOW STOCK
+# ---------------------------------------------------------
+@app.route("/stock/low/pdf")
+def stock_low_pdf():
+    threshold = 10
+
+    rows = db_query("""
+        SELECT *
+        FROM Stock
+        WHERE quantity_remaining <= ?
+        ORDER BY quantity_remaining ASC
+    """, (threshold,))
+
+    # Build simple HTML content
+    html = """
+    <html>
+    <head>
+    <style>
+    body { font-family: Arial; }
+    h2 { text-align: center; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid #333; padding: 6px; font-size: 12px; }
+    th { background: #eee; }
+    </style>
+    </head>
+    <body>
+    <h2>Low Stock Report</h2>
+    <table>
+    <tr>
+        <th>Date</th>
+        <th>Drug Name</th>
+        <th>Category</th>
+        <th>Qty Remaining</th>
+        <th>Sales Price</th>
+    </tr>
+    """
+
+    for r in rows:
+        html += f"""
+        <tr>
+            <td>{r['date']}</td>
+            <td>{r['drug_name']}</td>
+            <td>{r['categories']}</td>
+            <td>{r['quantity_remaining']}</td>
+            <td>{r['sales_price']}</td>
+        </tr>
+        """
+
+    html += "</table></body></html>"
+
+    # Convert HTML to PDF using wkhtmltopdf (Render supports this)
+    import pdfkit
+
+    pdf_bytes = pdfkit.from_string(html, False)
+
+    pdf_base64 = base64.b64encode(pdf_bytes).decode("utf-8")
+
+    return jsonify({"pdf": pdf_base64})
+
+# ---------------------------------------------------------
 # DRUG LIST
 # ---------------------------------------------------------
 import os
@@ -1060,6 +1218,9 @@ import qrcode
 import io
 import base64
 
+# ---------------------------------------------------------
+# BILL CALCULATOR PAGE (GET)
+# ---------------------------------------------------------
 @app.route("/inpatient/bill/calculator", methods=["GET"])
 def inpatient_bill_page():
     if "user" not in session:
@@ -1072,6 +1233,7 @@ def inpatient_bill_page():
             role=session.get("role")
         ), 403
 
+    # Load all unique patients for autocomplete
     patients = db_query("SELECT DISTINCT patient_name FROM InpatientData ORDER BY patient_name ASC")
     patients = [p["patient_name"] for p in patients]
 
@@ -1086,6 +1248,9 @@ def inpatient_bill_page():
     )
 
 
+# ---------------------------------------------------------
+# FETCH ALL DATES FOR A PATIENT (AJAX)
+# ---------------------------------------------------------
 @app.route("/inpatient/bill/get_dates")
 def inpatient_get_dates():
     patient = request.args.get("patient")
@@ -1105,11 +1270,38 @@ def inpatient_get_dates():
     return {"dates": dates}
 
 
-@app.route("/inpatient/bill/calculate", methods=["POST"])
+# ---------------------------------------------------------
+# BILL CALCULATION (GET + POST MERGED)
+# ---------------------------------------------------------
+@app.route("/inpatient/bill/calculate", methods=["GET", "POST"])
 def inpatient_bill_calculate():
     if "user" not in session:
         return redirect("/login")
 
+    if not has_permission("inpatient"):
+        return render_template(
+            "no_access.html",
+            user=session.get("user"),
+            role=session.get("role")
+        ), 403
+
+    # --------------------------
+    # GET → Show calculator page
+    # --------------------------
+    if request.method == "GET":
+        patients = db_query("SELECT DISTINCT patient_name FROM InpatientData ORDER BY patient_name ASC")
+        patients = [p["patient_name"] for p in patients]
+
+        return render_template(
+            "bill_calculator.html",
+            user=session.get("user"),
+            role=session.get("role"),
+            patients=patients
+        )
+
+    # --------------------------
+    # POST → Perform calculation
+    # --------------------------
     patient = request.form.get("patient")
     admission = request.form.get("admission_date")
     discharge = request.form.get("discharge_date")
@@ -1129,7 +1321,7 @@ def inpatient_bill_calculate():
     generated_date = dt.datetime.now().strftime("%d-%b-%Y %I:%M %p")
     invoice_number = f"INV-{dt.datetime.now().strftime('%Y%m%d%H%M%S')}"
 
-    # Save invoice number
+    # Save invoice number to all rows in the range
     db_execute("""
         UPDATE InpatientData
         SET invoice_number = ?
@@ -1138,7 +1330,9 @@ def inpatient_bill_calculate():
         AND date <= ?
     """, (invoice_number, patient, admission, discharge))
 
-    # ⭐ OPTIMIZED QR CODE BLOCK
+    # --------------------------
+    # QR CODE GENERATION
+    # --------------------------
     invoice_url = f"http://yourserver.com/invoice/{invoice_number}"
 
     qr = qrcode.QRCode(
@@ -1172,6 +1366,10 @@ def inpatient_bill_calculate():
         qr_code=qr_base64
     )
 
+
+# ---------------------------------------------------------
+# PATIENT HISTORY PAGE
+# ---------------------------------------------------------
 @app.route("/inpatient/history")
 def inpatient_history():
     patient = request.args.get("patient")

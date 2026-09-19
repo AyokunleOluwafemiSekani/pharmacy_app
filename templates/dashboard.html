@@ -219,6 +219,12 @@
         <i class="fa-solid fa-house"></i> Dashboard
     </a>
 
+    {% if has_permission("inpatient_bill") %}
+    <a href="/inpatient/bill/calculate" class="{% if request.path == '/inpatient/bill/calculate' %}active{% endif %}">
+        <i class="fa-solid fa-calculator"></i> Bill Calculator
+    </a>
+    {% endif %}
+    
     {% if has_permission("pos") %}
     <a href="/pos" class="{% if request.path == '/pos' %}active{% endif %}">
         <i class="fa-solid fa-prescription-bottle-medical"></i> POS / Dispense
@@ -260,6 +266,13 @@
         <i class="fa-solid fa-chart-line"></i> KPI Dashboard
     </a>
     {% endif %}
+   
+    {% if has_permission("low_stock") %}
+    <a href="/stock/low" class="{% if request.path == '/stock/low' %}active{% endif %}">
+        <i class="fa-solid fa-triangle-exclamation"></i> Low Stock
+    </a>
+    {% endif %}
+
 
     {% if has_permission("admin_panel") %}
     <a href="/admin/dashboard" class="{% if request.path == '/admin/dashboard' %}active{% endif %}">
