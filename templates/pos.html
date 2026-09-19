@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
 <meta charset="UTF-8">
 <title>POS – Pharmacy Billing</title>
@@ -30,6 +29,7 @@
     --dark-text: #f0f0f0;
     --dark-border: #444;
 }
+
 /* ACTIVE LINK HIGHLIGHT + GLOW */
 .sidebar a.active {
     background: var(--hospital-blue);
@@ -38,6 +38,7 @@
     box-shadow: inset 0 0 10px rgba(255,255,255,0.4),
                 0 0 12px rgba(76,125,126,0.8);
 }
+
 /* TOP BAR ROLE INDICATOR */
 .role-indicator {
     position: fixed;
@@ -75,7 +76,8 @@ body {
     overflow-x: hidden;
     transition: background 0.3s ease, color 0.3s ease;
 }
-./* ROLE BADGES WITH COLORS + GLOW + PULSE */
+
+/* ROLE BADGES WITH COLORS + GLOW + PULSE */
 .role-badge {
     display: inline-block;
     padding: 8px 16px;
@@ -88,7 +90,7 @@ body {
 
 /* Admin = Red */
 .role-admin {
-     background: #2F4F4F;
+    background: #2F4F4F;
     box-shadow: 0 0 12px rgba(47,79,79,0.7);
 }
 
@@ -116,7 +118,6 @@ body {
     50% { transform: scale(1.05); box-shadow: 0 0 18px rgba(255,255,255,0.7); }
     100% { transform: scale(1); box-shadow: 0 0 12px rgba(255,255,255,0.4); }
 }
-
 
 /* Dark mode body */
 body.dark-mode {
@@ -444,7 +445,7 @@ body.dark-mode .modal-box {
         padding: 15px;
     }
 
-    .pos-card {
+    pos-card {
         padding: 15px;
     }
 }
@@ -455,6 +456,10 @@ body.dark-mode .modal-box {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 
 <script>
+// =========================
+//  DATA INITIALIZATION
+// =========================
+
 const drugData = {{ drugs|tojson }};
 const stockData = {{ stock|tojson }};
 
@@ -468,12 +473,46 @@ for (const s of stockData) {
     stockIndex[s["drug_name"]] = s;
 }
 
-function buildDrugOptions() {
-    return drugData.map(d => ({
-        id: d["drug_name"],
-        text: d["drug_name"]
-    }));
+// =========================
+//  TRANSACTION ID AUTO-REFRESH
+// =========================
+
+function refreshTransactionID() {
+    $.get("/next_tid", function(data) {
+        $("#tidValue").text(data.next_tid);
+        $("#transactionID").val(data.next_tid);
+    });
 }
+setInterval(refreshTransactionID, 5000);
+
+// =========================
+//  STRICT DRUG CONTROL
+// =========================
+
+function enforceDrugControl(row) {
+    const drug = $("#drug_" + row).val();
+
+    const fields = [
+        "#qty_", "#price_", "#total_", "#cost_",
+        "#costTotal_", "#remain_"
+    ];
+
+    for (let f of fields) {
+        let input = $(f + row);
+        if (!drug) {
+            input.val("");
+            input.prop("readonly", true);
+        } else {
+            if (f === "#qty_") {
+                input.prop("readonly", false);
+            }
+        }
+    }
+}
+
+// =========================
+//  BALANCE + FILL ROW
+// =========================
 
 function getLatestBalance(drugName) {
     return stockIndex[drugName]?.["quantity_remaining"] ??
@@ -482,6 +521,8 @@ function getLatestBalance(drugName) {
 
 function fillRow(row) {
     const drugName = $("#drug_" + row).val();
+    enforceDrugControl(row);
+
     const qty = parseFloat($("#qty_" + row).val());
 
     if (!drugName) {
@@ -510,6 +551,32 @@ function fillRow(row) {
     updateSummary();
 }
 
+// =========================
+//  ENTER KEY → NEXT ROW
+// =========================
+
+$(document).on("keydown", "input, select", function(e) {
+    if (e.key === "Enter") {
+        e.preventDefault();
+
+        let id = $(this).attr("id");
+        if (!id) return;
+
+        let parts = id.split("_");
+        let row = parseInt(parts[1]);
+        let nextRow = row + 1;
+
+        let nextDrug = $("#drug_" + nextRow);
+        if (nextDrug.length) {
+            nextDrug.select2("open");
+        }
+    }
+});
+
+// =========================
+//  SUMMARY
+// =========================
+
 function getConsultationFee() {
     const hour = new Date().getHours();
     return (hour >= 8 && hour < 17) ? 2000 : 3000;
@@ -533,10 +600,9 @@ function updateSummary() {
     );
 }
 
-function deleteRow(btn) {
-    $(btn).closest("tr").remove();
-    updateSummary();
-}
+// =========================
+//  ADD ROW
+// =========================
 
 let rowCount = 10;
 
@@ -558,12 +624,27 @@ function addRow() {
 `);
 
     $("#drug_" + rowCount).select2({
-        data: buildDrugOptions(),
+        data: drugData.map(d => ({ id: d["drug_name"], text: d["drug_name"] })),
         placeholder: "Select Drug",
         allowClear: true,
         width: "100%"
     }).on("change", () => fillRow(rowCount));
+
+    enforceDrugControl(rowCount);
 }
+
+// =========================
+//  DELETE ROW
+// =========================
+
+function deleteRow(btn) {
+    $(btn).closest("tr").remove();
+    updateSummary();
+}
+
+// =========================
+//  VALIDATION + SUBMISSION
+// =========================
 
 function validatePOS() {
     let hasEntries = false;
@@ -648,7 +729,10 @@ function submitInpatientName() {
     $("#posForm").submit();
 }
 
-/* Sidebar toggle with smooth animation and outside click close */
+// =========================
+//  SIDEBAR + DARK MODE
+// =========================
+
 $(document).ready(function () {
     const sidebar = $("#sidebar");
     const main = $("#mainContent");
@@ -685,7 +769,7 @@ $(document).ready(function () {
 
     $(".drug-select").each(function () {
         $(this).select2({
-            data: buildDrugOptions(),
+            data: drugData.map(d => ({ id: d["drug_name"], text: d["drug_name"] })),
             placeholder: "Select Drug",
             allowClear: true,
             width: "100%"
@@ -695,20 +779,26 @@ $(document).ready(function () {
         });
     });
 
-    // Dark mode toggle
     $("#darkModeToggle").click(function () {
         $("body").toggleClass("dark-mode");
     });
 });
 </script>
-
 </head>
 
 <body>
 
 <!-- TOP CONTROLS -->
 <div id="topControls">
+    <div id="tidPreview"
+         style="background:#2F4F4F; color:white; padding:10px 16px;
+                border-radius:8px; font-size:16px; font-weight:600;
+                box-shadow:0 3px 10px rgba(0,0,0,0.25);">
+        Transaction ID: <span id="tidValue">{{ next_tid }}</span>
+    </div>
+
     <div id="totalBox">GRAND TOTAL: ₦0.00</div>
+
     <button class="top-btn" type="button" onclick="openPatientTypePopup()">SUBMIT</button>
     <button class="top-btn" type="button" onclick="window.location.href='/inpatient/bill/calculator?patient={{ patient }}'">Bill Calculator</button>
     <button class="top-btn" type="button" onclick="window.location.href='/last_transaction'">View Last Transaction</button>
@@ -723,10 +813,10 @@ $(document).ready(function () {
 
         <!-- ROLE BADGE -->
         <span class="role-badge
-            {% if role == 'Admin' %}role-admin{% endif %}
-            {% if role == 'Auditor' %}role-auditor{% endif %}
-            {% if role == 'Pharmacist' %}role-pharmacist{% endif %}
-            {% if role == 'Administrator' %}role-administrator{% endif %}
+        {% if role == 'Admin' %}role-admin{% endif %}
+        {% if role == 'Auditor' %}role-auditor{% endif %}
+        {% if role == 'Pharmacist' %}role-pharmacist{% endif %}
+        {% if role == 'Administrator' %}role-administrator{% endif %}
         ">
             {{ role }}
         </span>
@@ -746,8 +836,6 @@ $(document).ready(function () {
     </a>
     {% endif %}
 
-
-
     {% if has_permission("pos") %}
     <a href="/pos" class="{% if request.path == '/pos' %}active{% endif %}">
         <i class="fa-solid fa-prescription-bottle-medical"></i> POS / Dispense
@@ -765,7 +853,6 @@ $(document).ready(function () {
         <i class="fa-solid fa-triangle-exclamation"></i> Low Stock
     </a>
     {% endif %}
-
 
     {% if has_permission("drug_list") %}
     <a href="/druglist" class="{% if request.path == '/druglist' %}active{% endif %}">
@@ -812,18 +899,17 @@ $(document).ready(function () {
 <!-- MAIN CONTENT -->
 <div id="mainContent">
     <div class="pos-card">
-
         <h2>POS – Pharmacy Billing</h2>
-<button class="add-row-btn" type="button" onclick="addRow()">
-    <i class="fa-solid fa-plus"></i> Add Row
-</button>
 
+        <button class="add-row-btn" type="button" onclick="addRow()">
+            <i class="fa-solid fa-plus"></i> Add Row
+        </button>
 
         <form id="posForm" method="POST" action="/pos/submit">
-
             <input type="hidden" name="customer_type" id="customerType">
             <input type="hidden" name="patient" id="patientName">
             <input type="hidden" id="drugsTotal" name="drugsTotal">
+            <input type="hidden" id="transactionID" name="transaction_id" value="{{ next_tid }}">
 
             <div class="table-wrapper">
                 <table>
@@ -840,7 +926,6 @@ $(document).ready(function () {
                             <th>Delete</th>
                         </tr>
                     </thead>
-
                     <tbody id="posBody">
                         {% for i in range(1, 11) %}
                         <tr>
@@ -849,7 +934,6 @@ $(document).ready(function () {
                                     <option></option>
                                 </select>
                             </td>
-
                             <td><input id="cat_{{i}}" name="cat_{{i}}" readonly></td>
                             <td><input id="qty_{{i}}" name="qty_{{i}}" onkeyup="fillRow({{i}})"></td>
                             <td><input id="price_{{i}}" name="price_{{i}}" readonly></td>
@@ -857,16 +941,13 @@ $(document).ready(function () {
                             <td><input id="cost_{{i}}" name="cost_{{i}}" readonly></td>
                             <td><input id="costTotal_{{i}}" name="costTotal_{{i}}" readonly></td>
                             <td><input id="remain_{{i}}" name="remain_{{i}}" readonly></td>
-
                             <td><button class="delete-btn" type="button" onclick="deleteRow(this)">Delete</button></td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
-
         </form>
-
     </div>
 </div>
 

@@ -704,7 +704,6 @@ def logout():
 # ---------------------------------------------------------
 # POS PAGE
 # ---------------------------------------------------------
-
 @app.route("/pos", methods=["GET"])
 def pos():
     if "user" not in session:
@@ -716,6 +715,9 @@ def pos():
             role=session.get("role")
         ), 403
 
+    # ⭐ Generate next transaction ID for preview
+    next_tid = generate_transaction_id()
+
     drugs = db_query("SELECT * FROM DrugList ORDER BY drug_name ASC")
     stock = db_query("SELECT * FROM Stock ORDER BY id DESC")
 
@@ -725,9 +727,12 @@ def pos():
         role=session.get("role"),
         drugs=drugs,
         stock=stock,
-        patient=""
+        patient="",
+        next_tid=next_tid   # ⭐ Pass to template
     )
-
+@app.route("/next_tid")
+def next_tid():
+    return {"next_tid": generate_transaction_id()}
 
 @app.route("/pos/success")
 def pos_success():
@@ -738,14 +743,32 @@ def pos_success():
 
 def generate_transaction_id():
     today_sql = datetime.now().strftime("%Y-%m-%d")
+    today_compact = today_sql.replace("-", "")
+
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
-    cur.execute("SELECT COUNT(*) AS count FROM Stock WHERE date = ?", (today_sql,))
-    count = cur.fetchone()["count"]
+
+    # Get the highest D-number for today
+    cur.execute("""
+        SELECT transaction_id 
+        FROM Stock 
+        WHERE date = ?
+        ORDER BY transaction_id DESC
+        LIMIT 1
+    """, (today_sql,))
+
+    row = cur.fetchone()
     conn.close()
-    suffix = count + 1
-    return f"{today_sql.replace('-', '')}-D{suffix}"
+
+    if row:
+        last_id = row["transaction_id"]     # e.g. "20260414-D8"
+        last_number = int(last_id.split("D")[1])
+        new_number = last_number + 1
+    else:
+        new_number = 1
+
+    return f"{today_compact}-D{new_number}"
 
 
 @app.route("/pos/submit", methods=["POST"])
