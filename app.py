@@ -753,18 +753,16 @@ def pos_success():
 # TRANSACTION ID GENERATOR (FIXED)
 # ---------------------------------------------------------
 def generate_transaction_id():
-    # Today in both formats
-    today_sql = datetime.now().strftime("%Y-%m-%d")   # e.g. "2026-04-14"
-    today_compact = today_sql.replace("-", "")        # e.g. "20260414"
+    today_sql = datetime.now().strftime("%Y-%m-%d")
+    today_compact = today_sql.replace("-", "")
 
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
-    # ⭐ Look at the LAST Stock row overall, not only by date
-    # This avoids issues when `date` column format is inconsistent
+    # ⭐ Look at the last Stock row overall
     cur.execute("""
-        SELECT transaction_id, date
+        SELECT transaction_id
         FROM Stock
         ORDER BY id DESC
         LIMIT 1
@@ -773,23 +771,21 @@ def generate_transaction_id():
     conn.close()
 
     if row:
-        last_tid = row["transaction_id"]  # e.g. "20260414-D8"
-        last_date = row["date"]          # e.g. "2026-04-14"
+        last_tid = row["transaction_id"]  # e.g. "20260414-D2"
 
-        # If last transaction is from today and matches pattern, continue sequence
         try:
-            last_prefix, last_suffix = last_tid.split("-D")
-            if last_prefix == today_compact and last_date == today_sql:
-                last_number = int(last_suffix)
+            prefix, suffix = last_tid.split("-D")
+            last_number = int(suffix)
+
+            # ⭐ Only check prefix, NOT the date column
+            if prefix == today_compact:
                 new_number = last_number + 1
             else:
-                # New day or mismatched date → start from D1 for today
                 new_number = 1
-        except Exception:
-            # If format is unexpected, safely start from D1
+
+        except:
             new_number = 1
     else:
-        # No previous transactions at all
         new_number = 1
 
     return f"{today_compact}-D{new_number}"
