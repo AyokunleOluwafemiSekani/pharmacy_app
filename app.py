@@ -814,7 +814,7 @@ def pos_submit():
             drug,
             stock_row["categories"],
             opening_balance,
-            "Sale",
+            "Dispensed",
             qty,
             remaining,
             stock_row["cost_price"],
@@ -2499,6 +2499,41 @@ def undo_transaction(transaction_id):
 
     return redirect(f"/last_transaction?message=Transaction+{transaction_id}+undone")
 
+@app.route("/last_transaction")
+def last_transaction():
+    if "user" not in session:
+        return redirect("/login")
+
+    transaction_id = session.get("last_transaction_id")
+    if not transaction_id:
+        return render_template("last_transaction.html", rows=[], transaction_id="N/A")
+
+    rows = db_query("""
+        SELECT
+            date AS "Date",
+            time AS "Time",
+            drug_name AS "DRUG NAME",
+            categories AS "Category",
+            opening_balance AS "Opening Balance",
+            transaction_type AS "Transaction Type",
+            quantity_sold AS "Quantity Sold",
+            quantity_remaining AS "qty Remaining",
+            cost_price AS "Cost Price",
+            sales_price AS "Sales Price",
+            customer_type AS "Customer Type",
+            bill AS "Bill",
+            sales_price_sum AS "Sales Price Sum",
+            sum_cost_value AS "Sum of Cost Price"
+        FROM Stock
+        WHERE transaction_id = ?
+        ORDER BY id ASC
+    """, (transaction_id,))
+
+    return render_template(
+        "last_transaction.html",
+        rows=rows,
+        transaction_id=transaction_id
+    )
 
 # ---------------------------------------------------------
 # RUN APP
