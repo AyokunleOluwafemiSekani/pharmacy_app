@@ -770,25 +770,38 @@ def pos_submit():
     patient = request.form.get("patient", "")
     cashier = session.get("user")
 
-    # ⭐ Generate ONE transaction ID for the entire sale
+    # One transaction ID for entire sale
     transaction_id = generate_transaction_id()
     session["last_transaction_id"] = transaction_id
 
-    cart = []  # store items for success page
+    cart = []
 
-    # Loop through POS rows (1–100)
+    # Loop through POS rows
     for i in range(1, 101):
         drug = request.form.get(f"drug_{i}")
         qty = request.form.get(f"qty_{i}")
         price = request.form.get(f"price_{i}")
         total = request.form.get(f"total_{i}")
 
-        if not drug or not qty or float(qty) <= 0:
+        if not drug or not qty:
             continue
 
-        qty = float(qty)
-        price = float(price)
-        total = float(total)
+        try:
+            qty = float(qty)
+            if qty <= 0:
+                continue
+        except:
+            continue
+
+        try:
+            price = float(price or 0)
+        except:
+            price = 0
+
+        try:
+            total = float(total or 0)
+        except:
+            total = price * qty
 
         cart.append({
             "drug": drug,
@@ -796,13 +809,18 @@ def pos_submit():
             "total": total
         })
 
-        # Fetch current stock
+        # Fetch stock row
         stock_row = db_query("SELECT * FROM DrugList WHERE drug_name = ?", (drug,))
         if not stock_row:
             continue
 
         stock_row = stock_row[0]
-        opening_balance = float(stock_row["starting_balance"])
+
+        # NULL‑safe values
+        opening_balance = float(stock_row["starting_balance"] or 0)
+        categories = stock_row["categories"] or ""
+        cost_price = float(stock_row["cost_price"] or 0)
+
         remaining = opening_balance - qty
 
         # Update DrugList balance
@@ -824,19 +842,19 @@ def pos_submit():
             datetime.now().strftime("%Y-%m-%d"),
             datetime.now().strftime("%H:%M:%S"),
             drug,
-            stock_row["categories"],
+            categories,
             opening_balance,
             "Dispensed",
             qty,
             remaining,
-            stock_row["cost_price"],
+            cost_price,
             price,
             customer_type,
             transaction_id,
             "",
             total,
             total,
-            stock_row["cost_price"] * qty
+            cost_price * qty
         ))
 
         # Insert into Transactions
@@ -848,12 +866,12 @@ def pos_submit():
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             drug, qty, price, total,
-            stock_row["cost_price"],
-            stock_row["cost_price"] * qty,
+            cost_price,
+            cost_price * qty,
             customer_type, patient, cashier
         ))
 
-        # ⭐ FLEXIBLE INPATIENT LOGIC
+        # Inpatient logging
         if "inpatient" in customer_type.lower():
             db_execute("""
                 INSERT INTO InpatientData (
@@ -866,7 +884,7 @@ def pos_submit():
                 datetime.now().strftime("%Y-%m-%d"),
                 drug,
                 patient,
-                stock_row["categories"],
+                categories,
                 price,
                 transaction_id,
                 total,
