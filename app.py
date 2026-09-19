@@ -258,51 +258,32 @@ def migrate_stock_from_excel():
 
     print("Stock imported.")
 
-def migrate_inpatient_from_excel():
-    df = load_sheet("Inpatient Data")
-    if df.empty:
-        print("InpatientData sheet empty or missing.")
-        return
-
-    rows = []
-    for _, row in df.iterrows():
-        rows.append((
-            str(row["Date"]).strip(),
-            str(row["Drug Name"]).strip(),
-            str(row["Patient Name"]).strip(),
-            str(row["Categories"]).strip(),
-            float(row["Sales Price"]),
-            str(row["Transaction ID"]).strip(),
-            float(row["Bill Total"]),
-            float(row["Qty Sold"])
-        ))
-
-def migrate_inpatient_from_excel():
-    df = load_sheet("Inpatient Data")
-
-    if df.empty:
-        print("InpatientData sheet empty or missing.")
-        return
-
-    rows = []
-
-    for _, row in df.iterrows():
-        rows.append((
-            str(row["Date"]).strip(),
-            str(row["Drug Name"]).strip(),
-            str(row["Patient Name"]).strip(),
-            str(row["Categories"]).strip(),
-            float(row["Sales Price"]),
-            str(row["Transaction ID"]).strip(),
-            float(row["Bill Total"]),
-            float(row["Qty Sold"])
-        ))
-
 def generate_invoice_number():
     now = datetime.now()
     return "INV-" + now.strftime("%Y%m%d%H%M%S")
 
-    invoice_number = generate_invoice_number()
+
+def migrate_inpatient_from_excel():
+    df = load_sheet("Inpatient Data")
+
+    if df.empty:
+        print("InpatientData sheet empty or missing.")
+        return
+
+    rows = []
+
+    for _, row in df.iterrows():
+        rows.append((
+            str(row["Date"]).strip(),
+            str(row["Drug Name"]).strip(),
+            str(row["Patient Name"]).strip(),
+            str(row["Categories"]).strip(),
+            float(row["Sales Price"]),
+            str(row["Transaction ID"]).strip(),
+            float(row["Bill Total"]),
+            float(row["Qty Sold"]),
+            generate_invoice_number()
+        ))
 
     db_insert_many("""
         INSERT INTO InpatientData (
@@ -317,20 +298,7 @@ def generate_invoice_number():
             invoice_number
         )
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    """, [
-        (
-            r[0],  # date
-            r[1],  # drug_name
-            r[2],  # patient_name
-            r[3],  # categories
-            r[4],  # sales_price
-            r[5],  # transaction_id
-            r[6],  # bill_total
-            r[7],  # qty_sold
-            invoice_number
-        )
-        for r in rows
-    ])
+    """, rows)
 
     print("InpatientData imported")
 
