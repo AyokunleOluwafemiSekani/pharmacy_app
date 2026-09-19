@@ -704,18 +704,22 @@ def logout():
 # ---------------------------------------------------------
 # POS PAGE
 # ---------------------------------------------------------
+# ---------------------------------------------------------
+# POS PAGE
+# ---------------------------------------------------------
 @app.route("/pos", methods=["GET"])
 def pos():
     if "user" not in session:
         return redirect("/login")
 
     if not has_permission("pos"):
-        return render_template("no_access.html",
+        return render_template(
+            "no_access.html",
             user=session.get("user"),
             role=session.get("role")
         ), 403
 
-    # ⭐ Generate next transaction ID for preview
+    # ⭐ Generate next transaction ID for preview (based on last Stock row)
     next_tid = generate_transaction_id()
 
     drugs = db_query("SELECT * FROM DrugList ORDER BY drug_name ASC")
@@ -728,11 +732,15 @@ def pos():
         drugs=drugs,
         stock=stock,
         patient="",
-        next_tid=next_tid   # ⭐ Pass to template
+        next_tid=next_tid
     )
+
+
 @app.route("/next_tid")
 def next_tid():
+    # Live auto-refresh preview
     return {"next_tid": generate_transaction_id()}
+
 
 @app.route("/pos/success")
 def pos_success():
@@ -741,50 +749,71 @@ def pos_success():
     return render_template("pos_success.html", cart=cart, transaction_id=transaction_id)
 
 
+# ---------------------------------------------------------
+# TRANSACTION ID GENERATOR (FIXED)
+# ---------------------------------------------------------
 def generate_transaction_id():
-    today_sql = datetime.now().strftime("%Y-%m-%d")
-    today_compact = today_sql.replace("-", "")
+    # Today in both formats
+    today_sql = datetime.now().strftime("%Y-%m-%d")   # e.g. "2026-04-14"
+    today_compact = today_sql.replace("-", "")        # e.g. "20260414"
 
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
-    # Get the highest D-number for today
+    # ⭐ Look at the LAST Stock row overall, not only by date
+    # This avoids issues when `date` column format is inconsistent
     cur.execute("""
-        SELECT transaction_id 
-        FROM Stock 
-        WHERE date = ?
-        ORDER BY transaction_id DESC
+        SELECT transaction_id, date
+        FROM Stock
+        ORDER BY id DESC
         LIMIT 1
-    """, (today_sql,))
-
+    """)
     row = cur.fetchone()
     conn.close()
 
     if row:
-        last_id = row["transaction_id"]     # e.g. "20260414-D8"
-        last_number = int(last_id.split("D")[1])
-        new_number = last_number + 1
+        last_tid = row["transaction_id"]  # e.g. "20260414-D8"
+        last_date = row["date"]          # e.g. "2026-04-14"
+
+        # If last transaction is from today and matches pattern, continue sequence
+        try:
+            last_prefix, last_suffix = last_tid.split("-D")
+            if last_prefix == today_compact and last_date == today_sql:
+                last_number = int(last_suffix)
+                new_number = last_number + 1
+            else:
+                # New day or mismatched date → start from D1 for today
+                new_number = 1
+        except Exception:
+            # If format is unexpected, safely start from D1
+            new_number = 1
     else:
+        # No previous transactions at all
         new_number = 1
 
     return f"{today_compact}-D{new_number}"
 
 
+# ---------------------------------------------------------
+# POS SUBMIT
+# ---------------------------------------------------------
 @app.route("/pos/submit", methods=["POST"])
 def pos_submit():
     if "user" not in session:
         return redirect("/login")
 
     if not has_permission("pos"):
-        return render_template("no_access.html",
+        return render_template(
+            "no_access.html",
             user=session.get("user"),
             role=session.get("role")
         ), 403
 
     role = session.get("role")
     if role in ["Director", "Administrator", "Auditor", "HIM Officer"]:
-        return render_template("no_access.html",
+        return render_template(
+            "no_access.html",
             user=session.get("user"),
             role=session.get("role")
         ), 403
@@ -793,7 +822,7 @@ def pos_submit():
     patient = request.form.get("patient", "")
     cashier = session.get("user")
 
-    # One transaction ID for entire sale
+    # ⭐ One transaction ID for entire sale, based on last Stock row
     transaction_id = generate_transaction_id()
     session["last_transaction_id"] = transaction_id
 
@@ -832,7 +861,7 @@ def pos_submit():
             "total": total
         })
 
-        # Fetch stock row
+        # Fetch drug row
         stock_row = db_query("SELECT * FROM DrugList WHERE drug_name = ?", (drug,))
         if not stock_row:
             continue
