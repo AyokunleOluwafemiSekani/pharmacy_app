@@ -445,7 +445,7 @@ body.dark-mode .modal-box {
         padding: 15px;
     }
 
-    pos-card {
+    .pos-card {
         padding: 15px;
     }
 }
@@ -552,24 +552,129 @@ function fillRow(row) {
 }
 
 // =========================
-//  ENTER KEY → NEXT ROW
+//  FIELD ORDER FOR GRID NAV
+// =========================
+
+const fieldOrder = ["drug", "cat", "qty", "price", "total", "cost", "costTotal", "remain"];
+
+function getNextField(field) {
+    const idx = fieldOrder.indexOf(field);
+    if (idx === -1) return field;
+    return fieldOrder[Math.min(fieldOrder.length - 1, idx + 1)];
+}
+
+function getPrevField(field) {
+    const idx = fieldOrder.indexOf(field);
+    if (idx === -1) return field;
+    return fieldOrder[Math.max(0, idx - 1)];
+}
+
+// =========================
+//  SPREADSHEET-STYLE NAVIGATION
 // =========================
 
 $(document).on("keydown", "input, select", function(e) {
+    let id = $(this).attr("id");
+    if (!id) return;
+
+    let parts = id.split("_");
+    let field = parts[0];
+    let row = parseInt(parts[1]);
+
+    // ENTER: move down same column
     if (e.key === "Enter") {
         e.preventDefault();
-
-        let id = $(this).attr("id");
-        if (!id) return;
-
-        let parts = id.split("_");
-        let row = parseInt(parts[1]);
         let nextRow = row + 1;
-
-        let nextDrug = $("#drug_" + nextRow);
-        if (nextDrug.length) {
-            nextDrug.select2("open");
+        let target = $("#" + field + "_" + nextRow);
+        if (target.length) {
+            target.focus();
+            if (field === "drug") target.select2("open");
         }
+        return;
+    }
+
+    // SHIFT+ENTER: move up same column
+    if (e.key === "Enter" && e.shiftKey) {
+        e.preventDefault();
+        let prevRow = row - 1;
+        let target = $("#" + field + "_" + prevRow);
+        if (target.length) {
+            target.focus();
+            if (field === "drug") target.select2("open");
+        }
+        return;
+    }
+
+    // Arrow Down: same column, next row
+    if (e.key === "ArrowDown") {
+        e.preventDefault();
+        let nextRow = row + 1;
+        let target = $("#" + field + "_" + nextRow);
+        if (target.length) {
+            target.focus();
+            if (field === "drug") target.select2("open");
+        }
+        return;
+    }
+
+    // Arrow Up: same column, previous row
+    if (e.key === "ArrowUp") {
+        e.preventDefault();
+        let prevRow = row - 1;
+        let target = $("#" + field + "_" + prevRow);
+        if (target.length) {
+            target.focus();
+            if (field === "drug") target.select2("open");
+        }
+        return;
+    }
+
+    // Arrow Right: next field same row
+    if (e.key === "ArrowRight") {
+        e.preventDefault();
+        let nextField = getNextField(field);
+        let target = $("#" + nextField + "_" + row);
+        if (target.length) {
+            target.focus();
+            if (nextField === "drug") target.select2("open");
+        }
+        return;
+    }
+
+    // Arrow Left: previous field same row
+    if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        let prevField = getPrevField(field);
+        let target = $("#" + prevField + "_" + row);
+        if (target.length) {
+            target.focus();
+            if (prevField === "drug") target.select2("open");
+        }
+        return;
+    }
+
+    // TAB: next field same row
+    if (e.key === "Tab" && !e.shiftKey) {
+        e.preventDefault();
+        let nextField = getNextField(field);
+        let target = $("#" + nextField + "_" + row);
+        if (target.length) {
+            target.focus();
+            if (nextField === "drug") target.select2("open");
+        }
+        return;
+    }
+
+    // SHIFT+TAB: previous field same row
+    if (e.key === "Tab" && e.shiftKey) {
+        e.preventDefault();
+        let prevField = getPrevField(field);
+        let target = $("#" + prevField + "_" + row);
+        if (target.length) {
+            target.focus();
+            if (prevField === "drug") target.select2("open");
+        }
+        return;
     }
 });
 
