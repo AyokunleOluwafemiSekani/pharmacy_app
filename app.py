@@ -790,6 +790,29 @@ def generate_transaction_id():
 
     return f"{today_compact}-D{new_number}"
 
+@app.route("/debug/stock")
+def debug_stock():
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT id, transaction_id, date
+        FROM Stock
+        ORDER BY id DESC
+        LIMIT 10
+    """)
+
+    rows = cur.fetchall()
+    conn.close()
+
+    output = "<h2>Last 10 Stock Rows</h2><pre>"
+    for r in rows:
+        output += f"ID: {r['id']}, TID: {r['transaction_id']}, DATE: {r['date']}\n"
+    output += "</pre>"
+
+    return output
+
 
 # ---------------------------------------------------------
 # POS SUBMIT
